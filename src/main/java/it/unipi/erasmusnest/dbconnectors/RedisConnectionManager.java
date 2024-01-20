@@ -12,6 +12,10 @@ public class RedisConnectionManager extends ConnectionManager{
         super("localhost", 6379);
     }
 
+    //CRUD OPERATIONS
+
+    // READ
+
     public String getPassword(String email) {
         String value = null;
         try(Jedis jedis = new Jedis(super.getHost(), super.getPort())) {
@@ -33,7 +37,94 @@ public class RedisConnectionManager extends ConnectionManager{
         return value;
     }
 
-    public boolean addUser(String email, String password) {
+    public ArrayList<Reservation> getReservationsForApartment(Long houseId) {
+        ArrayList<Reservation> reservations = new ArrayList<>();
+
+        try(Jedis jedis = new Jedis(super.getHost(), super.getPort())) {
+            // Specify the houseId you want to search for
+            String houseIdToSearch = houseId.toString();
+
+            // key design: <entity>:<userEmail>:<houseId>:<startYear>:<startMonth>:<numberOfMonths>:<dateTime>
+
+            // Use the KEYS command to get all keys matching the pattern
+            Set<String> keys = jedis.keys("reservation:*:" + houseIdToSearch + ":*:*:*:timestamp");
+
+            for (String key : keys) {
+                String[] keyParts = key.split(":");
+                reservations.add(new Reservation(keyParts[1], keyParts[2], Integer.parseInt(keyParts[3]), Integer.parseInt(keyParts[4]), Integer.parseInt(keyParts[5])));
+            }
+        } catch (Exception e) {
+            System.out.println("Connection problem: " + e.getMessage());
+            new AlertDialogGraphicManager("Redis connection failed").show();
+        }
+
+        return reservations;
+    }
+
+    public ArrayList<Reservation> getReservationsForUser(String  userEmail) {
+        ArrayList<Reservation> reservations = new ArrayList<>();
+
+        try(Jedis jedis = new Jedis(super.getHost(), super.getPort())) {
+
+            // key design: <entity>:<userEmail>:<houseId>:<startYear>:<startMonth>:<numberOfMonths>:<dateTime>
+
+            // Use the KEYS command to get all keys matching the pattern
+            String subKey = "reservation:" + userEmail + ":*:*:*:*:";
+            Set<String> keys = jedis.keys(subKey + "timestamp");
+
+            for (String key : keys) {
+
+                // remove "timestamp" at the end of the key
+                String subK = key.substring(0, key.length() - 9);
+
+                ArrayList<String> attributesValues = getAttributesForReservation(subK);
+
+                String[] keyParts = key.split(":");
+                reservations.add(new Reservation(keyParts[1], keyParts[2], Integer.parseInt(keyParts[3]),
+                        Integer.parseInt(keyParts[4]), Integer.parseInt(keyParts[5]),
+                        java.time.LocalDateTime.parse(attributesValues.get(0)),
+                        attributesValues.get(1), attributesValues.get(2)));
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Connection problem: " + e.getMessage());
+            new AlertDialogGraphicManager("Redis connection failed").show();
+        }
+
+        return reservations;
+    }
+
+    public ArrayList<String> getAttributesForReservation(String subKey) {
+
+        ArrayList<String> attributes = new ArrayList<>();
+        attributes.add("timestamp");
+        attributes.add("city");
+        attributes.add("apartmentImage");
+
+        ArrayList<String> values = new ArrayList<>();
+
+        try(Jedis jedis = new Jedis(super.getHost(), super.getPort())) {
+
+            for (String attribute : attributes) {
+                Set<String> keys = jedis.keys(subKey + attribute);
+                String key = keys.iterator().next();
+                String value = jedis.get(key);
+                values.add(value);
+            }
+
+        } catch (Exception e) {
+            System.out.println("Connection problem: " + e.getMessage());
+            new AlertDialogGraphicManager("Redis connection failed").show();
+        }
+
+        return values;
+    }
+
+
+    // CREATE
+
+    public void addUser(String email, String password) {
 
         boolean availableUsername = true;
 
@@ -61,15 +152,10 @@ public class RedisConnectionManager extends ConnectionManager{
                 System.out.println("Connection problem: " + e.getMessage());
                 // Commentoo altrimenti crasha
                 // new AlertDialogGraphicManager("Redis connection failed").show();
-                return false;
             }
         }
 
-        return availableUsername;
-
     }
-
-
     public void addReservation(String userEmail, String houseId, String startYear, String startMonth, String numberOfMonths) {
 
         try(Jedis jedis = new Jedis(super.getHost(), super.getPort())) {
@@ -126,85 +212,42 @@ public class RedisConnectionManager extends ConnectionManager{
         //return true; // to modify in order to return the operation esit
     }
 
-    public ArrayList<Reservation> getReservationsForApartment(Long houseId) {
-        ArrayList<Reservation> reservations = new ArrayList<>();
+    // UPDATE
 
+    public boolean updateUserPassword(String email, String password) {
         try(Jedis jedis = new Jedis(super.getHost(), super.getPort())) {
-            // Specify the houseId you want to search for
-            String houseIdToSearch = houseId.toString();
-
-            // key design: <entity>:<userEmail>:<houseId>:<startYear>:<startMonth>:<numberOfMonths>:<dateTime>
-
-            // Use the KEYS command to get all keys matching the pattern
-            Set<String> keys = jedis.keys("reservation:*:" + houseIdToSearch + ":*:*:*:timestamp");
-
-
-            for (String key : keys) {
-                String[] keyParts = key.split(":");
-                reservations.add(new Reservation(keyParts[1], keyParts[2], Integer.parseInt(keyParts[3]), Integer.parseInt(keyParts[4]), Integer.parseInt(keyParts[5])));
-            }
+            // key design: <entity>:<email>:<attribute>
+            // entity: user
+            // attribute: password
+            String attribute = "password";
+            String key = "user:" + email + ":" + attribute;
+            // set the key
+            jedis.set(key, password);
+            // jedis.close(); // not needed with try-with-resources
+            return true;
         } catch (Exception e) {
             System.out.println("Connection problem: " + e.getMessage());
             new AlertDialogGraphicManager("Redis connection failed").show();
         }
-
-        return reservations;
+        return false;
     }
 
-    public ArrayList<Reservation> getReservationsForUser(String  userEmail) {
-        ArrayList<Reservation> reservations = new ArrayList<>();
+    // DELETE
 
+    public void deleteUser(String email) {
         try(Jedis jedis = new Jedis(super.getHost(), super.getPort())) {
-
-            // key design: <entity>:<userEmail>:<houseId>:<startYear>:<startMonth>:<numberOfMonths>:<dateTime>
-
-            // Use the KEYS command to get all keys matching the pattern
-            String subKey = "reservation:" + userEmail + "::*:*:*:*:";
-            Set<String> keys = jedis.keys(subKey + "timestamp");
-
-            for (String key : keys) {
-
-                ArrayList<String> attributesValues = getAttributesForReservation(subKey);
-
-                String[] keyParts = key.split(":");
-                reservations.add(new Reservation(keyParts[1], keyParts[2], Integer.parseInt(keyParts[3]),
-                        Integer.parseInt(keyParts[4]), Integer.parseInt(keyParts[5]),
-                        java.time.LocalDateTime.parse(attributesValues.get(0)),
-                        attributesValues.get(1), attributesValues.get(2)));
-
-            }
+            // key design: <entity>:<email>:<attribute>
+            // entity: user
+            // attribute: password
+            String attribute = "password";
+            String key = "user:" + email + ":" + attribute;
+            // delete the key
+            jedis.del(key);
+            // jedis.close(); // not needed with try-with-resources
         } catch (Exception e) {
             System.out.println("Connection problem: " + e.getMessage());
             new AlertDialogGraphicManager("Redis connection failed").show();
         }
-
-        return reservations;
-    }
-
-    public ArrayList<String> getAttributesForReservation(String subKey) {
-
-        ArrayList<String> attributes = new ArrayList<>();
-        attributes.add("timestamp");
-        attributes.add("city");
-        attributes.add("apartmentImage");
-
-        ArrayList<String> values = new ArrayList<>();
-
-        try(Jedis jedis = new Jedis(super.getHost(), super.getPort())) {
-
-            for(int i=0; i<attributes.size(); i++) {
-                String attribute = attributes.get(i);
-                String key = subKey + attribute;
-                String value = jedis.get(key);
-                values.add(value);
-            }
-
-        } catch (Exception e) {
-            System.out.println("Connection problem: " + e.getMessage());
-            new AlertDialogGraphicManager("Redis connection failed").show();
-        }
-
-        return values;
     }
 
 }

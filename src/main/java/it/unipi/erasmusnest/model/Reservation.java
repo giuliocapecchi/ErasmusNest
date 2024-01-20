@@ -96,4 +96,18 @@ public class Reservation {
     public void setApartmentImage(String apartmentImage) {
         this.apartmentImage = apartmentImage;
     }
+
+    @Override
+    public String toString() {
+        return "Reservation{" +
+                "studentEmail='" + studentEmail + '\'' +
+                ", apartmentId='" + apartmentId + '\'' +
+                ", startYear=" + startYear +
+                ", startMonth=" + startMonth +
+                ", numberOfMonths=" + numberOfMonths +
+                ", timestamp=" + timestamp +
+                ", city='" + city + '\'' +
+                ", apartmentImage='" + apartmentImage + '\'' +
+                '}';
+    }
 }
