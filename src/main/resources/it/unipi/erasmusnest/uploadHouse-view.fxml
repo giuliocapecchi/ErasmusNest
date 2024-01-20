@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.erasmusnest.controllers.UploadHouseController">
+    <ScrollPane fitToWidth="true" fitToHeight="true" >
+        <VBox alignment="TOP_LEFT" spacing="10" style="-fx-border-color: orange; -fx-border-width: 2px; -fx-padding: 10px;">
+            <Label text="House Name:" />
+            <TextField fx:id="houseNameTextField" />
+            <Label text="Picture Url:" />
+            <TextField fx:id="pictureUrlTextField" />
+            <Label text="Accommodates:" />
+            <TextField fx:id="accommodatesTextField" />
+            <Label text="Bathrooms:" />
+            <TextField fx:id="bathroomsTextField" />
+            <Label text="Beds:" />
+            <TextField fx:id="bedsTextField" />
+            <Label text="Price:" />
+            <TextField fx:id="priceTextField" />
+            <Label text="Neighborhood:" />
+            <TextField fx:id="neighborhoodTextField" />
+            <Label text="Latitude:" />
+            <TextField fx:id="latitudeTextField" />
+            <Label text="Longitude:" />
+            <TextField fx:id="longitudeTextField" />
+            <Button fx:id="updateButton" text="Upload" onAction="#onUploadButtonClick" style="-fx-background-color: orange; -fx-text-fill: white; -fx-padding: 5px 10px;" />
+            <!-- Aggiungi il bottone per tornare alla pagina precedente -->
+            <Button text="Back" onAction="#onBackButtonClick" style="-fx-background-color: orange; -fx-text-fill: white; -fx-padding: 5px 10px;" />
+        </VBox>
+    </ScrollPane>
+</StackPane>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane fx:id="rootPane" prefHeight="200" prefWidth="200" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.erasmusnest.controllers.AnalyticsController">
+    <BorderPane prefHeight="266.0" prefWidth="306.0">
+        <top>
+            <Label fx:id="title" alignment="CENTER" contentDisplay="CENTER" prefHeight="29.0" prefWidth="121.0" style="-fx-background-color: #ff4700; -fx-font-weight: bold;" text="Admin analytics page" textAlignment="CENTER" textFill="#ffffff" BorderPane.alignment="CENTER" />
+        </top>
+
+        <center>
+            <VBox alignment="TOP_CENTER" BorderPane.alignment="TOP_CENTER">
+                <!--- hbox analytic 1 -->
+                <HBox alignment="CENTER_LEFT" style="-fx-border-color: red; -fx-border-width: 3;">
+                    <VBox.margin>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                    </VBox.margin>
+                    <VBox fx:id="vboxQuery">
+                        <Label alignment="CENTER" style="-fx-font-weight: bold;" text="Query:" textFill="#093400">
+                     <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </VBox.margin></Label>
+                        <Label text="rega er traffik spinge i chili d'erba da quanno c'ha 15 anni quindi non scrivete cazzate porco d*o nel mio dm non lo sporcate con le vostre parole stupide brutti bitch ass nigga traffik è il re della trap spinge i chili noi non è che stamo a fa i repperini che se svejamo la mattina e famo i repperini capito questo è trap for real tutte le canzoni che scrivemo sono la nostra vita hai capito gallagher e traffik viviamo in un film er traffik l'hanno arrestato capito perchè c'aveva i chili non sapete quanto me mancherà stare a casa cor traffik a trappà tutti i giorni in casa sua capito non sapete quanto me mancherà er traffik tutte le cose che abbiamo passato le risate tutte le volte che ve avemo preso per il culo a tutti voi" wrapText="true">
+                     <VBox.margin>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                     </VBox.margin></Label>
+                    </VBox>
+                    <Separator orientation="VERTICAL" />
+                    <VBox fx:id="vboxOutput">
+                        <Label alignment="CENTER" style="-fx-font-weight: bold;" text="Output:" textFill="#093400">
+                     <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </VBox.margin></Label>
+                        <TextArea fx:id="outputTextArea" editable="false">
+                     <VBox.margin>
+                        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+                     </VBox.margin></TextArea>
+                    </VBox>
+                    <Separator orientation="VERTICAL" />
+                    <HBox fx:id="hboxButton" alignment="CENTER">
+                        <Button fx:id="analyticsButton1" mnemonicParsing="false" onAction="#analytics1" text="Submit" />
+                    </HBox>
+
+                </HBox>
+                <VBox.margin>
+                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                </VBox.margin>
+            </VBox>
+
+        </center>
+
+        <bottom>
+            <HBox alignment="BOTTOM_CENTER" prefHeight="34.0" prefWidth="594.0" style="-fx-background-color: orange">
+                <Button fx:id="goBackButton" mnemonicParsing="false" onAction="#goBack" prefHeight="25.0" prefWidth="201.0" text="Go back">
+                    <HBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                    </HBox.margin>
+                </Button>
+                <Region prefHeight="57.0" prefWidth="215.0" HBox.hgrow="ALWAYS" /> <!-- Spacer per spingere il bottone successivo a destra -->
+                <Button fx:id="goToHomepageButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#goToTheHomePage" prefHeight="25.0" prefWidth="155.0" text="Go to the homepage">
+                    <HBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                    </HBox.margin>
+                </Button>
+            </HBox>
+        </bottom>
+
+    </BorderPane>
+</StackPane>

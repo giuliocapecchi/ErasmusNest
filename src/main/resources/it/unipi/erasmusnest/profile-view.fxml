@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.erasmusnest.controllers.ProfileController">
+    <SplitPane orientation="HORIZONTAL" dividerPositions="0.5">
+        <!-- Parte sinistra con i dettagli dell'utente -->
+        <VBox spacing="10" alignment="TOP_LEFT">
+            <HBox spacing="10">
+                <Label text="Email:" minWidth="75" style="-fx-font-weight: bold;" />
+                <Label fx:id="emailLabel" />
+            </HBox>
+            <HBox spacing="10">
+                <Label text="Name:" minWidth="75" style="-fx-font-weight: bold;" />
+                <Label fx:id="nameLabel" />
+            </HBox>
+            <HBox spacing="10">
+                <Label text="Surname:" minWidth="75" style="-fx-font-weight: bold;" />
+                <Label fx:id="surnameLabel" />
+            </HBox>
+            <HBox spacing="10">
+                <!-- Parte destra con l'elenco delle case -->
+                <Label text="Study Field:" minWidth="75" style="-fx-font-weight: bold;" />
+                <Label fx:id="studyFieldLabel" />
+            </HBox>
+            <!-- <ScrollPane fitToWidth="true" fitToHeight="true"> -->
+                <Label text="Cities interested in:" minWidth="75" style="-fx-font-weight: bold;" />
+                <VBox fx:id="citiesOfInterestBox" spacing="5">
+                    <!-- Qui verranno inserite le checkbox -->
+
+                    <!-- Aggiungi altre checkbox se necessario -->
+                </VBox>
+                <!-- </ScrollPane> -->
+            <Button fx:id="backBrowseButton" text="Back to search" onAction="#backToBrowse" />
+        </VBox>
+
+        <!-- Parte destra con l'elenco delle case -->
+        <ScrollPane fitToWidth="true" fitToHeight="true">
+            <VBox fx:id="housesContainer" spacing="10" alignment="TOP_CENTER" >
+                <!-- Qui verranno aggiunte dinamicamente le case -->
+                <Label text="Houses:" style="-fx-font-size: 22px; -fx-font-weight: bold;" />
+            </VBox>
+        </ScrollPane>
+    </SplitPane>
+</StackPane>

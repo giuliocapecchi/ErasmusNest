@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane fx:id="rootPane" prefHeight="348.0" prefWidth="387.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.erasmusnest.controllers.HomepageController">
+   <BorderPane prefHeight="200.0" prefWidth="200.0">
+       <top>
+           <VBox alignment="TOP_CENTER" spacing="10" BorderPane.alignment="CENTER" style="-fx-background-color: #ff8000;">
+               <Label fx:id="title" style="-fx-font-size: 25px; -fx-font-style: italic; -fx-text-fill: white;" text="Apartment finder">
+                   <VBox.margin>
+                       <Insets bottom="5.0" left="20.0" right="5.0" top="5.0" />
+                   </VBox.margin>
+               </Label>
+           </VBox>
+       </top>
+      <center>
+           <VBox alignment="CENTER" BorderPane.alignment="CENTER">
+             <ImageView fx:id="logoImageView" fitHeight="70.0" fitWidth="74.0" pickOnBounds="true" preserveRatio="true">
+                 <Image url="@../../../media/logo.png" />
+               <VBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </VBox.margin>
+             </ImageView>
+               <Label text="Type in a city name to start the search engine">
+               <VBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </VBox.margin></Label>
+               <TextField fx:id="cityTextField" onKeyReleased="#handleSearchAction">
+               <VBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </VBox.margin></TextField>
+               <VBox fx:id="resultsBox">
+                   <VBox.margin>
+                       <Insets top="5.0" />
+                   </VBox.margin>
+               </VBox>
+           </VBox>
+      </center>
+       <bottom>
+           <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: orange;" BorderPane.alignment="CENTER">
+               <Button fx:id="logoutButton" mnemonicParsing="false" onAction="#handleLogoutAction" text="Logout">
+                   <cursor>
+                       <Cursor fx:constant="DEFAULT" />
+                   </cursor>
+               </Button>
+               <Button fx:id="profileButton" mnemonicParsing="false" onAction="#handleProfileAction" text="Profile" />
+               <Label fx:id="welcomeText" text="Hello, ${user.name}">
+                   <padding>
+                       <Insets left="20.0" />
+                   </padding></Label>
+               <Button fx:id="signUpButton" mnemonicParsing="false" onAction="#handleSignupAction" text="Signup">
+                   <cursor>
+                       <Cursor fx:constant="DEFAULT" />
+                   </cursor>
+               </Button>
+               <Button fx:id="loginButton" mnemonicParsing="false" onAction="#handleLoginAction" text="Login" />
+           </ToolBar>
+       </bottom>
+   </BorderPane>
+
+</StackPane>
