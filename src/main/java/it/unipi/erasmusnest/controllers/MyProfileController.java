@@ -95,26 +95,6 @@ public class MyProfileController extends Controller {
         List<String> userCities = utente.getPreferredCities();
         cityTidlePane = createTitledPane(userCities);
         cityVBox.getChildren().add(cityTidlePane);
-        /*
-        for (String city : CITIES)
-        {
-            CheckBox comboCity = new CheckBox();
-            comboCity.setText(city);
-            citiesOfInterestBox.getChildren().add(comboCity);
-            // Check if the user has already selected this city
-            if(userCities!=null && userCities.contains(city)){
-                comboCity.setSelected(true);
-                selectedCities.add(city);
-            }
-            comboCity.setOnAction(event -> {
-                if (comboCity.isSelected()) {
-                    selectedCities.add(city);
-                } else {
-                    selectedCities.remove(city);
-                }
-            });
-        }
-        */
 
         // Update preferred cities
         updateCitiesButton.setOnAction(event -> {
