@@ -17,7 +17,7 @@ public class Session {
 
     private Integer current_page = 1;
 
-    private Integer current_filter = 1;
+    private Integer current_filter = 0;
 
     private String otherProfileMail;
 

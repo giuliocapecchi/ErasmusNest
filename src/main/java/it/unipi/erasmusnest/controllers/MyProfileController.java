@@ -8,6 +8,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox; // Import per il banner/pop-up
 import org.controlsfx.control.PopOver; // Import per il banner/pop-up
@@ -18,6 +19,8 @@ public class MyProfileController extends Controller {
 
     @FXML
     VBox personalInfoVbox;
+    public VBox cityVBox;
+    public  TitledPane cityTidlePane;
     @FXML
     VBox apartmentsContainerVBox;
     @FXML
@@ -57,6 +60,9 @@ public class MyProfileController extends Controller {
     private VBox citiesOfInterestBox; // Contenitore per le CheckBoxes delle città di interesse
     @FXML
     private ComboBox<String> studyFieldComboBox;
+    @FXML
+    private ComboBox<String> citiesOfInterestComboBox;
+
     private String selectedStudyField;
     private List<String> selectedCities = new ArrayList<>();
     private List<String> CITIES = new ArrayList<>();
@@ -72,7 +78,7 @@ public class MyProfileController extends Controller {
     @FXML
     private void initialize() {
 
-        getSession().setUser(new User("a@a.com","","",new ArrayList<>(),""));
+
 
 
         personalInfoVbox.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.6));
@@ -81,30 +87,15 @@ public class MyProfileController extends Controller {
         passwordChangeOuterBox.prefWidthProperty().bind(super.getRootPane().widthProperty());
 
         CITIES = getNeo4jConnectionManager().getAllCities();
-        User utente = new User();
+        User utente;
         String userEmail = getSession().getUser().getEmail();
 
         utente = getMongoConnectionManager().findUser(userEmail);
         passwordField.setText("******"); // Set password field to 6 asterisks
         List<String> userCities = utente.getPreferredCities();
+        cityTidlePane = createTitledPane(userCities);
+        cityVBox.getChildren().add(cityTidlePane);
 
-        for (String city : CITIES) {
-            CheckBox comboCity = new CheckBox();
-            comboCity.setText(city);
-            citiesOfInterestBox.getChildren().add(comboCity);
-            // Check if the user has already selected this city
-            if(userCities!=null && userCities.contains(city)){
-                comboCity.setSelected(true);
-                selectedCities.add(city);
-            }
-            comboCity.setOnAction(event -> {
-                if (comboCity.isSelected()) {
-                    selectedCities.add(city);
-                } else {
-                    selectedCities.remove(city);
-                }
-            });
-        }
         // Update preferred cities
         updateCitiesButton.setOnAction(event -> {
             if (updateCitiesInDatabase(selectedCities)) {
@@ -140,8 +131,8 @@ public class MyProfileController extends Controller {
 
         //apartmentsContainer = new VBox(10); // Assicurati che questo VBox sia definito nel FXML con fx:id="apartmentsContainer"
 
-        if(utente.getHouses() != null ){
-            if(!utente.getHouses().isEmpty()){
+            if(utente.getHouses() != null  && !utente.getHouses().isEmpty())
+            {
                 System.out.println("casa: " + utente.getHouses().get(0).getName());
 
                 // Recupera gli appartamenti dell'utente e li aggiunge al VBox apartmentsContainer
@@ -177,7 +168,6 @@ public class MyProfileController extends Controller {
                     apartmentsContainer.getChildren().add(apartmentBox); // This should add the apartment to the UI
                 }
             }
-        }
         else
         {
             apartmentsContainer.getChildren().add(new Label("No apartments available."));
@@ -198,6 +188,36 @@ public class MyProfileController extends Controller {
             adminContainer.getChildren().add(analyticsButton);
         }
         getSession().setUser(utente);
+    }
+
+    public TitledPane createTitledPane(List<String> userCities) {
+        GridPane gridPane = new GridPane();
+        List<String> cities = getNeo4jConnectionManager().getAllCities();
+        for(String city : cities)
+        {
+            CheckBox mainCheckBox = new CheckBox(city);
+            mainCheckBox.setText(city);
+            mainCheckBox.setOnAction(e -> {
+                if (mainCheckBox.isSelected()) {
+                    selectedCities.add(mainCheckBox.getText());
+                } else {
+                    selectedCities.remove(mainCheckBox.getText());
+                }
+            });
+            if(userCities!=null && userCities.contains(city)){
+                mainCheckBox.setSelected(true);
+                selectedCities.add(city);
+            }
+            gridPane.add(mainCheckBox, 0, cities.indexOf(city));
+        }
+
+        TitledPane titledPane = new TitledPane("Cities interested in", gridPane);
+        // titledPane.setStyle("-fx-pref-width: 10px;"); // Imposta la larghezza preferita inline
+        // titledPane.setPadding(new Insets(2, 2, 2, 2));
+
+        titledPane.setExpanded(false);
+
+        return titledPane;
     }
 
     @FXML

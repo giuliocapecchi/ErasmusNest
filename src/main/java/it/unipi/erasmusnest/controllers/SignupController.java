@@ -3,16 +3,18 @@ package it.unipi.erasmusnest.controllers;
 import com.dlsc.gemsfx.EmailField;
 import it.unipi.erasmusnest.model.User;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.TextFlow;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class SignupController extends Controller{
 
-    public ComboBox<String> cityComboBox;
     @FXML
     private GridPane gridPane;
 
@@ -43,6 +45,13 @@ public class SignupController extends Controller{
     @FXML
     private ComboBox<String> studiesComboBox;
 
+    private ArrayList<String> selectedCities = new ArrayList<>();
+
+    public VBox cityVBox;
+
+    public  TitledPane cityTidlePane;
+
+
     @FXML
     private void initialize() {
 
@@ -54,18 +63,9 @@ public class SignupController extends Controller{
         surnameField.textProperty().addListener((observable, oldValue, newValue) -> checkFields());
         studiesComboBox.valueProperty().addListener((observable, oldValue, newValue) -> checkFields());
 
-        // Popolazione della combobox delle città
-        populateComboBox(cityComboBox, "cityFields.txt");
+        cityTidlePane = createTitledPane();
 
-        /*
-        cityComboBox.valueProperty().addListener((observable, oldValue, newValue) -> checkFields());
-        cityComboBox.getItems().add("Amsterdam");
-        cityComboBox.getItems().add("Padua");
-        cityComboBox.getItems().add("Bologna");
-        cityComboBox.getItems().add("Parma");
-        cityComboBox.getItems().add("Pisa");
-        cityComboBox.getItems().add("None");
-        */
+        cityVBox.getChildren().add(cityTidlePane);
 
         for(String studyField : getSession().getStudyFields()){
             studiesComboBox.getItems().add(studyField);
@@ -79,19 +79,42 @@ public class SignupController extends Controller{
         backButton.maxWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.3));
         errorTextFlow.maxWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.5));
         studiesComboBox.maxWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.3));
-        cityComboBox.maxWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.3));
+        // cityComboBox.maxWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.3));
 
     }
 
-    private void populateComboBox(ComboBox<String> cityComboBox, String file) {
+    public TitledPane createTitledPane() {
+        GridPane gridPane = new GridPane();
+        List<String> cities = getNeo4jConnectionManager().getAllCities();
+        for(String city : cities)
+        {
+            CheckBox mainCheckBox = new CheckBox(city);
+            mainCheckBox.setText(city);
+            mainCheckBox.setOnAction(e -> {
+                if (mainCheckBox.isSelected()) {
+                    selectedCities.add(mainCheckBox.getText());
+                } else {
+                    selectedCities.remove(mainCheckBox.getText());
+                }
+            });
+            gridPane.add(mainCheckBox, 0, cities.indexOf(city));
+        }
 
+        TitledPane titledPane = new TitledPane("Cities interested in", gridPane);
+        // titledPane.setStyle("-fx-pref-width: 10px;"); // Imposta la larghezza preferita inline
+        // titledPane.setPadding(new Insets(2, 2, 2, 2));
+
+        titledPane.setExpanded(false);
+
+        return titledPane;
     }
+
 
     @FXML
     protected void checkFields() {
         // check username disponibile si fa live o @btn pressed?
         signupButton.setDisable(!isTextFieldValid(passwordField) || !isEmailFieldValid(emailField)
-                || !isTextFieldValid(nameField) || !isTextFieldValid(surnameField) || cityComboBox.getValue() == null
+                || !isTextFieldValid(nameField) || !isTextFieldValid(surnameField)
                 || studiesComboBox.getValue() == null || !passwordField.getText().equals(confirmPasswordField.getText()));
 
         if(!isEmailFieldValid(emailField)) {
@@ -104,8 +127,6 @@ public class SignupController extends Controller{
             showErrorMessage("Invalid name format (4-20 characters required)", errorTextFlow);
         } else if (!isTextFieldValid(surnameField)) {
             showErrorMessage("Invalid surname format (4-20 characters required)", errorTextFlow);
-        } else if (cityComboBox.getValue() == null) {
-            showErrorMessage("Please select a city you are interested in, or none", errorTextFlow);
         }
         else if (studiesComboBox.getValue() == null) {
             showErrorMessage("Please select your study field", errorTextFlow);
@@ -129,18 +150,9 @@ public class SignupController extends Controller{
         utente.setPassword(passwordField.getText());
         utente.setStudyField(studiesComboBox.getValue());
         // Aggiungere citta di interesse
-        ArrayList<String> cities = new ArrayList<>();
-
-        for(String city : cityComboBox.getItems())
-        {
-            if(cityComboBox.getValue() != null)
-            {
-                cities.add(city);
-            }
-        }
+        ArrayList<String> cities = selectedCities;
         utente.setPreferredCities(cities);
         boolean emailAvailable = super.getMongoConnectionManager().addUser(utente);
-
         if(emailAvailable) {
             super.changeWindow("login");
         } else {
