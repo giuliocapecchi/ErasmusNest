@@ -19,12 +19,9 @@ public class MyProfileController extends Controller {
 
     @FXML
     VBox personalInfoVbox;
-    @FXML
-    public Button backButton;
-    public VBox adminContainer;
     public VBox cityVBox;
-
     public  TitledPane cityTidlePane;
+    @FXML
     VBox apartmentsContainerVBox;
     @FXML
     Button updateCitiesButton;
