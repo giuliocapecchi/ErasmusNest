@@ -132,7 +132,7 @@
                         <Insets bottom="5.0" />
                      </VBox.margin>
                   </DatePicker>
-                  <Button fx:id="confirmButton" text="Confirm">
+                  <Button fx:id="confirmButton" onAction="#onConfirmButtonClick" text="Confirm">
                      <VBox.margin>
                         <Insets bottom="5.0" top="5.0" />
                      </VBox.margin>
