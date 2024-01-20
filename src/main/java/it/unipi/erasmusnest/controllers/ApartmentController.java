@@ -71,13 +71,15 @@ public class ApartmentController extends Controller{
     @FXML
     private TextFlow loginMessage;
 
+    private Apartment apartment;
+
     public ApartmentController() {
     }
 
     @FXML
     private void initialize() {
 
-        Apartment apartment = getMongoConnectionManager().getApartment(getSession().getApartmentId());
+        apartment = getMongoConnectionManager().getApartment(getSession().getApartmentId());
         if(apartment==null){
             super.changeWindow("apartments");
         }else{
@@ -170,7 +172,8 @@ public class ApartmentController extends Controller{
 
             String userEmail = getSession().getUser().getEmail();
             String houseId = String.valueOf(getSession().getApartmentId());
-            getRedisConnectionManager().addReservation(userEmail, houseId, String.valueOf(startYear), String.valueOf(startMonth), String.valueOf(numberOfMonths));
+
+            getRedisConnectionManager().addReservationWithAttributes(userEmail, houseId, String.valueOf(startYear), String.valueOf(startMonth), String.valueOf(numberOfMonths), getSession().getCity(), apartment.getImageURL());
 
             super.changeWindow("myreservations");
         }

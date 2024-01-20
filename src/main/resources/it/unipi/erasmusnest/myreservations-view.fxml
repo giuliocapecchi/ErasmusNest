@@ -40,7 +40,7 @@
                         <Cursor fx:constant="DEFAULT" />
                     </cursor>
                 </Button>
-                <Button fx:id="loginButton" mnemonicParsing="false" text="Login" />
+                <Button fx:id="loginButton" mnemonicParsing="false" onAction="#loginButtonClick" text="Login" />
             </ToolBar>
         </bottom>
     </BorderPane>

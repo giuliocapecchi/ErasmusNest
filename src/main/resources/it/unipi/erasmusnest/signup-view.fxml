@@ -28,10 +28,14 @@
             <Label text="Study field" GridPane.rowIndex="6" />
             <ComboBox fx:id="studiesComboBox" promptText="select one" GridPane.columnIndex="1" GridPane.rowIndex="6" />
 
-            <Label text="City interested in" GridPane.rowIndex="8" />
-            <ComboBox fx:id="cityComboBox" promptText="select one" GridPane.columnIndex="1" GridPane.rowIndex="8" />
-
+            <!-- <Label text="City interested in" GridPane.rowIndex="8" /> -->
+            <!-- <ComboBox fx:id="cityComboBox" promptText="select one" GridPane.columnIndex="1" GridPane.rowIndex="8" /> -->
         </GridPane>
+        <VBox fx:id="cityVBox" >
+            <!-- Qui verranno inserite le checkbox -->
+
+            <!-- Aggiungi altre checkbox se necessario -->
+        </VBox>
         <VBox alignment="CENTER">
             <TextFlow fx:id="errorTextFlow" textAlignment="CENTER"/>
             <VBox.margin>

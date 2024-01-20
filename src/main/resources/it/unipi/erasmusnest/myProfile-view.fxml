@@ -34,7 +34,7 @@
                 </ComboBox>
             </HBox>
             <Label minWidth="75" style="-fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Cities of Interest:" />
-            <VBox fx:id="citiesOfInterestBox" spacing="5">
+            <VBox fx:id="cityVBox" >
                 <!-- Qui verranno inserite le checkbox -->
 
                 <!-- Aggiungi altre checkbox se necessario -->

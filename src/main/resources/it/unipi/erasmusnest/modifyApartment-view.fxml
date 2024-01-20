@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.web.*?>
+
+<StackPane fx:id="rootPane" prefHeight="554.0" prefWidth="652.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.erasmusnest.controllers.ModifyAparmentController">
+    <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="ALWAYS">
+        <BorderPane prefHeight="200.0" prefWidth="200.0">
+            <top>
+                <HBox alignment="CENTER_LEFT" style="-fx-background-color: #ff8000">
+                    <Label style="-fx-font-size: 25px; -fx-text-fill: white; -fx-font-style: italic;" text="Apartment view">
+                        <HBox.margin>
+                            <Insets bottom="5.0" left="20.0" right="20.0" top="5.0" />
+                        </HBox.margin>
+                    </Label>
+                </HBox>
+            </top>
+            <center>
+                <VBox fx:id="centerVBox" alignment="CENTER">
+                    <HBox fx:id="firstHBox" alignment="CENTER">
+                        <VBox fx:id="leftFirstVBox" alignment="TOP_CENTER">
+                            <Label fx:id="nameLabel" style="-fx-font-size: 20px; -fx-text-fill: #019fe1;" text="Apartment name">
+                                <VBox.margin>
+                                    <Insets top="5.0" />
+                                </VBox.margin>
+                            </Label>
+                            <ImageView fx:id="imageView" preserveRatio="true">
+                                <VBox.margin>
+                                    <Insets bottom="5.0" top="5.0" />
+                                </VBox.margin>
+                            </ImageView>
+                        </VBox>
+                        <VBox fx:id="rightFirstVBox" alignment="TOP_CENTER">
+                            <Label style="-fx-font-size: 20px; -fx-text-fill: #019fe1;" text="Location">
+                                <VBox.margin>
+                                    <Insets bottom="5.0" />
+                                </VBox.margin>
+                            </Label>
+                            <WebView fx:id="webView">
+                                <VBox.margin>
+                                    <Insets bottom="5.0" left="20.0" right="20.0" />
+                                </VBox.margin>
+                            </WebView>
+                        </VBox>
+                    </HBox>
+                    <HBox fx:id="secondHBox" alignment="CENTER">
+                        <VBox fx:id="leftVBox" alignment="TOP_CENTER">
+                            <Label style="-fx-font-size: 20px; -fx-text-fill: #019fe1;" text="Information">
+                                <VBox.margin>
+                                    <Insets top="10.0" />
+                                </VBox.margin>
+                            </Label>
+                            <Text fx:id="infoText">
+                                <VBox.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                </VBox.margin>
+                            </Text>
+
+                            <HBox alignment="CENTER">
+                                <ImageView fx:id="ratingImage1" fitHeight="20" fitWidth="20" preserveRatio="true">
+                                    <HBox.margin>
+                                        <Insets bottom="5.0" />
+                                    </HBox.margin>
+                                </ImageView>
+                                <ImageView fx:id="ratingImage2" fitHeight="20" fitWidth="20" preserveRatio="true">
+                                    <HBox.margin>
+                                        <Insets bottom="5.0" />
+                                    </HBox.margin>
+                                </ImageView>
+                                <ImageView fx:id="ratingImage3" fitHeight="20" fitWidth="20" preserveRatio="true">
+                                    <HBox.margin>
+                                        <Insets bottom="5.0" />
+                                    </HBox.margin>
+                                </ImageView>
+                                <ImageView fx:id="ratingImage4" fitHeight="20" fitWidth="20" preserveRatio="true">
+                                    <HBox.margin>
+                                        <Insets bottom="5.0" />
+                                    </HBox.margin>
+                                </ImageView>
+                                <ImageView fx:id="ratingImage5" fitHeight="20" fitWidth="20" preserveRatio="true">
+                                    <HBox.margin>
+                                        <Insets bottom="5.0" />
+                                    </HBox.margin>
+                                </ImageView>
+                                <Button fx:id="reviewsButton" onAction="#onShowReviewsButtonClick" text="Show reviews">
+                                    <HBox.margin>
+                                        <Insets bottom="5.0" left="10.0" />
+                                    </HBox.margin>
+                                </Button>
+                            </HBox>
+                            <HBox alignment="CENTER">
+                                <Text fx:id="hostEmail">
+                                    <VBox.margin>
+                                        <Insets bottom="5.0" left="20.0" right="20.0" />
+                                    </VBox.margin>
+                                </Text>
+                                <Button onAction="#onContactHostButtonClick" text="View host">
+                                    <HBox.margin>
+                                        <Insets bottom="5.0" left="10.0" top="5.0" />
+                                    </HBox.margin>
+                                </Button>
+                            </HBox>
+
+                        </VBox>
+                        <VBox fx:id="rightVBox" alignment="TOP_CENTER">
+                            <Label style="-fx-font-size: 20px; -fx-text-fill: #019fe1;" text="Make a reservation">
+                                <VBox.margin>
+                                    <Insets bottom="5.0" top="10.0" />
+                                </VBox.margin>
+                            </Label>
+                            <Label text="Select start date">
+                                <VBox.margin>
+                                    <Insets bottom="5.0" />
+                                </VBox.margin>
+                            </Label>
+                            <DatePicker fx:id="startDatePicker">
+                                <VBox.margin>
+                                    <Insets bottom="5.0" />
+                                </VBox.margin>
+                            </DatePicker>
+                            <Label text="Select end date">
+                                <VBox.margin>
+                                    <Insets bottom="5.0" />
+                                </VBox.margin>
+                            </Label>
+                            <DatePicker fx:id="endDatePicker">
+                                <VBox.margin>
+                                    <Insets bottom="5.0" />
+                                </VBox.margin>
+                            </DatePicker>
+                            <Button fx:id="confirmButton" text="Confirm">
+                                <VBox.margin>
+                                    <Insets bottom="5.0" top="5.0" />
+                                </VBox.margin>
+                            </Button>
+                            <TextFlow fx:id="loginMessage" textAlignment="CENTER">
+                                <VBox.margin>
+                                    <Insets top="5.0" />
+                                </VBox.margin>
+                            </TextFlow>
+                        </VBox>
+                    </HBox>
+
+                </VBox>
+            </center>
+            <bottom>
+                <HBox alignment="BOTTOM_LEFT" prefHeight="15.0" prefWidth="636.0" style="-fx-background-color: orange;" BorderPane.alignment="CENTER">
+                    <Button onAction="#onGoBackButtonClick" text="Go back">
+                        <HBox.margin>
+                            <Insets bottom="5.0" left="20.0" right="5.0" top="5.0" />
+                        </HBox.margin>
+                    </Button>
+                    <Region prefHeight="57.0" prefWidth="215.0" HBox.hgrow="ALWAYS" /> <!-- Spacer per spingere il bottone successivo a destra -->
+                    <Button fx:id="loginButton" onAction="#onLoginButtonClick" text="Login">
+                        <HBox.margin>
+                            <Insets bottom="5.0" left="5.0" right="20.0" top="5.0" />
+                        </HBox.margin>
+                    </Button>
+                    <BorderPane.margin>
+                        <Insets top="20.0" />
+                    </BorderPane.margin>
+                </HBox>
+            </bottom>
+        </BorderPane>
+    </ScrollPane>
+</StackPane>
