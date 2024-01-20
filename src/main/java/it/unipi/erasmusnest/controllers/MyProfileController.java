@@ -72,16 +72,13 @@ public class MyProfileController extends Controller {
     @FXML
     private void initialize() {
 
-        getSession().setUser(new User("a@a.com","","",new ArrayList<>(),""));
-
-
         personalInfoVbox.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.6));
         apartmentsContainerVBox.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.4));
         outer_HBox.prefWidthProperty().bind(super.getRootPane().widthProperty());
         passwordChangeOuterBox.prefWidthProperty().bind(super.getRootPane().widthProperty());
 
         CITIES = getNeo4jConnectionManager().getAllCities();
-        User utente = new User();
+        User utente;
         String userEmail = getSession().getUser().getEmail();
 
         utente = getMongoConnectionManager().findUser(userEmail);
