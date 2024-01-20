@@ -53,7 +53,6 @@ public class ReservationGraphicManager {
     private void setHandlers(){
         startDatePicker.setOnAction(event -> onStartDatePickerClick());
         endDatePicker.setOnAction(event -> onEndDatePickerClick());
-        confirmButton.setOnAction(event -> onConfirmButtonClick());
     }
 
     private void enableOnlyFutureFirstDayOfMonthsAvailable(DatePicker datePicker, ArrayList<Reservation> reservations){
@@ -130,25 +129,6 @@ public class ReservationGraphicManager {
         int nextMonth = date.plusDays(1).getMonthValue();
 
         return nextMonth != currentMonth;
-    }
-
-    public void onConfirmButtonClick(){
-        LocalDate startDate = startDatePicker.getValue();
-        LocalDate endDate = endDatePicker.getValue();
-
-        if(startDate != null && endDate != null) {
-
-            int startYear = startDate.getYear();
-            int startMonth = startDate.getMonthValue();
-
-            Period period = Period.between(startDate, endDate);
-            int numberOfMonths = (period.getMonths() + period.getYears() * 12) + 1;
-
-            String userEmail = session.getUser().getEmail();
-            String houseId = String.valueOf(session.getApartmentId());
-            redisConnectionManager.addReservation(userEmail, houseId, String.valueOf(startYear), String.valueOf(startMonth), String.valueOf(numberOfMonths));
-
-        }
     }
 
     public void onStartDatePickerClick() {

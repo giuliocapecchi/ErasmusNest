@@ -49,7 +49,6 @@ public class RedisConnectionManager extends ConnectionManager{
             // Use the KEYS command to get all keys matching the pattern
             Set<String> keys = jedis.keys("reservation:*:" + houseIdToSearch + ":*:*:*:timestamp");
 
-
             for (String key : keys) {
                 String[] keyParts = key.split(":");
                 reservations.add(new Reservation(keyParts[1], keyParts[2], Integer.parseInt(keyParts[3]), Integer.parseInt(keyParts[4]), Integer.parseInt(keyParts[5])));
@@ -70,12 +69,15 @@ public class RedisConnectionManager extends ConnectionManager{
             // key design: <entity>:<userEmail>:<houseId>:<startYear>:<startMonth>:<numberOfMonths>:<dateTime>
 
             // Use the KEYS command to get all keys matching the pattern
-            String subKey = "reservation:" + userEmail + "::*:*:*:*:";
+            String subKey = "reservation:" + userEmail + ":*:*:*:*:";
             Set<String> keys = jedis.keys(subKey + "timestamp");
 
             for (String key : keys) {
 
-                ArrayList<String> attributesValues = getAttributesForReservation(subKey);
+                // remove "timestamp" at the end of the key
+                String subK = key.substring(0, key.length() - 9);
+
+                ArrayList<String> attributesValues = getAttributesForReservation(subK);
 
                 String[] keyParts = key.split(":");
                 reservations.add(new Reservation(keyParts[1], keyParts[2], Integer.parseInt(keyParts[3]),
@@ -85,6 +87,7 @@ public class RedisConnectionManager extends ConnectionManager{
 
             }
         } catch (Exception e) {
+            e.printStackTrace();
             System.out.println("Connection problem: " + e.getMessage());
             new AlertDialogGraphicManager("Redis connection failed").show();
         }
@@ -103,9 +106,9 @@ public class RedisConnectionManager extends ConnectionManager{
 
         try(Jedis jedis = new Jedis(super.getHost(), super.getPort())) {
 
-            for(int i=0; i<attributes.size(); i++) {
-                String attribute = attributes.get(i);
-                String key = subKey + attribute;
+            for (String attribute : attributes) {
+                Set<String> keys = jedis.keys(subKey + attribute);
+                String key = keys.iterator().next();
                 String value = jedis.get(key);
                 values.add(value);
             }

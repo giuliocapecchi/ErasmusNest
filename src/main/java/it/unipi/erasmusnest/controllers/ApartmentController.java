@@ -18,6 +18,8 @@ import javafx.scene.text.TextFlow;
 import javafx.scene.web.WebView;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.ArrayList;
 
 public class ApartmentController extends Controller{
@@ -126,7 +128,7 @@ public class ApartmentController extends Controller{
                 reviewsButton.setVisible(false);
             }
 
-            ReservationGraphicManager reservationGraphicManager = new ReservationGraphicManager(startDatePicker, endDatePicker, confirmButton, getSession(), getRedisConnectionManager());
+            new ReservationGraphicManager(startDatePicker, endDatePicker, confirmButton, getSession(), getRedisConnectionManager());
 
             if(!getSession().isLogged()){
                 showErrorMessage("Login required", loginMessage);
@@ -151,6 +153,27 @@ public class ApartmentController extends Controller{
     protected void onLoginButtonClick() throws IOException {
         getSession().setNextWindowName("apartment");
         super.changeWindow("login");
+    }
+
+    @FXML
+    protected void onConfirmButtonClick(){
+        LocalDate startDate = startDatePicker.getValue();
+        LocalDate endDate = endDatePicker.getValue();
+
+        if(startDate != null && endDate != null) {
+
+            int startYear = startDate.getYear();
+            int startMonth = startDate.getMonthValue();
+
+            Period period = Period.between(startDate, endDate);
+            int numberOfMonths = (period.getMonths() + period.getYears() * 12) + 1;
+
+            String userEmail = getSession().getUser().getEmail();
+            String houseId = String.valueOf(getSession().getApartmentId());
+            getRedisConnectionManager().addReservation(userEmail, houseId, String.valueOf(startYear), String.valueOf(startMonth), String.valueOf(numberOfMonths));
+
+            super.changeWindow("myreservations");
+        }
     }
 
     public void onGoBackButtonClick(ActionEvent actionEvent) {
