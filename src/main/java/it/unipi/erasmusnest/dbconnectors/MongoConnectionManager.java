@@ -93,7 +93,7 @@ public class MongoConnectionManager extends ConnectionManager{
         return user;
     }
 
-   public boolean updateEmail(String oldEmail, String newEmail)
+  /* public boolean updateEmail(String oldEmail, String newEmail)
    {
        // Effettua l'aggiornamento nel database MongoDB con la nuova email
        MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
@@ -111,7 +111,7 @@ public class MongoConnectionManager extends ConnectionManager{
        mongoClient.close();
 
        return true;
-   }
+   }*/
 
     public Apartment getApartment(Long apartmentId){
 
@@ -330,7 +330,7 @@ public class MongoConnectionManager extends ConnectionManager{
 
 
 
-    public boolean availableEmail(String emailAddress){ // add javadoc here
+    public boolean availableEmail(String emailAddress){
         boolean availableEmail = true;
         try(MongoClient mongoClient = MongoClients.create("mongodb://"+super.getHost()+":"+super.getPort()))
         {

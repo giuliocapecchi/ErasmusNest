@@ -1,6 +1,5 @@
 package it.unipi.erasmusnest.controllers;
 
-import com.dlsc.gemsfx.EmailField;
 import it.unipi.erasmusnest.model.Apartment;
 import it.unipi.erasmusnest.model.User;
 import javafx.event.ActionEvent;
@@ -17,101 +16,73 @@ import java.util.List;
 
 public class MyProfileController extends Controller {
 
-    public Button updateCitiesButton;
     @FXML
-    public VBox apartmentsContainer;
+    VBox personalInfoVbox;
     @FXML
-    public Button backButton;
-    public VBox adminContainer;
+    VBox apartmentsContainerVBox;
     @FXML
-    private Label emailLabel;
+    Button updateCitiesButton;
     @FXML
-    private Label nameLabel;
+    VBox apartmentsContainer;
     @FXML
-    private Label lastNameLabel;
+    Button backButton;
     @FXML
-    private Button uploadHouseButton;
+    VBox adminContainer;
     @FXML
-    private ImageView houseImageView;
-
+    HBox outer_HBox;
     @FXML
-    private EmailField emailField; // Aggiungi questo campo per l'indirizzo email
+    Label emailLabel;
     @FXML
-    private Button modifyButton; // Aggiungi questo campo per il bottone Modify/Update
-
+    Label nameLabel;
     @FXML
-    private PasswordField passwordField; // Campo password
+    Label lastNameLabel;
     @FXML
-    private Button modifyPasswordButton; // Bottone per la modifica della password
-
+    Button uploadHouseButton;
     @FXML
-    private boolean isEditingEmail = false;
-
+    PasswordField passwordField; // Campo password
     @FXML
-    private VBox passwordChangeBox; // Banner/pop-up per la modifica della password
-
+    Button modifyPasswordButton; // Bottone per la modifica della password
+    @FXML
+    VBox passwordChangeBox; // Banner/pop-up per la modifica della password
     @FXML
     private VBox passwordChangeOuterBox;
-
     @FXML
-    private PasswordField oldPasswordField; // Aggiunto campo per la vecchia password
+    PasswordField newPasswordField; // Campo per la nuova password
     @FXML
-    private PasswordField newPasswordField; // Campo per la nuova password
+    PasswordField confirmNewPasswordField; // Campo per la conferma della nuova password
+    boolean isEditingPassword = false; // Aggiunto per gestire la modifica della password
     @FXML
-    private PasswordField confirmNewPasswordField; // Campo per la conferma della nuova password
-
-    private boolean isEditingPassword = false; // Aggiunto per gestire la modifica della password
-
-    @FXML
-    private Label passwordErrorLabel; // Etichetta per visualizzare gli errori
-
-    private String currentPassword;
-
-    private boolean changedEmail = false;
-
-    private boolean changePassword = false;
-
-    @FXML
-    private Label studyFieldLabel; // Etichetta per il campo Study Field
-
-    @FXML
-    private Label citiesOfInterestLabel; // Etichetta per il campo Cities of Interest
-
+    Label passwordErrorLabel; // Etichetta per visualizzare gli errori
     @FXML
     private VBox citiesOfInterestBox; // Contenitore per le CheckBoxes delle città di interesse
-
-    private List<String> selectedCitiesOfInterest; // Lista delle città di interesse selezionate
-
     @FXML
     private ComboBox<String> studyFieldComboBox;
-
-    @FXML
-    private ComboBox<String> citiesOfInterestComboBox;
-
     private String selectedStudyField;
-    private String selectedCityOfInterest;
-
     private List<String> selectedCities = new ArrayList<>();
-
     private List<String> CITIES = new ArrayList<>();
 
 
     // Metodo per impostare il testo dell'etichetta dell'errore
-    private void setPasswordErrorText(String errorMessage) {
-        passwordErrorLabel.setText(errorMessage);
+    private void setPasswordErrorText() {
+        passwordErrorLabel.setText("The passwords don't match or the new password is invalid.");
     }
-
 
     public MyProfileController() {}
 
     @FXML
     private void initialize() {
 
+        getSession().setUser(new User("a@a.com","","",new ArrayList<>(),""));
+
+
+        personalInfoVbox.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.6));
+        apartmentsContainerVBox.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.4));
+        outer_HBox.prefWidthProperty().bind(super.getRootPane().widthProperty());
+        passwordChangeOuterBox.prefWidthProperty().bind(super.getRootPane().widthProperty());
+
         CITIES = getNeo4jConnectionManager().getAllCities();
         User utente = new User();
         String userEmail = getSession().getUser().getEmail();
-
-        emailField.setPromptText(userEmail);
 
         utente = getMongoConnectionManager().findUser(userEmail);
         passwordField.setText("******"); // Set password field to 6 asterisks
@@ -150,10 +121,7 @@ public class MyProfileController extends Controller {
         // Inizializza il ComboBox per il campo "Study Field" (SF)
 
         studyFieldComboBox.getItems().addAll(getSession().getStudyFields());
-
         // Inizializza il ComboBox per il campo "Cities of Interest" (CoI)
-        // citiesOfInterestComboBox.getItems().addAll("Florence", "Padua", "Bologna", "Amsterdam", "Other");
-
         // Estrai il campo "Study Field" (SF) e "Cities of Interest" (CoI) dal documento dell'utente
         // selectedStudyField = userDocument.getString("SF");
         selectedStudyField = utente.getStudyField();
@@ -166,9 +134,9 @@ public class MyProfileController extends Controller {
         // Assumi che "house" possa essere un Document o una List<Document>
         //Object houseObject = userDocument.get("house");
 
-        currentPassword = utente.getPassword();
         nameLabel.setText(utente.getName());
         lastNameLabel.setText(utente.getSurname());
+        emailLabel.setText(utente.getEmail());
 
         //apartmentsContainer = new VBox(10); // Assicurati che questo VBox sia definito nel FXML con fx:id="apartmentsContainer"
 
@@ -176,51 +144,6 @@ public class MyProfileController extends Controller {
             if(!utente.getHouses().isEmpty()){
                 System.out.println("casa: " + utente.getHouses().get(0).getName());
 
-            /*
-            for(Apartment a : utente.getHouses())
-            {
-                String houseName = a.getName();
-                String pictureUrl = a.getImageURL();
-
-                if(pictureUrl== null || pictureUrl.isEmpty())
-                {
-                    pictureUrl = "https://hips.hearstapps.com/hmg-prod/images/lago-di-montagna-cervinia-1628008263.jpg";
-                }
-                System.out.println("houseName: " + houseName);
-                System.out.println("immmagine: " + pictureUrl);
-
-                HBox apartmentBox = new HBox(10);
-                apartmentBox.setAlignment(Pos.CENTER_LEFT);
-
-                ImageView apartmentImage = new ImageView();
-                apartmentImage.setFitHeight(100);
-                apartmentImage.setFitWidth(100);
-                apartmentImage.setPreserveRatio(true);
-
-                Image houseImage = new Image(pictureUrl);
-                //houseImageView.setImage(houseImage);
-                apartmentImage.setImage(houseImage);
-                // houseButton.setText(houseName);
-
-                Label apartmentName = new Label(a.getName());
-                apartmentName.setStyle("-fx-font-weight: bold; -fx-text-fill: #ff6200;");
-
-                apartmentBox.getChildren().addAll(apartmentImage, apartmentName);
-                apartmentsContainer.getChildren().add(apartmentBox);
-
-
-                /*
-                if (pictureUrl != null || !pictureUrl.isEmpty()) {
-                    Image houseImage = new Image(pictureUrl);
-                    houseImageView.setImage(houseImage);
-                }
-                else
-                {
-                    String defaultImageUrl = "https://www.liveinup.it/thumbs/luoghi/esperienze-in-montagna-copertina.webp";
-                    Image defaultImage = new Image(defaultImageUrl);
-                    houseImageView.setImage(defaultImage);
-                }
-                */
                 // Recupera gli appartamenti dell'utente e li aggiunge al VBox apartmentsContainer
                 for (Apartment apartment : utente.getHouses())
                 {
@@ -290,7 +213,6 @@ public class MyProfileController extends Controller {
     private void onModifyPasswordButtonClick() {
         // Mostra il banner/pop-up per la modifica della password
         if (isEditingPassword) {
-            emailField.setEmailAddress("");
             passwordChangeOuterBox.setVisible(false);
             isEditingPassword = false;
         }
@@ -313,23 +235,29 @@ public class MyProfileController extends Controller {
 
         if (newPassword.length() >= 4 && newPassword.length() <= 20 && newPassword.equals(confirmNewPassword))
         {
-            if(getMongoConnectionManager().updatePassword(getSession().getUser().getEmail(), newPassword))
-            {
-                // Nascondi il banner/pop-up e mostra un messaggio di conferma
-                //passwordChangeBox.setVisible(false);
+            if(getRedisConnectionManager().updateUserPassword(getSession().getUser().getEmail(), newPassword)){
+                System.out.println("Password aggiornata su Redis");
                 passwordChangeOuterBox.setVisible(false);
                 showConfirmationMessagePassword("Password aggiornata con successo!");
+            }else{ // aggiorno su Mongo e basta / TODO : eventual consistency da gestire qui! La password rimane solo su Redis per ora
+                System.out.println("Password non aggiornata su Redis perchè non trovata la chiave. La aggiorno su MongoDB");
+                // per come è ora il codice, su mongo la password viene aggiornata a priori (errore???)
+                if(getMongoConnectionManager().updatePassword(getSession().getUser().getEmail(), newPassword)){
+                    // Nascondi il banner/pop-up e mostra un messaggio di conferma
+                    //passwordChangeBox.setVisible(false);
+                    passwordChangeOuterBox.setVisible(false);
+                    showConfirmationMessagePassword("Password aggiornata con successo!");
+                }else{
+                    // Mostra un messaggio di errore se la nuova password non è valida o la vecchia password non coincide
+                    setPasswordErrorText();
+                }
             }
-            else
-            {
-                // Mostra un messaggio di errore se la nuova password non è valida o la vecchia password non coincide
-                setPasswordErrorText("Impossibile modificare la password. Verifica i dati inseriti.");
-            }
+
         }
         else
         {
             // Mostra un messaggio di errore se la nuova password non è valida o la vecchia password non coincide
-            setPasswordErrorText("Impossibile modificare la password. Verifica i dati inseriti.");
+            setPasswordErrorText();
         }
     }
 
@@ -371,7 +299,6 @@ public class MyProfileController extends Controller {
         popOver.setContentNode(label);
         popOver.setDetachable(false);
         popOver.setAutoHide(true);
-        popOver.show(emailField);
     }
 
     // Metodo per mostrare un messaggio di errore
@@ -441,21 +368,4 @@ public class MyProfileController extends Controller {
         super.changeWindow("login");
     }
 
-    @FXML
-    private void checkEmailField(){
-        modifyButton.setDisable(!isEmailFieldValid(emailField));
-    }
-
-    public void onModifyButtonClick(ActionEvent actionEvent) {
-        if(!getMongoConnectionManager().availableEmail(emailField.getEmailAddress())){
-            showConfirmationMessageEmail("Email already in use: change it.");
-        }else{
-            getMongoConnectionManager().updateEmail(getSession().getUser().getEmail(), emailField.getEmailAddress());
-            getSession().getUser().setEmail(emailField.getEmailAddress());
-            showConfirmationMessageEmail("Email updated successfully!");
-            emailField.setPromptText(getSession().getUser().getEmail());
-            emailField.setEmailAddress("");
-        }
-        modifyButton.setDisable(true);
-    }
 }
