@@ -104,7 +104,7 @@ public class MongoConnectionManager extends ConnectionManager{
 
        collection.updateOne(Filters.eq("email", oldEmail), new Document("$set", new Document("email", newEmail)));
 
-       collection = database.getCollection("case");
+       collection = database.getCollection("apartments");
 
        collection.updateOne(Filters.eq("host_email", oldEmail), new Document("$set", new Document("host_email", newEmail)));
 

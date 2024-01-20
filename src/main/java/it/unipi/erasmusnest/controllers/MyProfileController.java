@@ -9,6 +9,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox; // Import per il banner/pop-up
 import org.controlsfx.control.PopOver; // Import per il banner/pop-up
@@ -23,6 +24,9 @@ public class MyProfileController extends Controller {
     @FXML
     public Button backButton;
     public VBox adminContainer;
+    public VBox cityVBox;
+
+    public  TitledPane cityTidlePane;
     @FXML
     private Label emailLabel;
     @FXML
@@ -84,7 +88,6 @@ public class MyProfileController extends Controller {
 
     @FXML
     private ComboBox<String> studyFieldComboBox;
-
     @FXML
     private ComboBox<String> citiesOfInterestComboBox;
 
@@ -107,7 +110,7 @@ public class MyProfileController extends Controller {
     @FXML
     private void initialize() {
 
-        CITIES = getNeo4jConnectionManager().getAllCities();
+        // CITIES = getNeo4jConnectionManager().getAllCities();
         User utente = new User();
         String userEmail = getSession().getUser().getEmail();
 
@@ -115,9 +118,13 @@ public class MyProfileController extends Controller {
 
         utente = getMongoConnectionManager().findUser(userEmail);
         passwordField.setText("******"); // Set password field to 6 asterisks
-        List<String> userCities = utente.getPreferredCities();
 
-        for (String city : CITIES) {
+        List<String> userCities = utente.getPreferredCities();
+        cityTidlePane = createTitledPane(userCities);
+        cityVBox.getChildren().add(cityTidlePane);
+        /*
+        for (String city : CITIES)
+        {
             CheckBox comboCity = new CheckBox();
             comboCity.setText(city);
             citiesOfInterestBox.getChildren().add(comboCity);
@@ -134,6 +141,8 @@ public class MyProfileController extends Controller {
                 }
             });
         }
+        */
+
         // Update preferred cities
         updateCitiesButton.setOnAction(event -> {
             if (updateCitiesInDatabase(selectedCities)) {
@@ -172,56 +181,9 @@ public class MyProfileController extends Controller {
 
         //apartmentsContainer = new VBox(10); // Assicurati che questo VBox sia definito nel FXML con fx:id="apartmentsContainer"
 
-        if(utente.getHouses() != null ){
-            if(!utente.getHouses().isEmpty()){
-                System.out.println("casa: " + utente.getHouses().get(0).getName());
-
-            /*
-            for(Apartment a : utente.getHouses())
+            if(utente.getHouses() != null  && !utente.getHouses().isEmpty())
             {
-                String houseName = a.getName();
-                String pictureUrl = a.getImageURL();
-
-                if(pictureUrl== null || pictureUrl.isEmpty())
-                {
-                    pictureUrl = "https://hips.hearstapps.com/hmg-prod/images/lago-di-montagna-cervinia-1628008263.jpg";
-                }
-                System.out.println("houseName: " + houseName);
-                System.out.println("immmagine: " + pictureUrl);
-
-                HBox apartmentBox = new HBox(10);
-                apartmentBox.setAlignment(Pos.CENTER_LEFT);
-
-                ImageView apartmentImage = new ImageView();
-                apartmentImage.setFitHeight(100);
-                apartmentImage.setFitWidth(100);
-                apartmentImage.setPreserveRatio(true);
-
-                Image houseImage = new Image(pictureUrl);
-                //houseImageView.setImage(houseImage);
-                apartmentImage.setImage(houseImage);
-                // houseButton.setText(houseName);
-
-                Label apartmentName = new Label(a.getName());
-                apartmentName.setStyle("-fx-font-weight: bold; -fx-text-fill: #ff6200;");
-
-                apartmentBox.getChildren().addAll(apartmentImage, apartmentName);
-                apartmentsContainer.getChildren().add(apartmentBox);
-
-
-                /*
-                if (pictureUrl != null || !pictureUrl.isEmpty()) {
-                    Image houseImage = new Image(pictureUrl);
-                    houseImageView.setImage(houseImage);
-                }
-                else
-                {
-                    String defaultImageUrl = "https://www.liveinup.it/thumbs/luoghi/esperienze-in-montagna-copertina.webp";
-                    Image defaultImage = new Image(defaultImageUrl);
-                    houseImageView.setImage(defaultImage);
-                }
-                */
-                // Recupera gli appartamenti dell'utente e li aggiunge al VBox apartmentsContainer
+                System.out.println("casa: " + utente.getHouses().get(0).getName());
                 for (Apartment apartment : utente.getHouses())
                 {
                     //QUI TUTTO CORRETTO
@@ -254,7 +216,6 @@ public class MyProfileController extends Controller {
                     apartmentsContainer.getChildren().add(apartmentBox); // This should add the apartment to the UI
                 }
             }
-        }
         else
         {
             apartmentsContainer.getChildren().add(new Label("No apartments available."));
@@ -275,6 +236,36 @@ public class MyProfileController extends Controller {
             adminContainer.getChildren().add(analyticsButton);
         }
         getSession().setUser(utente);
+    }
+
+    public TitledPane createTitledPane(List<String> userCities) {
+        GridPane gridPane = new GridPane();
+        List<String> cities = getNeo4jConnectionManager().getAllCities();
+        for(String city : cities)
+        {
+            CheckBox mainCheckBox = new CheckBox(city);
+            mainCheckBox.setText(city);
+            mainCheckBox.setOnAction(e -> {
+                if (mainCheckBox.isSelected()) {
+                    selectedCities.add(mainCheckBox.getText());
+                } else {
+                    selectedCities.remove(mainCheckBox.getText());
+                }
+            });
+            if(userCities!=null && userCities.contains(city)){
+                mainCheckBox.setSelected(true);
+                selectedCities.add(city);
+            }
+            gridPane.add(mainCheckBox, 0, cities.indexOf(city));
+        }
+
+        TitledPane titledPane = new TitledPane("Cities interested in", gridPane);
+        // titledPane.setStyle("-fx-pref-width: 10px;"); // Imposta la larghezza preferita inline
+        // titledPane.setPadding(new Insets(2, 2, 2, 2));
+
+        titledPane.setExpanded(false);
+
+        return titledPane;
     }
 
     @FXML
