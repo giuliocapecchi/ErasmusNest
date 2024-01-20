@@ -68,4 +68,9 @@ public class MyReservationsController extends Controller {
         centerVBox.getChildren().add(reservationHBox);
 
     }
+
+    @FXML
+    protected void loginButtonClick(){
+        super.changeWindow("login");
+    }
 }
