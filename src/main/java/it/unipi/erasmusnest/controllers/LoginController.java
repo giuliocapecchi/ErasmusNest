@@ -100,7 +100,7 @@ public class LoginController extends Controller{
                     getSession().getUser().setEmail(emailField.getEmailAddress());
                     super.getRedisConnectionManager().addUser(emailField.getEmailAddress(), passwordField.getText());
                     logged = true;
-                } else {
+                }else{
                     showErrorMessage("Invalid email or password", errorTextFlow);
                 }
             }
