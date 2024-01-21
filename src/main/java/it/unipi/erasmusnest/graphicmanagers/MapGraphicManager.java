@@ -81,6 +81,7 @@ public class MapGraphicManager {
             String encoded_address = URLEncoder.encode(address, StandardCharsets.UTF_8);
             JSONArray results = getObjects(encoded_address);
             if (!results.isEmpty()) {
+                System.out.println(results);
                 resultLabel.setText("");
                 JSONObject result = results.getJSONObject(0);
                 this.webView = webView;
