@@ -78,7 +78,7 @@ public class MyProfileController extends Controller {
     @FXML
     private void initialize() {
 
-        
+
 
 
         personalInfoVbox.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.6));
@@ -87,14 +87,14 @@ public class MyProfileController extends Controller {
         passwordChangeOuterBox.prefWidthProperty().bind(super.getRootPane().widthProperty());
 
         CITIES = getNeo4jConnectionManager().getAllCities();
-        User utente = new User();
         String userEmail = getSession().getUser().getEmail();
 
-        utente = getMongoConnectionManager().findUser(userEmail);
+        User utente = getMongoConnectionManager().findUser(userEmail);
         passwordField.setText("******"); // Set password field to 6 asterisks
         List<String> userCities = utente.getPreferredCities();
         cityTidlePane = createTitledPane(userCities);
         cityVBox.getChildren().add(cityTidlePane);
+
         // Update preferred cities
         updateCitiesButton.setOnAction(event -> {
             if (updateCitiesInDatabase(selectedCities)) {
@@ -378,7 +378,6 @@ public class MyProfileController extends Controller {
 
     public void onApartmentView() {
         // Non funziona perche c'è un errore nel RatingGraphicManager
-        // Questo era quello che si faceva prima della creazione di modifyApartment
         getSession().setApartmentId(getSession().getUser().getHouses().get(0).getId());
         super.changeWindow("apartment");
     }

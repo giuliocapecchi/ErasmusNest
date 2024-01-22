@@ -137,7 +137,6 @@ public class MongoConnectionManager extends ConnectionManager{
             //System.out.println("Apartment: " + apartment.toJson());
 
             String coordinates = apartment.getString("position");
-            System.out.println("\n\n\nCoordinates: " + coordinates);
             // remove space from coordinates
             coordinates = coordinates.replaceAll("\\s","");
             // split coordinates in latitude and longitude that are separated by ','
@@ -167,23 +166,7 @@ public class MongoConnectionManager extends ConnectionManager{
                 id = (Long) apartment.get("id");
 
             // to retrieve also studyFields
-            // old constructor
-            /*
             resultApartment = new Apartment(
-                    id,
-                    apartment.getString("house_name"),
-                    description,
-                    new Point2D(Double.parseDouble(latLong[0]), Double.parseDouble(latLong[1])),
-                    Double.parseDouble(apartment.getString("price").replace("$", "")),
-                    apartment.getInteger("accommodates"),
-                    apartment.getString("host_email"),
-                    apartment.getString("picture_url"),
-                    bathroomsNumber
-            );
-            */
-            // new constructor
-            resultApartment = new Apartment(
-                    //apartmentId,
                     id,
                     apartment.getString("house_name"),
                     description,
@@ -327,6 +310,7 @@ public class MongoConnectionManager extends ConnectionManager{
         } else {
             availableEmail = false;
         }
+
         return availableEmail;
     }
 
