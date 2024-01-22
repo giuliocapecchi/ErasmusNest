@@ -93,26 +93,6 @@ public class MongoConnectionManager extends ConnectionManager{
         return user;
     }
 
-  /* public boolean updateEmail(String oldEmail, String newEmail)
-   {
-       // Effettua l'aggiornamento nel database MongoDB con la nuova email
-       MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
-       // MongoDatabase database = mongoClient.getDatabase("progetto");
-       // MongoCollection<Document> collection = database.getCollection("utenti");
-       MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
-       MongoCollection<Document> collection = database.getCollection("users");
-
-       collection.updateOne(Filters.eq("email", oldEmail), new Document("$set", new Document("email", newEmail)));
-
-       collection = database.getCollection("apartments");
-
-       collection.updateOne(Filters.eq("host_email", oldEmail), new Document("$set", new Document("host_email", newEmail)));
-
-       mongoClient.close();
-
-       return true;
-   }*/
-
     public Apartment getApartment(Long apartmentId){
 
         Apartment resultApartment = null;

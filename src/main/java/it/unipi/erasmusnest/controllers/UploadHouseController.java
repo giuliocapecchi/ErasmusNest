@@ -5,17 +5,24 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import it.unipi.erasmusnest.graphicmanagers.MapGraphicManager;
 import it.unipi.erasmusnest.model.User;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
+import javafx.scene.web.WebView;
 import org.bson.Document;
 import org.controlsfx.control.PopOver;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class UploadHouseController extends Controller {
 
@@ -41,27 +48,34 @@ public class UploadHouseController extends Controller {
     private TextField neighborhoodTextField;
 
     @FXML
-    private TextField latitudeTextField;
+    private TextField addressTextField;
+
+    @FXML Button uploadButton;
 
     @FXML
-    private TextField longitudeTextField;
+    Button geocodeButton;
 
-    public Button updateButton;
+    @FXML
+    Label geocodeResultLabel;
+
+    @FXML
+    VBox mapVBox;
+
+    MapGraphicManager mapGraphicManager;
 
     public UploadHouseController() {}
 
+    @FXML
     private void initialize() {
-
+        mapGraphicManager = new MapGraphicManager();
+        uploadButton.setDisable(true);
     }
 
     @FXML
     void onUploadButtonClick(ActionEvent event) {
-        // Ottieni i dati inseriti dall'utente
         String houseName = houseNameTextField.getText();
         String pictureUrl = pictureUrlTextField.getText();
-
-        if(pictureUrl.isBlank() || pictureUrl.isEmpty())
-        {
+        if(pictureUrl.isBlank() || pictureUrl.isEmpty()){ //TODO : ABBIAMO IL PLACEHOLDER PER QUANDO UN'IMMAGINE NON è DISPONIBILE, si trova dentro media
             pictureUrl = "https://www.altabadia.org/media/titelbilder/arrivo-coppa-del-mondo-by-freddy-planinschekjpg-3-1.jpg";
         }
 
@@ -69,42 +83,34 @@ public class UploadHouseController extends Controller {
         String bathroomsStr = bathroomsTextField.getText();
         String bedsStr = bedsTextField.getText();
         String priceStr = priceTextField.getText();
-        String latitudeStr = latitudeTextField.getText();
-        String longitudeStr = longitudeTextField.getText();
         String neighborhood = neighborhoodTextField.getText();
+        double latitude = mapGraphicManager.getLatitude();
+        double longitude = mapGraphicManager.getLongitude();
 
         try {
             int accommodates = Integer.parseInt(accommodatesStr);
-            int bathrooms = Integer.parseInt(bathroomsStr);
             int beds = Integer.parseInt(bedsStr);
-            double price = Double.parseDouble(priceStr);
-            double latitude = Double.parseDouble(latitudeStr);
-            double longitude = Double.parseDouble(longitudeStr);
 
-            String check = checkFields(houseName, accommodates, bathrooms, beds, price, latitude, longitude);
-            // carica casa
             // prima bisogna recuperare le credenziali dell'utente dal db utenti
             String userEmail = getSession().getUser().getEmail();
 
-            MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
-            MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
-            MongoCollection<Document> collection = database.getCollection("users");
-            Document userDocument = collection.find(Filters.eq("email", userEmail)).first();
 
-            if (userDocument != null) {
-                // user_id di utenti è host_id di case
-                int userId = userDocument.getInteger("user_id");
-                // host_name e host_surname di case è first_name e last_name di utenti
-                String host_name = userDocument.getString("first_name");
-                String host_surname = userDocument.getString("last_name");
+            // TODO: ANDRE C'è DA USARE STI CONNETTORI OVUNQUE NON FARE STE  MINCHIA DI CHIAMATE DIRETTE AL DB -> User user = getMongoConnectionManager().findUser(userEmail);
+
+            User user = getMongoConnectionManager().findUser(userEmail);
+
+            if (user != null) {
+                String host_email = user.getEmail();
+                String host_name = user.getName();
+                String host_surname = user.getSurname();
                 // host_email di case è email di utenti
-                String host_email = userDocument.getString("email");
+
                 // Creare un nuovo documento per la casa
                 Document houseDocument = new Document()
                         .append("house_id", 7) // Genera un nuovo ID per la casa
                         .append("house_name", houseName)
                         .append("picture_url", pictureUrl)
-                        .append("host_id", userId)
+                      //  .append("host_id", userId) -> NON LO ABBIAMO
                         .append("host_name", host_name)
                         .append("host_surname", host_surname)
                         .append("host_email", host_email)
@@ -115,6 +121,9 @@ public class UploadHouseController extends Controller {
                         .append("neighbourhood", neighborhood)
                         .append("position", latitude + "," + longitude)
                         .append("email", host_email);
+
+
+                //TODO: (PARTE2) ANDRE C'è DA USARE STI CONNETTORI OVUNQUE NON FARE STE  MINCHIA DI CHIAMATE DIRETTE AL DB
 
                 // Inserisci il nuovo documento nel database
                 MongoCollection<Document> housesCollection = database.getCollection("apartments");
@@ -155,6 +164,8 @@ public class UploadHouseController extends Controller {
                         existingUser.put("house", userHouses);
                     }
 
+                    //todo: PARTE 3  connettori
+
                     // Aggiorna il documento utente con il nuovo documento casa
                     usersCollection.replaceOne(Filters.eq("email", userEmail), existingUser);
 
@@ -177,32 +188,29 @@ public class UploadHouseController extends Controller {
         popOver.setContentNode(label);
         popOver.setDetachable(false);
         popOver.setAutoHide(true);
-
         // Mostra il messaggio di conferma
-        popOver.show(updateButton); // rootPane è il tuo StackPane principale
+        popOver.show(uploadButton);
     }
 
-    private String checkFields(String houseName, int accommodates, int bathrooms, int beds,
-                               double price, double latitude, double longitude) {
-        if (houseName.isBlank() || houseName.isEmpty())
-            return "houseName";
-        if (accommodates <= 0)
-            return "accommodates";
-        if (bathrooms <= 0)
-            return "bathrooms";
-        if (beds <= 0)
-            return "beds";
-        if (price <= 0)
-            return "price";
-        if (latitude == 0)
-            return "latitude";
-        if (longitude == 0)
-            return "longitude";
-        return "OK";
-    }
-
-    public void onBackButtonClick(ActionEvent actionEvent)
+    @FXML void onBackButtonClick()
     {
         super.changeWindow("myProfile");
+    }
+
+    @FXML void onGeocodeButtonClick(){
+        String address = URLEncoder.encode(addressTextField.getText(), StandardCharsets.UTF_8);
+        WebView mapWebView = new WebView();
+        mapVBox.getChildren().clear();
+        mapVBox.getChildren().add(mapWebView);
+        mapWebView.maxWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.5));
+        mapWebView.maxHeightProperty().bind(super.getRootPane().heightProperty().multiply(0.5));
+        if(mapGraphicManager.geocodeAddress(address, mapWebView, geocodeResultLabel)){
+            uploadButton.setDisable(false);
+        }
+    }
+
+    @FXML
+    private void checkFields(){
+        uploadButton.setDisable(Objects.equals(houseNameTextField.getText(), "") || Objects.equals(pictureUrlTextField.getText(), "") || Objects.equals(accommodatesTextField.getText(), "") || Objects.equals(bathroomsTextField.getText(), "") || Objects.equals(bedsTextField.getText(), "") || Objects.equals(priceTextField.getText(), "") || Objects.equals(addressTextField.getText(), ""));
     }
 }

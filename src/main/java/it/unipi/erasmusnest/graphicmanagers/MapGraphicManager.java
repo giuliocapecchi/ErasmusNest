@@ -115,5 +115,13 @@ public class MapGraphicManager {
         return new JSONArray(response.toString());
     }
 
+    public double getLatitude(){
+        return location.getX();
+    }
+
+    public double getLongitude(){
+        return location.getY();
+    }
+
 
 }
