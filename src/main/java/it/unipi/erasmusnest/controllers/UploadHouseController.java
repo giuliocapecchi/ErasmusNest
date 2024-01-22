@@ -96,8 +96,13 @@ public class UploadHouseController extends Controller {
 
 
             // TODO: ANDRE C'è DA USARE STI CONNETTORI OVUNQUE NON FARE STE  MINCHIA DI CHIAMATE DIRETTE AL DB -> User user = getMongoConnectionManager().findUser(userEmail);
+            MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
+            MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
+            MongoCollection<Document> collection = database.getCollection("users");
+            Document userDocument = collection.find(Filters.eq("email", userEmail)).first();
 
             User user = getMongoConnectionManager().findUser(userEmail);
+
 
             if (user != null) {
                 String host_email = user.getEmail();
