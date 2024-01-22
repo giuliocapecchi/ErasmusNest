@@ -87,10 +87,9 @@ public class MyProfileController extends Controller {
         passwordChangeOuterBox.prefWidthProperty().bind(super.getRootPane().widthProperty());
 
         CITIES = getNeo4jConnectionManager().getAllCities();
-        User utente;
         String userEmail = getSession().getUser().getEmail();
 
-        utente = getMongoConnectionManager().findUser(userEmail);
+        User utente = getMongoConnectionManager().findUser(userEmail);
         passwordField.setText("******"); // Set password field to 6 asterisks
         List<String> userCities = utente.getPreferredCities();
         cityTidlePane = createTitledPane(userCities);
@@ -159,10 +158,11 @@ public class MyProfileController extends Controller {
                     apartmentImage.setImage(image);
                     Button apartmentButton = new Button();
                     apartmentButton.setText(apartment.getName());
+                    apartmentButton.setId(apartment.getId().toString());
                     //Now add the apartment image and button to the HBox
                     apartmentButton.setOnAction(event -> {
                         // Chiamare il metodo desiderato quando il bottone viene premuto
-                        onApartmentView();
+                        onApartmentView(apartmentButton.getId());
                     });
                     apartmentBox.getChildren().addAll(apartmentImage, apartmentButton);
                     apartmentsContainer.getChildren().add(apartmentBox); // This should add the apartment to the UI
@@ -252,7 +252,6 @@ public class MyProfileController extends Controller {
 
         // Aggiungi la logica per verificare la vecchia password
         // String currentPassword = getCurrentUserPassword(); // Sostituisci con la tua logica per ottenere la password corrente
-
         if (newPassword.length() >= 4 && newPassword.length() <= 20 && newPassword.equals(confirmNewPassword))
         {
             if(getRedisConnectionManager().updateUserPassword(getSession().getUser().getEmail(), newPassword)){
@@ -272,7 +271,6 @@ public class MyProfileController extends Controller {
                     setPasswordErrorText();
                 }
             }
-
         }
         else
         {
@@ -382,6 +380,12 @@ public class MyProfileController extends Controller {
         // Non funziona perche c'è un errore nel RatingGraphicManager
         getSession().setApartmentId(getSession().getUser().getHouses().get(0).getId());
         super.changeWindow("apartment");
+    }
+
+    public void onApartmentView(String apartmentId) {
+        getSession().setApartmentId(Long.parseLong(apartmentId));
+        System.out.println("\n\n\nApartment ID: " + apartmentId);
+        super.changeWindow("modifyApartment");
     }
 
     public void onBack(ActionEvent actionEvent) {

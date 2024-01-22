@@ -1,34 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
 <StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.erasmusnest.controllers.UploadHouseController">
-    <ScrollPane fitToWidth="true" fitToHeight="true" >
-        <VBox alignment="TOP_LEFT" spacing="10" style="-fx-border-color: orange; -fx-border-width: 2px; -fx-padding: 10px;">
+    <ScrollPane fitToWidth="true">
+        <VBox spacing="10" style="-fx-border-color: orange; -fx-border-width: 2px; -fx-padding: 10px;">
             <Label text="House Name:" />
-            <TextField fx:id="houseNameTextField" />
+            <TextField fx:id="houseNameTextField" onKeyReleased="#checkFields"/>
             <Label text="Picture Url:" />
-            <TextField fx:id="pictureUrlTextField" />
+            <TextField fx:id="pictureUrlTextField" onKeyReleased="#checkFields"/>
             <Label text="Accommodates:" />
-            <TextField fx:id="accommodatesTextField" />
+            <TextField fx:id="accommodatesTextField" onKeyReleased="#checkFields" />
             <Label text="Bathrooms:" />
-            <TextField fx:id="bathroomsTextField" />
+            <TextField fx:id="bathroomsTextField" onKeyReleased="#checkFields"/>
             <Label text="Beds:" />
-            <TextField fx:id="bedsTextField" />
+            <TextField fx:id="bedsTextField" onKeyReleased="#checkFields"/>
             <Label text="Price:" />
-            <TextField fx:id="priceTextField" />
-            <Label text="Neighborhood:" />
-            <TextField fx:id="neighborhoodTextField" />
-            <Label text="Latitude:" />
-            <TextField fx:id="latitudeTextField" />
-            <Label text="Longitude:" />
-            <TextField fx:id="longitudeTextField" />
-            <Button fx:id="updateButton" text="Upload" onAction="#onUploadButtonClick" style="-fx-background-color: orange; -fx-text-fill: white; -fx-padding: 5px 10px;" />
-            <!-- Aggiungi il bottone per tornare alla pagina precedente -->
-            <Button text="Back" onAction="#onBackButtonClick" style="-fx-background-color: orange; -fx-text-fill: white; -fx-padding: 5px 10px;" />
+            <TextField fx:id="priceTextField" onKeyReleased="#checkFields" />
+            <Label text="Neighborhood: (optional)" />
+            <TextField fx:id="neighborhoodTextField" onKeyReleased="#checkFields"/>
+            <Label text="Address:" />
+            <TextField fx:id="addressTextField" onKeyReleased="#checkFields"/>
+            <Button fx:id="geocodeButton" onAction="#onGeocodeButtonClick" style="-fx-background-color: #b4bd00; -fx-text-fill: white; -fx-padding: 5px 10px;" text="Check address" />
+            <Label fx:id="geocodeResultLabel" layoutX="14.0" layoutY="53.0" prefHeight="7.0" prefWidth="624.0" textAlignment="CENTER" textFill="#ff0000" />
+            <VBox fx:id="mapVBox"/>
+            <Button fx:id="uploadButton" onAction="#onUploadButtonClick" style="-fx-background-color: orange; -fx-text-fill: white; -fx-padding: 5px 10px;" text="Upload" />
+            <Button onAction="#onBackButtonClick" style="-fx-background-color: orange; -fx-text-fill: white; -fx-padding: 5px 10px;" text="Back" />
         </VBox>
     </ScrollPane>
 </StackPane>
