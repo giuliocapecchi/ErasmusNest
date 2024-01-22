@@ -95,27 +95,6 @@ public class MyProfileController extends Controller {
         List<String> userCities = utente.getPreferredCities();
         cityTidlePane = createTitledPane(userCities);
         cityVBox.getChildren().add(cityTidlePane);
-        /*
-        for (String city : CITIES)
-        {
-            CheckBox comboCity = new CheckBox();
-            comboCity.setText(city);
-            citiesOfInterestBox.getChildren().add(comboCity);
-            // Check if the user has already selected this city
-            if(userCities!=null && userCities.contains(city)){
-                comboCity.setSelected(true);
-                selectedCities.add(city);
-            }
-            comboCity.setOnAction(event -> {
-                if (comboCity.isSelected()) {
-                    selectedCities.add(city);
-                } else {
-                    selectedCities.remove(city);
-                }
-            });
-        }
-        */
-
         // Update preferred cities
         updateCitiesButton.setOnAction(event -> {
             if (updateCitiesInDatabase(selectedCities)) {
@@ -179,10 +158,11 @@ public class MyProfileController extends Controller {
                     apartmentImage.setImage(image);
                     Button apartmentButton = new Button();
                     apartmentButton.setText(apartment.getName());
+                    apartmentButton.setId(apartment.getId().toString());
                     //Now add the apartment image and button to the HBox
                     apartmentButton.setOnAction(event -> {
                         // Chiamare il metodo desiderato quando il bottone viene premuto
-                        onApartmentView();
+                        onApartmentView(apartmentButton.getId());
                     });
                     apartmentBox.getChildren().addAll(apartmentImage, apartmentButton);
                     apartmentsContainer.getChildren().add(apartmentBox); // This should add the apartment to the UI
@@ -272,7 +252,6 @@ public class MyProfileController extends Controller {
 
         // Aggiungi la logica per verificare la vecchia password
         // String currentPassword = getCurrentUserPassword(); // Sostituisci con la tua logica per ottenere la password corrente
-
         if (newPassword.length() >= 4 && newPassword.length() <= 20 && newPassword.equals(confirmNewPassword))
         {
             if(getRedisConnectionManager().updateUserPassword(getSession().getUser().getEmail(), newPassword)){
@@ -292,7 +271,6 @@ public class MyProfileController extends Controller {
                     setPasswordErrorText();
                 }
             }
-
         }
         else
         {
@@ -400,8 +378,15 @@ public class MyProfileController extends Controller {
 
     public void onApartmentView() {
         // Non funziona perche c'è un errore nel RatingGraphicManager
+        // Questo era quello che si faceva prima della creazione di modifyApartment
         getSession().setApartmentId(getSession().getUser().getHouses().get(0).getId());
         super.changeWindow("apartment");
+    }
+
+    public void onApartmentView(String apartmentId) {
+        getSession().setApartmentId(Long.parseLong(apartmentId));
+        System.out.println("\n\n\nApartment ID: " + apartmentId);
+        super.changeWindow("modifyApartment");
     }
 
     public void onBack(ActionEvent actionEvent) {

@@ -15,10 +15,12 @@ public class Apartment {
     private Integer maxAccommodates;
     private String hostEmail;
     private String imageURL;        // embedded in User (host)
-
     private Double averageRating;    // embedded in User (host)
 
     private int numberOfReviews = 0; // in neo4j
+    private String bathrooms; // in MONGO
+    private String hostName;
+    private String hostSurname;
 
     public Apartment(Long id, String name, String description, Point2D location, ArrayList<String> studyFields, String hostEmail, String imageURL, Double averageRating) {
         this.id = id;
@@ -84,6 +86,43 @@ public class Apartment {
 
     public Apartment(Long id, String name, String pictureUrl) {
         this.id=id; this.name=name; this.imageURL=pictureUrl;
+    }
+
+    public Apartment(Long id, String houseName, String description, Point2D point2D, double price, Integer accommodates, String hostEmail, String pictureUrl, String bathroomsNumber)
+    {
+        this.id = id;
+        this.name = houseName;
+        this.description = description;
+        this.location = point2D;
+        this.dollarPriceMonth = price;
+        this.maxAccommodates = accommodates;
+        this.hostEmail = hostEmail;
+        this.imageURL = pictureUrl;
+        this.bathrooms = bathroomsNumber;
+    }
+
+    public String getHostName() {
+        return hostName;
+    }
+
+    public void setHostName(String hostName) {
+        this.hostName = hostName;
+    }
+
+    public String getHostSurname() {
+        return hostSurname;
+    }
+
+    public void setHostSurname(String hostSurname) {
+        this.hostSurname = hostSurname;
+    }
+
+    public String getBathrooms() {
+        return bathrooms;
+    }
+
+    public void setBathrooms(String bathrooms) {
+        this.bathrooms = bathrooms;
     }
 
     public Long getId() {
@@ -158,6 +197,14 @@ public class Apartment {
         return maxAccommodates;
     }
 
+    public void setMaxAccommodates(Integer maxAccommodates) {
+        this.maxAccommodates = maxAccommodates;
+    }
+
+    public void setDollarPriceMonth(Double dollarPriceMonth) {
+        this.dollarPriceMonth = dollarPriceMonth;
+    }
+
     @Override
     public String toString() {
         return "Apartment{" +
@@ -168,6 +215,7 @@ public class Apartment {
                 ", studyFields=" + studyFields +
                 ", dollarPriceMonth=" + dollarPriceMonth +
                 ", maxAccommodates=" + maxAccommodates +
+                ", bathrooms=" + bathrooms +
                 ", hostEmail='" + hostEmail + '\'' +
                 ", imageURL='" + imageURL + '\'' +
                 ", averageRating=" + averageRating +

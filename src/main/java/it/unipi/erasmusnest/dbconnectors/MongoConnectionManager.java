@@ -93,25 +93,36 @@ public class MongoConnectionManager extends ConnectionManager{
         return user;
     }
 
-  /* public boolean updateEmail(String oldEmail, String newEmail)
-   {
-       // Effettua l'aggiornamento nel database MongoDB con la nuova email
-       MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
-       // MongoDatabase database = mongoClient.getDatabase("progetto");
-       // MongoCollection<Document> collection = database.getCollection("utenti");
-       MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
-       MongoCollection<Document> collection = database.getCollection("users");
-
-       collection.updateOne(Filters.eq("email", oldEmail), new Document("$set", new Document("email", newEmail)));
-
-       collection = database.getCollection("apartments");
-
-       collection.updateOne(Filters.eq("host_email", oldEmail), new Document("$set", new Document("host_email", newEmail)));
-
-       mongoClient.close();
-
-       return true;
-   }*/
+    public boolean uploadApartment(Apartment apartment)
+    {
+        boolean result = false;
+        try(MongoClient mongoClient = MongoClients.create("mongodb://"+super.getHost()+":"+super.getPort()))
+        {
+            MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
+            MongoCollection<Document> collection = database.getCollection("apartments");
+            Document newApartment = new Document("house_id", apartment.getId())
+                    .append("house_name", apartment.getName())
+                    .append("picture_url", apartment.getImageURL())
+                    .append("host_name",apartment.getHostName())
+                    .append("host_surname",apartment.getHostSurname())
+                    .append("host_email", apartment.getHostEmail())
+                    .append("accommodates", apartment.getMaxAccommodates())
+                    .append("bathrooms_text", apartment.getBathrooms())
+                    .append("price", "$" + apartment.getDollarPriceMonth())
+                    .append("position", apartment.getLocation().getX() + ", " + apartment.getLocation().getY())
+                    .append("neighbourhood", apartment.getDescription());
+            collection.insertOne(newApartment);
+            result = true;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            new AlertDialogGraphicManager("MongoDB UPLOAD failed").show();
+            System.out.println("Error in uploadApartment: " + e.getMessage());
+            result = false;
+        }
+        return result;
+    }
 
     public Apartment getApartment(Long apartmentId){
 
@@ -126,6 +137,7 @@ public class MongoConnectionManager extends ConnectionManager{
             //System.out.println("Apartment: " + apartment.toJson());
 
             String coordinates = apartment.getString("position");
+            System.out.println("\n\n\nCoordinates: " + coordinates);
             // remove space from coordinates
             coordinates = coordinates.replaceAll("\\s","");
             // split coordinates in latitude and longitude that are separated by ','
@@ -140,7 +152,12 @@ public class MongoConnectionManager extends ConnectionManager{
             	description += s + "\n";
             }
 
-            description += "Bathrooms: "+apartment.getString("bathrooms_text");
+            // description += "Bathrooms: "+apartment.getString("bathrooms_text");
+
+            String bathroomsText = apartment.getString("bathrooms_text");
+            String[] bathSplit = bathroomsText.split("\\s+");
+            String bathroomsNumber = bathSplit[0];
+            bathroomsNumber = Integer.parseInt(bathroomsNumber) == 1 ? bathroomsNumber + " bath" : bathroomsNumber + " baths";
 
             Long id = null;
             // if apartment.get("id") return an integer, it is necessary to cast it to Long
@@ -150,6 +167,8 @@ public class MongoConnectionManager extends ConnectionManager{
                 id = (Long) apartment.get("id");
 
             // to retrieve also studyFields
+            // old constructor
+            /*
             resultApartment = new Apartment(
                     id,
                     apartment.getString("house_name"),
@@ -158,7 +177,22 @@ public class MongoConnectionManager extends ConnectionManager{
                     Double.parseDouble(apartment.getString("price").replace("$", "")),
                     apartment.getInteger("accommodates"),
                     apartment.getString("host_email"),
-                    apartment.getString("picture_url")
+                    apartment.getString("picture_url"),
+                    bathroomsNumber
+            );
+            */
+            // new constructor
+            resultApartment = new Apartment(
+                    //apartmentId,
+                    id,
+                    apartment.getString("house_name"),
+                    description,
+                    new Point2D(Double.parseDouble(latLong[0]), Double.parseDouble(latLong[1])),
+                    Double.parseDouble(apartment.getString("price").replace("$", "")),
+                    apartment.getInteger("accommodates"),
+                    apartment.getString("host_email"),
+                    apartment.getString("picture_url"),
+                    bathroomsNumber
             );
 
         }catch (Exception e){
@@ -293,42 +327,8 @@ public class MongoConnectionManager extends ConnectionManager{
         } else {
             availableEmail = false;
         }
-
         return availableEmail;
-
-        /*
-        if(getPassword(emailAddress) != null)
-        {
-            System.out.println("USERNAME NON DISPONIBILE\n\n\n\n\n\n");
-            availableEmail = false;
-        }
-        else
-        {
-            try(MongoClient mongoClient = MongoClients.create("mongodb://"+super.getHost()+":"+super.getPort()))
-            {
-                MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
-                MongoCollection<Document> collection = database.getCollection("users");
-                Document newUser = new Document("email", emailAddress)
-                        .append("password", text)
-                        .append("first_name", "")
-                        .append("last_name", "")
-                        .append("SF", "")
-                        .append("CoI", new ArrayList<String>())
-                        .append("house", new ArrayList<Document>());
-                collection.insertOne(newUser);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                new AlertDialogGraphicManager("MongoDB SIGNUP failed").show();
-                System.out.println("Error in addUser: " + e.getMessage());
-            }
-        }
-        */
-
     }
-
-
 
     public boolean availableEmail(String emailAddress){
         boolean availableEmail = true;
@@ -339,7 +339,7 @@ public class MongoConnectionManager extends ConnectionManager{
             Document userDocument = collection.find(Filters.eq("email", emailAddress)).first();
             if(userDocument != null)
             {
-                //Vuol dire che la mail è gia stata presa, ce gia un account
+                //Mail already in use
                 availableEmail = false;
             }
         }
@@ -351,4 +351,33 @@ public class MongoConnectionManager extends ConnectionManager{
         }
         return availableEmail;
     }
+
+    public boolean updateApartment(Apartment updatedHouse)
+    {
+        boolean updated = false;
+        try(MongoClient mongoClient = MongoClients.create("mongodb://"+super.getHost()+":"+super.getPort()))
+        {
+            MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
+            MongoCollection<Document> collection = database.getCollection("apartments");
+            Document updatedHouseDocument = new Document("house_id", updatedHouse.getId())
+                    .append("house_name", updatedHouse.getName())
+                    .append("price", "$" + updatedHouse.getDollarPriceMonth())
+                    .append("accommodates", updatedHouse.getMaxAccommodates())
+                    .append("host_email", updatedHouse.getHostEmail())
+                    .append("picture_url", updatedHouse.getImageURL())
+                    .append("position", updatedHouse.getLocation().getX() + ", " + updatedHouse.getLocation().getY())
+                    .append("neighbourhood", updatedHouse.getDescription())
+                    .append("bathrooms_text", updatedHouse.getBathrooms());
+            collection.updateOne(Filters.eq("house_id", updatedHouse.getId()), new Document("$set", updatedHouseDocument));
+            updated = true;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            new AlertDialogGraphicManager("MongoDB UPDATE failed").show();
+            System.out.println("Error in updateApartment: " + e.getMessage());
+        }
+        return updated;
+    }
+
 }
