@@ -123,5 +123,9 @@ public class MapGraphicManager {
         return location.getY();
     }
 
+    public Point2D getLocation(){
+        return location;
+    }
+
 
 }
