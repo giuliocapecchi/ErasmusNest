@@ -250,4 +250,30 @@ public class RedisConnectionManager extends ConnectionManager{
         }
     }
 
+    public void deleteReservation(Reservation reservation){
+        try(Jedis jedis = new Jedis(super.getHost(), super.getPort())) {
+
+            String subKey = getSubKey(reservation);
+            String key = subKey + "timestamp";
+            // delete the key
+            jedis.del(key);
+            key = subKey + "city";
+            jedis.del(key);
+            key = subKey + "apartmentImage";
+            jedis.del(key);
+
+        } catch (Exception e) {
+            System.out.println("Connection problem: " + e.getMessage());
+            new AlertDialogGraphicManager("Redis connection failed").show();
+        }
+    }
+
+    private static String getSubKey(Reservation reservation) {
+        return "reservation:" + reservation.getStudentEmail()
+                + ":" + reservation.getApartmentId()
+                + ":" + reservation.getStartYear()
+                + ":" + reservation.getStartMonth()
+                + ":" + reservation.getNumberOfMonths() + ":";
+    }
+
 }

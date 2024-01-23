@@ -172,6 +172,6 @@ public class UploadHouseController extends Controller {
 
     @FXML
     private void checkFields(){
-        uploadButton.setDisable(Objects.equals(houseNameTextField.getText(), "") || Objects.equals(pictureUrlTextField.getText(), "") || Objects.equals(accommodatesTextField.getText(), "") || Objects.equals(bathroomsTextField.getText(), "") || Objects.equals(bedsTextField.getText(), "") || Objects.equals(priceTextField.getText(), "") || Objects.equals(addressTextField.getText(), ""));
+        uploadButton.setDisable(Objects.equals(houseNameTextField.getText(), "") || Objects.equals(pictureUrlTextField.getText(), "") || Objects.equals(accommodatesTextField.getText(), "") || Objects.equals(bathroomsTextField.getText(), "") || Objects.equals(bedsTextField.getText(), "") || Objects.equals(priceTextField.getText(), "") || (mapGraphicManager.getLocation()==null));
     }
 }
