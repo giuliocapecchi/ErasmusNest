@@ -6,13 +6,12 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import it.unipi.erasmusnest.graphicmanagers.MapGraphicManager;
+import it.unipi.erasmusnest.model.Apartment;
 import it.unipi.erasmusnest.model.User;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
+import javafx.geometry.Point2D;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import org.bson.Document;
@@ -26,11 +25,19 @@ import java.util.Objects;
 
 public class UploadHouseController extends Controller {
 
+    public VBox apartmentVBox;
+    public VBox bathroomsVBox;
+    public VBox priceVBox;
+    public VBox neighborhoodVBox;
     @FXML
     private TextField houseNameTextField;
 
     @FXML
     private TextField pictureUrlTextField;
+    public Spinner<Integer> inputAccommodates;
+    public Spinner<Double> inputBathrooms;
+    public Spinner<Double> inputPrice;
+    public TextArea descriptionTextArea;
 
     @FXML
     private TextField accommodatesTextField;
@@ -69,120 +76,69 @@ public class UploadHouseController extends Controller {
     private void initialize() {
         mapGraphicManager = new MapGraphicManager();
         uploadButton.setDisable(true);
+
+        inputAccommodates = new Spinner<>();
+        inputBathrooms = new Spinner<>();
+        inputPrice = new Spinner<>();
+
+        SpinnerValueFactory<Integer> accomodatesValues = new SpinnerValueFactory.IntegerSpinnerValueFactory(1,10,1);
+        SpinnerValueFactory<Double> bathroomValues = new SpinnerValueFactory.DoubleSpinnerValueFactory(1,10,1,0.5);
+        SpinnerValueFactory<Double> priceValues = new SpinnerValueFactory.DoubleSpinnerValueFactory(1,2000,1,0.5);
+
+        inputAccommodates.setValueFactory(accomodatesValues);
+        inputBathrooms.setValueFactory(bathroomValues);
+        inputPrice.setValueFactory(priceValues);
+        priceVBox.getChildren().add(inputPrice);
+        apartmentVBox.getChildren().add(inputAccommodates);
+        bathroomsVBox.getChildren().add(inputBathrooms);
+        descriptionTextArea = new TextArea();
+        descriptionTextArea.setPromptText("Insert neighbourhood description");
+        descriptionTextArea.setWrapText(true);
+        neighborhoodVBox.getChildren().add(descriptionTextArea);
+
     }
 
     @FXML
-    void onUploadButtonClick(ActionEvent event) {
+    void onUploadButtonClick(ActionEvent event)
+    {
         String houseName = houseNameTextField.getText();
         String pictureUrl = pictureUrlTextField.getText();
-        if(pictureUrl.isBlank() || pictureUrl.isEmpty()){ //TODO : ABBIAMO IL PLACEHOLDER PER QUANDO UN'IMMAGINE NON è DISPONIBILE, si trova dentro media
-            pictureUrl = "https://www.altabadia.org/media/titelbilder/arrivo-coppa-del-mondo-by-freddy-planinschekjpg-3-1.jpg";
+        if(pictureUrl.isBlank() || pictureUrl.isEmpty())
+        {
+            pictureUrl = "/media/no_photo_available.png";
         }
-
-        String accommodatesStr = accommodatesTextField.getText();
-        String bathroomsStr = bathroomsTextField.getText();
-        String bedsStr = bedsTextField.getText();
-        String priceStr = priceTextField.getText();
-        String neighborhood = neighborhoodTextField.getText();
+        Integer accommodates = inputAccommodates.getValue();
+        Double bathrooms = inputBathrooms.getValue();
+        String bathroomsStr = bathrooms==1 ? bathrooms +" bath" : bathrooms +" baths";
+        Double price = inputPrice.getValue();
+        String neighborhood = descriptionTextArea.getText();
         double latitude = mapGraphicManager.getLatitude();
         double longitude = mapGraphicManager.getLongitude();
-
-        try {
-            int accommodates = Integer.parseInt(accommodatesStr);
-            int beds = Integer.parseInt(bedsStr);
-
-            // prima bisogna recuperare le credenziali dell'utente dal db utenti
+        Point2D location = new Point2D(latitude, longitude);
+        try
+        {
             String userEmail = getSession().getUser().getEmail();
-
-
-            // TODO: ANDRE C'è DA USARE STI CONNETTORI OVUNQUE NON FARE STE  MINCHIA DI CHIAMATE DIRETTE AL DB -> User user = getMongoConnectionManager().findUser(userEmail);
-            MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
-            MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
-            MongoCollection<Document> collection = database.getCollection("users");
-            Document userDocument = collection.find(Filters.eq("email", userEmail)).first();
-
             User user = getMongoConnectionManager().findUser(userEmail);
+            if (user != null)
+            {
+                //Create new apartment
+                Apartment apartment = new Apartment(7L,houseName,neighborhood,location,price, accommodates, userEmail,
+                        pictureUrl, 0.0,0,bathroomsStr,user.getName(),user.getSurname());
 
-
-            if (user != null) {
-                String host_email = user.getEmail();
-                String host_name = user.getName();
-                String host_surname = user.getSurname();
-                // host_email di case è email di utenti
-
-                // Creare un nuovo documento per la casa
-                Document houseDocument = new Document()
-                        .append("house_id", 7) // Genera un nuovo ID per la casa
-                        .append("house_name", houseName)
-                        .append("picture_url", pictureUrl)
-                      //  .append("host_id", userId) -> NON LO ABBIAMO
-                        .append("host_name", host_name)
-                        .append("host_surname", host_surname)
-                        .append("host_email", host_email)
-                        .append("accommodates", accommodates)
-                        .append("bathrooms_text", bathroomsStr)
-                        .append("beds", beds)
-                        .append("price", priceStr)
-                        .append("neighbourhood", neighborhood)
-                        .append("position", latitude + "," + longitude)
-                        .append("email", host_email);
-
-
-                //TODO: (PARTE2) ANDRE C'è DA USARE STI CONNETTORI OVUNQUE NON FARE STE  MINCHIA DI CHIAMATE DIRETTE AL DB
-
-                // Inserisci il nuovo documento nel database
-                MongoCollection<Document> housesCollection = database.getCollection("apartments");
-                housesCollection.insertOne(houseDocument);
-
-                showConfirmationMessage("CASA caricata con successo");
-
-                // Codice per aggiungere la casa alla collection utenti
-                // Prima di inserire un nuovo documento casa, verifica se l'utente ha già una casa associata
-                MongoCollection<Document> usersCollection = database.getCollection("users");
-                Document existingUser = usersCollection.find(Filters.eq("email", userEmail)).first();
-
-                if (existingUser != null) {
-                    // Crea un nuovo documento casa
-                    houseDocument = new Document()
-                            .append("house_id", 7) // Genera un nuovo ID per la casa
-                            .append("name", houseName)
-                            .append("picture_url", pictureUrl)
-                            .append("review_scores_rating", 4.6);
-
-                    // Verifica se l'utente ha già un campo "house" nel documento
-                    if (existingUser.containsKey("house")) {
-                        // Ottieni la lista delle case dell'utente
-                        List<Document> userHouses;
-                        if (existingUser.get("house") instanceof Document) {
-                            userHouses = new ArrayList<>();
-                            userHouses.add((Document) existingUser.get("house")); // Aggiungi il documento esistente
-                        } else {
-                            userHouses = (List<Document>) existingUser.get("house");
-                        }
-                        // Aggiungi il nuovo documento casa alla lista
-                        userHouses.add(houseDocument);
-                        existingUser.put("house", userHouses); // Sostituisci il campo "house" con la lista di documenti
-                    } else {
-                        // Se l'utente non ha ancora case, crea un nuovo campo "house" con il documento casa
-                        List<Document> userHouses = new ArrayList<>();
-                        userHouses.add(houseDocument);
-                        existingUser.put("house", userHouses);
-                    }
-
-                    //todo: PARTE 3  connettori
-
-                    // Aggiorna il documento utente con il nuovo documento casa
-                    usersCollection.replaceOne(Filters.eq("email", userEmail), existingUser);
-
+                // Call mongo to insert apartment
+                if(getMongoConnectionManager().uploadApartment(apartment))
+                {
                     showConfirmationMessage("CASA caricata con successo");
-                } else {
-                    showConfirmationMessage("L'utente non esiste.");
+                }
+                else
+                {
+                    showConfirmationMessage("Errore durante il caricamento della casa");
                 }
             }
         }
         catch (NumberFormatException e)
         {
-            showConfirmationMessage("Errore di parsing: Assicurati di inserire valori numerici validi.");
+            showConfirmationMessage("Error.");
         }
     }
 

@@ -14,6 +14,7 @@ import javafx.scene.layout.VBox; // Import per il banner/pop-up
 import org.controlsfx.control.PopOver; // Import per il banner/pop-up
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class MyProfileController extends Controller {
 
@@ -141,21 +142,22 @@ public class MyProfileController extends Controller {
                     HBox apartmentBox = new HBox(10);
                     apartmentBox.setAlignment(Pos.CENTER_LEFT);
 
-                    ImageView apartmentImage = new ImageView();
-                    apartmentImage.setFitHeight(100);
-                    apartmentImage.setFitWidth(100);
-                    apartmentImage.setPreserveRatio(true);
-                    //String imageUrl = apartment.getImageURL() != null && !apartment.getImageURL().isEmpty() ? apartment.getImageURL() : "https://hips.hearstapps.com/hmg-prod/images/lago-di-montagna-cervinia-1628008263.jpg";
+                    ImageView imageView = new ImageView();
+                    imageView.setFitHeight(100);
+                    imageView.setFitWidth(100);
 
-                    String imageUrl = apartment.getImageURL();
-                    if(imageUrl== null || imageUrl.isEmpty())
+                    try
                     {
-                        //imageUrl = "/media/no_photo_available.png"; // Path inside the classpath
-                        imageUrl = "https://www.altabadia.org/media/titelbilder/arrivo-coppa-del-mondo-by-freddy-planinschekjpg-3-1.jpg";
+                        Image image = new Image(apartment.getImageURL(), true); //true let the application continue without waiting for the image to fully load
+                        imageView.setImage(image);
+                        imageView.setPreserveRatio(true);
+                        // imageView.setSmooth(true);
                     }
-
-                    Image image = new Image(imageUrl, true);
-                    apartmentImage.setImage(image);
+                    catch (Exception e)
+                    {
+                        String imagePath = "/media/no_photo_available.png"; // Path inside the classpath
+                        imageView.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath))));
+                    }
                     Button apartmentButton = new Button();
                     apartmentButton.setText(apartment.getName());
                     apartmentButton.setId(apartment.getId().toString());
@@ -164,7 +166,7 @@ public class MyProfileController extends Controller {
                         // Chiamare il metodo desiderato quando il bottone viene premuto
                         onApartmentView(apartmentButton.getId());
                     });
-                    apartmentBox.getChildren().addAll(apartmentImage, apartmentButton);
+                    apartmentBox.getChildren().addAll(imageView, apartmentButton);
                     apartmentsContainer.getChildren().add(apartmentBox); // This should add the apartment to the UI
                 }
             }
@@ -184,7 +186,6 @@ public class MyProfileController extends Controller {
                 System.out.println("Analytics button clicked");
                 super.changeWindow("analytics");
             });
-
             adminContainer.getChildren().add(analyticsButton);
         }
         getSession().setUser(utente);

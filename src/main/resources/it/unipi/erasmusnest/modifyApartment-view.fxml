@@ -35,7 +35,7 @@
             </VBox>
 
             <VBox fx:id="buttons">
-                <Button fx:id="updateHouse" onAction="#onUpdateHouseButtonClick" text="Upload House" />
+                <Button fx:id="updateHouse" onAction="#onUpdateHouseButtonClick" text="Update House" />
                 <Button fx:id="goBack" onAction="#onGoBackButtonClick" text="Back to Profile" />
             </VBox>
 
