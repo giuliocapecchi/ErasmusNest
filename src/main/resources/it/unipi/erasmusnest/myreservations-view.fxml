@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
@@ -25,22 +24,9 @@
         </center>
         <bottom>
             <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: orange;" BorderPane.alignment="CENTER">
-                <Button fx:id="logoutButton" mnemonicParsing="false" text="Logout">
-                    <cursor>
-                        <Cursor fx:constant="DEFAULT" />
-                    </cursor>
-                </Button>
-                <Button fx:id="profileButton" mnemonicParsing="false" text="Profile" />
-                <Label fx:id="welcomeText" text="Hello, ${user.name}">
-                    <padding>
-                        <Insets left="20.0" />
-                    </padding></Label>
-                <Button fx:id="signUpButton" mnemonicParsing="false" text="Signup">
-                    <cursor>
-                        <Cursor fx:constant="DEFAULT" />
-                    </cursor>
-                </Button>
-                <Button fx:id="loginButton" mnemonicParsing="false" onAction="#loginButtonClick" text="Login" />
+                <Button onAction="#homepageButtonClick" text="Homepage" />
+                <Button onAction="#profileButtonClick" text="Profile" />
+                <Button onAction="#logoutButtonClick" text="Logout" />
             </ToolBar>
         </bottom>
     </BorderPane>

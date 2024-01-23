@@ -5,75 +5,94 @@
 <?import javafx.scene.layout.*?>
 
 <StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.erasmusnest.controllers.MyProfileController">
-    <HBox fx:id="outer_HBox" alignment="CENTER" StackPane.alignment="CENTER">
-        <padding>
-            <Insets bottom="20" left="20" right="20" top="20" />
-        </padding>
-        <VBox fx:id="personalInfoVbox" spacing="10">
-            <HBox alignment="CENTER_LEFT" spacing="10">
-                <Label minWidth="75" style="-fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Name:" />
-                <Label fx:id="nameLabel" />
+    <BorderPane prefHeight="200.0" prefWidth="200.0">
+        <top>
+            <HBox alignment="CENTER_LEFT" style="-fx-background-color: #ff8000">
+                <Label style="-fx-font-size: 25px; -fx-text-fill: white; -fx-font-style: italic;" text="My profile">
+                    <HBox.margin>
+                        <Insets bottom="5.0" left="20.0" right="20.0" top="5.0" />
+                    </HBox.margin>
+                </Label>
             </HBox>
-            <HBox alignment="CENTER_LEFT" spacing="10">
-                <Label minWidth="75" style="-fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Surname:" />
-                <Label fx:id="lastNameLabel" />
-            </HBox>
-            <HBox alignment="CENTER_LEFT" spacing="10">
-                <Label minWidth="75" style="-fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Email:" />
-                <Label fx:id="emailLabel" />
-            </HBox>
-            <HBox alignment="CENTER_LEFT" spacing="10">
-                <Label minWidth="75" style="-fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Password:" />
-                <PasswordField fx:id="passwordField" editable="false" minWidth="200" text="••••••" />
-                <Button fx:id="modifyPasswordButton" onAction="#onModifyPasswordButtonClick" style="-fx-background-color: orange; -fx-border-color: red; -fx-border-width: 1px;" text="Change Password" />
-            </HBox>
-            <HBox alignment="CENTER_LEFT" spacing="10">
-                <Label minWidth="75" style="-fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Study Field:" />
-                <ComboBox fx:id="studyFieldComboBox" minWidth="200" onAction="#onStudyFieldSelectionChanged">
+        </top>
+        <center>
+            <ScrollPane fitToWidth="true" BorderPane.alignment="CENTER">
+                <VBox>
+                    <VBox fx:id="personalInfoVbox" spacing="10">
+                        <padding>
+                            <Insets bottom="20" left="20" right="20" top="20" />
+                        </padding>
+                        <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ff6200;" text="My information:" wrapText="true" />
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <Label minWidth="75" style="-fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Name:" />
+                            <Label fx:id="nameLabel" />
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <Label minWidth="75" style="-fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Surname:" />
+                            <Label fx:id="lastNameLabel" />
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <Label minWidth="75" style="-fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Email:" />
+                            <Label fx:id="emailLabel" />
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <Label minWidth="75" style="-fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Password:" />
+                            <PasswordField fx:id="passwordField" editable="false" minWidth="200" text="••••••" />
+                            <Button fx:id="modifyPasswordButton" onAction="#onModifyPasswordButtonClick" style="-fx-background-color: orange; -fx-border-color: red; -fx-border-width: 1px;" text="Change Password" />
+                        </HBox>
+                        <VBox fx:id="passwordChangeOuterBox" alignment="TOP_CENTER" spacing="10" visible="false">
+                            <VBox fx:id="passwordChangeBox" style="-fx-border-color: red; -fx-border-width: 5px; -fx-padding: 10px; -fx-background-color: white; -fx-background-radius: 5px; -fx-border-radius: 5px;">
+                                <HBox alignment="CENTER_LEFT" spacing="10">
+                                    <Label minWidth="75" text="New password:" />
+                                    <PasswordField fx:id="newPasswordField" minWidth="200" />
+                                </HBox>
+                                <HBox alignment="CENTER_LEFT" spacing="10">
+                                    <Label minWidth="75" text="Confirm password:" />
+                                    <PasswordField fx:id="confirmNewPasswordField" minWidth="200" />
+                                </HBox>
+                                <HBox>
+                                    <Button onAction="#onUpdatePasswordClick" text="Update" />
+                                    <Button onAction="#onBackButtonClick" text="Back" />
+                                </HBox>
+                            </VBox>
+                        </VBox>
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <Label minWidth="75" style="-fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Study Field:" />
+                            <ComboBox fx:id="studyFieldComboBox" minWidth="200" onAction="#onStudyFieldSelectionChanged"/>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <Label minWidth="75" style="-fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Cities of Interest:" />
+                            <VBox fx:id="cityVBox" />
+                            <Button fx:id="updateCitiesButton" onAction="#onUpdateButtonClick" style="-fx-background-color: orange; -fx-border-color: red; -fx-border-width: 1px;" text="Update Cities of Interest" />
+                        </HBox>
+                     <HBox.margin>
+                        <Insets left="10.0" top="50.0" />
+                     </HBox.margin>
+                    </VBox>
+                    <VBox fx:id="apartmentsContainerVBox" spacing="10">
+                        <padding>
+                            <Insets bottom="20" left="20" right="20" top="20" />
+                        </padding>
+                        <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ff6200;" text="My apartments:" wrapText="true" />
+                        <Button fx:id="uploadHouseButton" onAction="#onUploadHouseButtonClick" style="-fx-background-color: orange; -fx-border-color: red; -fx-border-width: 1px;" text="Upload new apartment" />
+                        <!-- Qui inizia la sezione modificata -->
+                        <VBox fx:id="apartmentsContainer" spacing="10">
+                            <!-- Qui verranno aggiunti dinamicamente gli HBox per ogni appartamento -->
+                        </VBox>
+                     <HBox.margin>
+                        <Insets right="60.0" top="50.0" />
+                     </HBox.margin>
+                    </VBox>
 
-                </ComboBox>
-            </HBox>
-            <Label minWidth="75" style="-fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Cities of Interest:" />
-            <VBox fx:id="cityVBox" >
-                <!-- Qui verranno inserite le checkbox -->
-
-                <!-- Aggiungi altre checkbox se necessario -->
-            </VBox>
-            <Button fx:id="updateCitiesButton" onAction="#onUpdateButtonClick" style="-fx-background-color: orange; -fx-border-color: red; -fx-border-width: 1px;" text="Update Cities of Interest" />
-            <Button fx:id="backButton" onAction="#onBack" style="-fx-background-color: orange; -fx-border-color: red; -fx-border-width: 1px;" text="Back to Homepage" />
-         <HBox.margin>
-            <Insets left="10.0" top="50.0" />
-         </HBox.margin>
-        </VBox>
-        <VBox fx:id="apartmentsContainerVBox" alignment="TOP_RIGHT" spacing="10">
-            <padding>
-                <Insets bottom="20" left="20" right="20" top="20" />
-            </padding>
-            <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ff6200;" text="My apartments:" wrapText="true" />
-            <Button fx:id="uploadHouseButton" onAction="#onUploadHouseButtonClick" style="-fx-background-color: orange; -fx-border-color: red; -fx-border-width: 1px;" text="Upload House" />
-            <!-- Qui inizia la sezione modificata -->
-            <VBox fx:id="apartmentsContainer" spacing="10">
-                <!-- Qui verranno aggiunti dinamicamente gli HBox per ogni appartamento -->
-            </VBox>
-         <HBox.margin>
-            <Insets right="60.0" top="50.0" />
-         </HBox.margin>
-        </VBox>
-    </HBox>
-    <VBox fx:id="passwordChangeOuterBox" alignment="TOP_CENTER" spacing="10" visible="false">
-        <VBox fx:id="passwordChangeBox" style="-fx-border-color: red; -fx-border-width: 5px; -fx-padding: 10px; -fx-background-color: white; -fx-background-radius: 5px; -fx-border-radius: 5px;">
-            <Label text="Change Password" />
-            <Label fx:id="passwordErrorLabel" style="-fx-text-fill: #f60000; -fx-font-size: 10px; -fx-padding: 5px 0;" />
-            <HBox alignment="CENTER_LEFT" spacing="10">
-                <Label minWidth="75" text="New Password:" />
-                <PasswordField fx:id="newPasswordField" minWidth="200" />
-            </HBox>
-            <HBox alignment="CENTER_LEFT" spacing="10">
-                <Label minWidth="75" text="Confirm New Password:" />
-                <PasswordField fx:id="confirmNewPasswordField" minWidth="200" />
-            </HBox>
-            <Button onAction="#onUpdatePasswordClick" text="Update" />
-            <Button onAction="#onBackButtonClick" text="Back" />
-        </VBox>
-    </VBox>
+                </VBox>
+            </ScrollPane>
+        </center>
+        <bottom>
+            <VBox fx:id="adminContainer" alignment="CENTER_RIGHT"/>
+            <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: orange;" BorderPane.alignment="CENTER">
+                <Button onAction="#logoutButtonClick" text="Logout" />
+                <Button onAction="#onBack" text="Homepage" />
+            </ToolBar>
+        </bottom>
+    </BorderPane>
 </StackPane>

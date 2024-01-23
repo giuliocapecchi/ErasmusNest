@@ -44,6 +44,7 @@ public class MyReservationsController extends Controller {
             noReservation();
         }
 
+        scrollPane.setVvalue(0.0);
     }
 
     private void noReservation(){
@@ -51,7 +52,7 @@ public class MyReservationsController extends Controller {
         HBox reservationHBox = new HBox();
         reservationHBox.setAlignment(Pos.BOTTOM_CENTER);
 
-        Label msg = new Label("Nessuna prenotazione effettuata");
+        Label msg = new Label("No reservations found");
 
         // change the style of the label
         msg.setStyle("-fx-font-size: 20px; -fx-text-fill: #019fe1; -fx-font-style: italic;");
@@ -123,7 +124,7 @@ public class MyReservationsController extends Controller {
         // remove '\n' from periodFromTo
         String msgPeriod = periodFromTo.replace("\n", " ");
         Button deleteButton = new Button("Delete reservation");
-        deleteButton.setStyle("-fx-background-color: #ff0000; -fx-text-fill: #ffffff; -fx-font-size: 10px; -fx-font-weight: bold; -fx-background-radius: 5px;");
+        deleteButton.setStyle("-fx-background-color: #ff0000; -fx-text-fill: #ffffff; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 5px;");
         deleteButton.setOnAction(event -> {
             boolean remove = new AlertDialogGraphicManager("Are you sure you want to delete this reservation\n"
                     + msgPeriod +" in "+ reservation.getCity()
@@ -142,11 +143,21 @@ public class MyReservationsController extends Controller {
         reservationHBox.getChildren().addAll(imageVBox, cityVBox, periodVBox, buttonsVBox);
         centerVBox.getChildren().add(reservationHBox);
 
-        //scrollPane.setVvalue(0.0);
     }
 
     @FXML
-    protected void loginButtonClick(){
+    protected void logoutButtonClick(){
+        getSession().reset();
         super.changeWindow("login");
+    }
+
+    @FXML
+    protected void homepageButtonClick(){
+        super.changeWindow("homepage");
+    }
+
+    @FXML
+    protected void profileButtonClick(){
+        super.changeWindow("profile");
     }
 }
