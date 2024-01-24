@@ -149,6 +149,7 @@ public class MyProfileController extends Controller {
                         imageUrl = "https://www.altabadia.org/media/titelbilder/arrivo-coppa-del-mondo-by-freddy-planinschekjpg-3-1.jpg";
                     }
 
+                    // roba nuova
                     Image image = new Image(imageUrl, true);
                     apartmentImage.setImage(image);
                     apartmentImage.setSmooth(true);
