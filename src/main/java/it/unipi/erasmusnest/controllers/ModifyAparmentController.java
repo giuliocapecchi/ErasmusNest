@@ -38,7 +38,6 @@ public class ModifyAparmentController extends Controller{
     private void initialize()
     {
         Long apartmentId = getSession().getApartmentId();
-        System.out.println("\n\n\nApartmentId: "+apartmentId);
         Apartment apartment = getMongoConnectionManager().getApartment(apartmentId);
 
         inputAccommodates = new Spinner<>();
@@ -77,7 +76,6 @@ public class ModifyAparmentController extends Controller{
     {
         //Qua deve sparare la query su MONGO per aggiornare i dati dell'appartamento
         Long apartmentId = getSession().getApartmentId();
-        System.out.println("\n\n\n STO ANDANDO A MODIFICARE L'APPARTAMENTO: "+apartmentId+"\n\n\n");
         Apartment apartment = getMongoConnectionManager().getApartment(apartmentId);
         apartment.setMaxAccommodates(inputAccommodates.getValue());
         Double bathrooms = inputBathrooms.getValue();
@@ -85,7 +83,8 @@ public class ModifyAparmentController extends Controller{
         apartment.setBathrooms(bathroomsText);
         apartment.setDollarPriceMonth(inputPrice.getValue());
         apartment.setDescription(descriptionTextArea.getText());
-        apartment.setImageURL(textField.getText());
+        String imageUrl = textField.getText().isBlank() || textField.getText().isEmpty() ? "" : textField.getText();
+        apartment.setImageURL(imageUrl);
         apartment.setId(getSession().getApartmentId());
 
         if(getMongoConnectionManager().updateApartment(apartment))
