@@ -14,6 +14,7 @@ import javafx.scene.layout.VBox; // Import per il banner/pop-up
 import org.controlsfx.control.PopOver; // Import per il banner/pop-up
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class MyProfileController extends Controller {
 
@@ -137,21 +138,18 @@ public class MyProfileController extends Controller {
                     apartmentBox.setAlignment(Pos.CENTER_LEFT);
 
                     ImageView apartmentImage = new ImageView();
-                    //apartmentImage.setFitHeight(100);
-                    //apartmentImage.setFitWidth(100);
                     apartmentImage.setPreserveRatio(true);
-                    //String imageUrl = apartment.getImageURL() != null && !apartment.getImageURL().isEmpty() ? apartment.getImageURL() : "https://hips.hearstapps.com/hmg-prod/images/lago-di-montagna-cervinia-1628008263.jpg";
 
                     String imageUrl = apartment.getImageURL();
-                    if(imageUrl== null || imageUrl.isEmpty())
+                    if(imageUrl.isEmpty())
                     {
-                        //imageUrl = "/media/no_photo_available.png"; // Path inside the classpath
-                        imageUrl = "https://www.altabadia.org/media/titelbilder/arrivo-coppa-del-mondo-by-freddy-planinschekjpg-3-1.jpg";
+                        String imagePath = "/media/no_photo_available.png"; // Path inside the classpath
+                        apartmentImage.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath))));
+                    } else {
+                        Image image = new Image(imageUrl, true);
+                        apartmentImage.setImage(image);
                     }
 
-                    // roba nuova
-                    Image image = new Image(imageUrl, true);
-                    apartmentImage.setImage(image);
                     apartmentImage.setSmooth(true);
                     apartmentImage.fitWidthProperty().bind(apartmentBox.widthProperty().multiply(0.4));
                     Button apartmentButton = new Button();
