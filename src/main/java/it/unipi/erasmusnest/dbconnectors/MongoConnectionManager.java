@@ -306,11 +306,6 @@ public class MongoConnectionManager extends ConnectionManager{
 
     public boolean addUser(User utente) {
         boolean availableEmail = true;
-        //System.out.println("EMAIL: " + emailAddress);
-        System.out.println("PASSWORD: " + utente.getPassword());
-        System.out.println("MAIL: " + utente.getEmail());
-        System.out.println("CITIES: " + utente.getPreferredCities());
-        System.out.println("STUDY: " + utente.getStudyField());
 
         if(availableEmail(utente.getEmail()))
         {
@@ -324,7 +319,6 @@ public class MongoConnectionManager extends ConnectionManager{
                         .append("password", utente.getPassword())
                         .append("first_name", utente.getName())
                         .append("last_name", utente.getSurname())
-                        .append("id", 1)
                         .append("SF", utente.getStudyField())
                         .append("CoI", utente.getPreferredCities())
                         .append("house", new ArrayList<Document>());
@@ -393,4 +387,25 @@ public class MongoConnectionManager extends ConnectionManager{
         return updated;
     }
 
+    public boolean removeApartment(Long apartmentId)
+    {
+        boolean removed = false;
+        try(MongoClient mongoClient = MongoClients.create("mongodb://"+super.getHost()+":"+super.getPort()))
+        {
+            MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
+            MongoCollection<Document> collection = database.getCollection("apartments");
+            collection.deleteOne(Filters.eq("house_id", apartmentId));
+            // remove apartment also from users collection
+            MongoCollection<Document> userCollection = database.getCollection("users");
+            userCollection.updateOne(Filters.eq("house.house_id", apartmentId), new Document("$pull", new Document("house", new Document("house_id", apartmentId))));
+            removed = true;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            new AlertDialogGraphicManager("MongoDB REMOVE failed").show();
+            System.out.println("Error in removeApartment: " + e.getMessage());
+        }
+        return removed;
+    }
 }
