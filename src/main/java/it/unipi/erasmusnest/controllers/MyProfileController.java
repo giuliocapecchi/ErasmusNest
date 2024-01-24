@@ -14,6 +14,7 @@ import javafx.scene.layout.VBox; // Import per il banner/pop-up
 import org.controlsfx.control.PopOver; // Import per il banner/pop-up
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class MyProfileController extends Controller {
 
@@ -27,12 +28,10 @@ public class MyProfileController extends Controller {
     Button updateCitiesButton;
     @FXML
     VBox apartmentsContainer;
-    @FXML
-    Button backButton;
+
     @FXML
     VBox adminContainer;
-    @FXML
-    HBox outer_HBox;
+
     @FXML
     Label emailLabel;
     @FXML
@@ -78,12 +77,8 @@ public class MyProfileController extends Controller {
     @FXML
     private void initialize() {
 
-
-
-
-        personalInfoVbox.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.6));
+        personalInfoVbox.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.4));
         apartmentsContainerVBox.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.4));
-        outer_HBox.prefWidthProperty().bind(super.getRootPane().widthProperty());
         passwordChangeOuterBox.prefWidthProperty().bind(super.getRootPane().widthProperty());
 
         CITIES = getNeo4jConnectionManager().getAllCities();
@@ -107,6 +102,7 @@ public class MyProfileController extends Controller {
         // Nascondi il banner/pop-up per la modifica della password all'inizio
         passwordChangeBox.setVisible(false);
         passwordChangeOuterBox.setVisible(false);
+        passwordChangeOuterBox.getChildren().clear();
 
         // Inizializza il ComboBox per il campo "Study Field" (SF)
 
@@ -141,23 +137,21 @@ public class MyProfileController extends Controller {
                     HBox apartmentBox = new HBox(10);
                     apartmentBox.setAlignment(Pos.CENTER_LEFT);
 
-                    // COMMENTO PER COMMIT IMMAGINE
-
                     ImageView apartmentImage = new ImageView();
-                    apartmentImage.setFitHeight(100);
-                    apartmentImage.setFitWidth(100);
                     apartmentImage.setPreserveRatio(true);
-                    //String imageUrl = apartment.getImageURL() != null && !apartment.getImageURL().isEmpty() ? apartment.getImageURL() : "https://hips.hearstapps.com/hmg-prod/images/lago-di-montagna-cervinia-1628008263.jpg";
 
                     String imageUrl = apartment.getImageURL();
-                    if(imageUrl== null || imageUrl.isEmpty())
+                    if(imageUrl.isEmpty())
                     {
-                        //imageUrl = "/media/no_photo_available.png"; // Path inside the classpath
-                        imageUrl = "https://www.altabadia.org/media/titelbilder/arrivo-coppa-del-mondo-by-freddy-planinschekjpg-3-1.jpg";
+                        String imagePath = "/media/no_photo_available.png"; // Path inside the classpath
+                        apartmentImage.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath))));
+                    } else {
+                        Image image = new Image(imageUrl, true);
+                        apartmentImage.setImage(image);
                     }
 
-                    Image image = new Image(imageUrl, true);
-                    apartmentImage.setImage(image);
+                    apartmentImage.setSmooth(true);
+                    apartmentImage.fitWidthProperty().bind(apartmentBox.widthProperty().multiply(0.4));
                     Button apartmentButton = new Button();
                     apartmentButton.setText(apartment.getName());
                     apartmentButton.setId(apartment.getId().toString());
@@ -223,6 +217,12 @@ public class MyProfileController extends Controller {
     }
 
     @FXML
+    protected void logoutButtonClick(){
+        getSession().reset();
+        super.changeWindow("login");
+    }
+
+    @FXML
     private void onBackButtonClick() {
         passwordChangeOuterBox.setVisible(false);
         // Puoi anche reimpostare i campi della password se lo desideri, ad esempio:
@@ -236,6 +236,7 @@ public class MyProfileController extends Controller {
         // Mostra il banner/pop-up per la modifica della password
         if (isEditingPassword) {
             passwordChangeOuterBox.setVisible(false);
+            passwordChangeOuterBox.getChildren().clear();
             isEditingPassword = false;
         }
         else
@@ -243,6 +244,10 @@ public class MyProfileController extends Controller {
             // Mostra il banner/pop-up per la modifica della password
             passwordChangeBox.setVisible(true);
             passwordChangeOuterBox.setVisible(true);
+            if(!passwordChangeOuterBox.getChildren().contains(passwordChangeBox))
+            {
+                passwordChangeOuterBox.getChildren().add(passwordChangeBox);
+            }
             isEditingPassword = true;
         }
     }

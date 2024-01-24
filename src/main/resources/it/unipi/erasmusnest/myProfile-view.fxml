@@ -88,9 +88,9 @@
             </ScrollPane>
         </center>
         <bottom>
+            <!-- roba -->
             <VBox fx:id="adminContainer" alignment="CENTER_RIGHT"/>
             <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: orange;" BorderPane.alignment="CENTER">
-                <!-- COMMENTO PER COMMIT IMMAGINE -->
                 <Button onAction="#logoutButtonClick" text="Logout" />
                 <Button onAction="#onBack" text="Homepage" />
             </ToolBar>
