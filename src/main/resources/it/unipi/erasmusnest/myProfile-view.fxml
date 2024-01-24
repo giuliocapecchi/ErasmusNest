@@ -88,7 +88,6 @@
             </ScrollPane>
         </center>
         <bottom>
-            <!-- modified -->
             <VBox fx:id="adminContainer" alignment="CENTER_RIGHT"/>
             <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: orange;" BorderPane.alignment="CENTER">
                 <Button onAction="#logoutButtonClick" text="Logout" />

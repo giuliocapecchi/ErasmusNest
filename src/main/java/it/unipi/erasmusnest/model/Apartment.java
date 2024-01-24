@@ -22,27 +22,6 @@ public class Apartment {
     private String hostName;
     private String hostSurname;
 
-    //Complete constructor
-    public Apartment(Long id, String name, String description, Point2D location, Double dollarPriceMonth,
-                     Integer maxAccomodates, String hostEmail, String imageURL, Double averageRating,
-                     int numberOfReviews, String bathrooms, String hostName, String hostSurname)
-    {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.location = location;
-        this.dollarPriceMonth = dollarPriceMonth;
-        this.maxAccommodates = maxAccomodates;
-        this.hostEmail = hostEmail;
-        this.imageURL = imageURL;
-        this.averageRating = averageRating;
-        this.numberOfReviews = numberOfReviews;
-        this.bathrooms = bathrooms;
-        this.hostName = hostName;
-        this.hostSurname = hostSurname;
-    }
-
-    // TODO: DELETE THIS ONE
     public Apartment(Long id, String name, String description, Point2D location, ArrayList<String> studyFields, String hostEmail, String imageURL, Double averageRating) {
         this.id = id;
         this.name = name;
@@ -54,7 +33,6 @@ public class Apartment {
         this.averageRating = averageRating;
     }
 
-    // TODO: DELETE THIS ONE
     public Apartment(Long id, String name, String description, Point2D location, String studyField, String hostEmail, String imageURL, Double averageRating) {
         this.id = id;
         this.name = name;
@@ -75,7 +53,6 @@ public class Apartment {
         this.numberOfReviews = numberOfReviews;
     }
 
-    // TODO: DELETE THIS ONE
     public Apartment(Long id, String name, String description, Point2D point2D, Double price, Integer accommodates, String hostEmail, String pictureUrl, Double reviewScoresRating) {
         this.id = id;
         this.name = name;
@@ -96,7 +73,6 @@ public class Apartment {
         this.averageRating = reviewScoresRating;
     }
 
-    // TODO: DELETE THIS ONE
     public Apartment(Long id, String houseName, String description, Point2D point2D, double v, Integer accommodates, String hostEmail, String pictureUrl) {
         this.id = id;
         this.name = houseName;
@@ -108,7 +84,6 @@ public class Apartment {
         this.imageURL = pictureUrl;
     }
 
-    // TODO: DELETE THIS ONE
     public Apartment(Long id, String name, String pictureUrl) {
         this.id=id; this.name=name; this.imageURL=pictureUrl;
     }

@@ -112,34 +112,6 @@ public class MongoConnectionManager extends ConnectionManager{
                     .append("position", apartment.getLocation().getX() + ", " + apartment.getLocation().getY())
                     .append("neighbourhood", apartment.getDescription());
             collection.insertOne(newApartment);
-            // Update the user's house list
-            MongoCollection<Document> userCollection = database.getCollection("users");
-            Document userDocument = userCollection.find(Filters.eq("email", apartment.getHostEmail())).first();
-            Document houseDocument = new Document()
-                    .append("house_id", apartment.getId())
-                    .append("name", apartment.getName())
-                    .append("picture_url", apartment.getImageURL())
-                    .append("review_scores_rating", 0.0);
-            // Prepare houses list
-            List<Document> userApartments = new ArrayList<>();
-            // NEW VERSION
-            if(userDocument.containsKey("house"))
-            {
-                if (userDocument.get("house") instanceof Document)
-                {
-                    userApartments.add((Document) userDocument.get("house"));
-                }
-                else
-                {
-                    userApartments = (List<Document>) userDocument.get("house");
-                }
-            }
-            // Add houseDocument to List<Document>
-            userApartments.add(houseDocument);
-            // Add the updated list to the userDocument
-            userDocument.put("house", userApartments);
-            // update user collection inserting new house
-            userCollection.replaceOne(Filters.eq("email", apartment.getHostEmail()), userDocument);
             result = true;
         }
         catch (Exception e)
@@ -184,8 +156,7 @@ public class MongoConnectionManager extends ConnectionManager{
             String bathroomsText = apartment.getString("bathrooms_text");
             String[] bathSplit = bathroomsText.split("\\s+");
             String bathroomsNumber = bathSplit[0];
-            System.out.println("\n\n\nBathrooms number: "+bathroomsNumber+"\n\n\n");
-            bathroomsNumber = Double.parseDouble(bathroomsNumber) == 1.0 ? bathroomsNumber + " bath" : bathroomsNumber + " baths";
+            bathroomsNumber = Integer.parseInt(bathroomsNumber) == 1 ? bathroomsNumber + " bath" : bathroomsNumber + " baths";
 
             Long id = null;
             // if apartment.get("id") return an integer, it is necessary to cast it to Long

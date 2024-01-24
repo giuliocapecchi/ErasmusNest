@@ -11,24 +11,16 @@
             <Label text="Picture Url:" />
             <TextField fx:id="pictureUrlTextField" onKeyReleased="#checkFields"/>
             <Label text="Accommodates:" />
-            <VBox fx:id="apartmentVBox">
-
-            </VBox>
+            <TextField fx:id="accommodatesTextField" onKeyReleased="#checkFields" />
             <Label text="Bathrooms:" />
-            <VBox fx:id="bathroomsVBox">
-
-            </VBox>
-
-            <Label text="Price per Month:" />
-            <VBox fx:id="priceVBox">
-
-            </VBox>
-
-            <Label text="Neighbourhood Description:" />
-            <VBox fx:id="neighborhoodVBox">
-
-            </VBox>
-
+            <TextField fx:id="bathroomsTextField" onKeyReleased="#checkFields"/>
+            <Label text="Beds:" />
+            <TextField fx:id="bedsTextField" onKeyReleased="#checkFields"/>
+            <Label text="Price:" />
+            <TextField fx:id="priceTextField" onKeyReleased="#checkFields" />
+            <Label text="Neighborhood: (optional)" />
+            <TextField fx:id="neighborhoodTextField" onKeyReleased="#checkFields"/>
+            <Label text="Address:" />
             <TextField fx:id="addressTextField" onKeyReleased="#checkFields"/>
             <Button fx:id="geocodeButton" onAction="#onGeocodeButtonClick" style="-fx-background-color: #b4bd00; -fx-text-fill: white; -fx-padding: 5px 10px;" text="Check address" />
             <Label fx:id="geocodeResultLabel" layoutX="14.0" layoutY="53.0" prefHeight="7.0" prefWidth="624.0" textAlignment="CENTER" textFill="#ff0000" />

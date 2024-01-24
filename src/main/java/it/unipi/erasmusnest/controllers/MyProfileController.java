@@ -27,12 +27,10 @@ public class MyProfileController extends Controller {
     Button updateCitiesButton;
     @FXML
     VBox apartmentsContainer;
-    @FXML
-    Button backButton;
+
     @FXML
     VBox adminContainer;
-    @FXML
-    HBox outer_HBox;
+
     @FXML
     Label emailLabel;
     @FXML
@@ -78,12 +76,8 @@ public class MyProfileController extends Controller {
     @FXML
     private void initialize() {
 
-
-
-
-        personalInfoVbox.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.6));
+        personalInfoVbox.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.4));
         apartmentsContainerVBox.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.4));
-        outer_HBox.prefWidthProperty().bind(super.getRootPane().widthProperty());
         passwordChangeOuterBox.prefWidthProperty().bind(super.getRootPane().widthProperty());
 
         CITIES = getNeo4jConnectionManager().getAllCities();
@@ -107,6 +101,7 @@ public class MyProfileController extends Controller {
         // Nascondi il banner/pop-up per la modifica della password all'inizio
         passwordChangeBox.setVisible(false);
         passwordChangeOuterBox.setVisible(false);
+        passwordChangeOuterBox.getChildren().clear();
 
         // Inizializza il ComboBox per il campo "Study Field" (SF)
 
@@ -142,8 +137,8 @@ public class MyProfileController extends Controller {
                     apartmentBox.setAlignment(Pos.CENTER_LEFT);
 
                     ImageView apartmentImage = new ImageView();
-                    apartmentImage.setFitHeight(100);
-                    apartmentImage.setFitWidth(100);
+                    //apartmentImage.setFitHeight(100);
+                    //apartmentImage.setFitWidth(100);
                     apartmentImage.setPreserveRatio(true);
                     //String imageUrl = apartment.getImageURL() != null && !apartment.getImageURL().isEmpty() ? apartment.getImageURL() : "https://hips.hearstapps.com/hmg-prod/images/lago-di-montagna-cervinia-1628008263.jpg";
 
@@ -157,6 +152,8 @@ public class MyProfileController extends Controller {
                     // roba nuova
                     Image image = new Image(imageUrl, true);
                     apartmentImage.setImage(image);
+                    apartmentImage.setSmooth(true);
+                    apartmentImage.fitWidthProperty().bind(apartmentBox.widthProperty().multiply(0.4));
                     Button apartmentButton = new Button();
                     apartmentButton.setText(apartment.getName());
                     apartmentButton.setId(apartment.getId().toString());
@@ -222,6 +219,12 @@ public class MyProfileController extends Controller {
     }
 
     @FXML
+    protected void logoutButtonClick(){
+        getSession().reset();
+        super.changeWindow("login");
+    }
+
+    @FXML
     private void onBackButtonClick() {
         passwordChangeOuterBox.setVisible(false);
         // Puoi anche reimpostare i campi della password se lo desideri, ad esempio:
@@ -235,6 +238,7 @@ public class MyProfileController extends Controller {
         // Mostra il banner/pop-up per la modifica della password
         if (isEditingPassword) {
             passwordChangeOuterBox.setVisible(false);
+            passwordChangeOuterBox.getChildren().clear();
             isEditingPassword = false;
         }
         else
@@ -242,6 +246,10 @@ public class MyProfileController extends Controller {
             // Mostra il banner/pop-up per la modifica della password
             passwordChangeBox.setVisible(true);
             passwordChangeOuterBox.setVisible(true);
+            if(!passwordChangeOuterBox.getChildren().contains(passwordChangeBox))
+            {
+                passwordChangeOuterBox.getChildren().add(passwordChangeBox);
+            }
             isEditingPassword = true;
         }
     }
