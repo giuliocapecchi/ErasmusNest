@@ -140,6 +140,7 @@ public class MyProfileController extends Controller {
                     ImageView apartmentImage = new ImageView();
                     apartmentImage.setPreserveRatio(true);
 
+                    // ho aggiunto roba qui
                     String imageUrl = apartment.getImageURL();
                     if(imageUrl.isEmpty())
                     {
