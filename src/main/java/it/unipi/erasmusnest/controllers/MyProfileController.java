@@ -400,4 +400,8 @@ public class MyProfileController extends Controller {
         super.changeWindow("login");
     }
 
+    @FXML
+    protected void onReservationsButtonClick() {
+        super.changeWindow("myreservations");
+    }
 }

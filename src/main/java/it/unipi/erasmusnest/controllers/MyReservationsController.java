@@ -158,6 +158,6 @@ public class MyReservationsController extends Controller {
 
     @FXML
     protected void profileButtonClick(){
-        super.changeWindow("profile");
+        super.changeWindow("myProfile");
     }
 }
