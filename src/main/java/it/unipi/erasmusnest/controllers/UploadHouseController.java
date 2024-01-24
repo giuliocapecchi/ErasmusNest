@@ -105,7 +105,7 @@ public class UploadHouseController extends Controller {
         String pictureUrl = pictureUrlTextField.getText();
         if(pictureUrl.isBlank() || pictureUrl.isEmpty())
         {
-            pictureUrl = "/media/no_photo_available.png";
+            pictureUrl = "";
         }
         Integer accommodates = inputAccommodates.getValue();
         Double bathrooms = inputBathrooms.getValue();

@@ -141,12 +141,13 @@ public class MyProfileController extends Controller {
                     apartmentImage.setPreserveRatio(true);
 
                     String imageUrl = apartment.getImageURL();
+                    System.out.println("\n\n\nimage url: " + imageUrl);
                     if(imageUrl.isEmpty())
                     {
                         String imagePath = "/media/no_photo_available.png"; // Path inside the classpath
                         apartmentImage.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath))));
                     } else {
-                        Image image = new Image(imageUrl, true);
+                        Image image = new Image(imageUrl);
                         apartmentImage.setImage(image);
                     }
 
