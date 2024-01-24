@@ -115,6 +115,9 @@ public class UploadHouseController extends Controller {
         double latitude = mapGraphicManager.getLatitude();
         double longitude = mapGraphicManager.getLongitude();
         Point2D location = new Point2D(latitude, longitude);
+
+        // COMMENTO PER COMMIT
+
         try
         {
             String userEmail = getSession().getUser().getEmail();
