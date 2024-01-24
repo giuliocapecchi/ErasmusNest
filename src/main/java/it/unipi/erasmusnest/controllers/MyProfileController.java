@@ -141,6 +141,8 @@ public class MyProfileController extends Controller {
                     HBox apartmentBox = new HBox(10);
                     apartmentBox.setAlignment(Pos.CENTER_LEFT);
 
+                    // COMMENTO PER COMMIT IMMAGINE
+
                     ImageView apartmentImage = new ImageView();
                     apartmentImage.setFitHeight(100);
                     apartmentImage.setFitWidth(100);
