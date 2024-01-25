@@ -87,6 +87,7 @@ public class MongoConnectionManager extends ConnectionManager{
         }
         catch (Exception e)
         {
+            e.printStackTrace();
             System.out.println("Error in findUser: " + e.getMessage());
             return null;
         }
