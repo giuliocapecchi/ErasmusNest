@@ -22,7 +22,7 @@
                         <padding>
                             <Insets bottom="20" left="20" right="20" top="20" />
                         </padding>
-                        <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ff6200;" text="My information:" wrapText="true" />
+                        <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ff6200;" text="My information" wrapText="true" />
                         <HBox alignment="CENTER_LEFT" spacing="10">
                             <Label minWidth="75" style="-fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Name:" />
                             <Label fx:id="nameLabel" />
@@ -69,11 +69,21 @@
                         <Insets left="10.0" top="50.0" />
                      </HBox.margin>
                     </VBox>
+                    <VBox spacing="10">
+                        <padding>
+                            <Insets bottom="20" left="20" right="20" top="20" />
+                        </padding>
+                        <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ff6200;" text="My reservations" wrapText="true" />
+                        <Button onAction="#onReservationsButtonClick" style="-fx-background-color: orange; -fx-border-color: red; -fx-border-width: 1px;" text="Go to reservations" />
+                        <HBox.margin>
+                            <Insets right="60.0" top="50.0" />
+                        </HBox.margin>
+                    </VBox>
                     <VBox fx:id="apartmentsContainerVBox" spacing="10">
                         <padding>
                             <Insets bottom="20" left="20" right="20" top="20" />
                         </padding>
-                        <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ff6200;" text="My apartments:" wrapText="true" />
+                        <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ff6200;" text="My apartments" wrapText="true" />
                         <Button fx:id="uploadHouseButton" onAction="#onUploadHouseButtonClick" style="-fx-background-color: orange; -fx-border-color: red; -fx-border-width: 1px;" text="Upload new apartment" />
                         <!-- Qui inizia la sezione modificata -->
                         <VBox fx:id="apartmentsContainer" spacing="10">
@@ -88,7 +98,6 @@
             </ScrollPane>
         </center>
         <bottom>
-            <!-- roba -->
             <VBox fx:id="adminContainer" alignment="CENTER_RIGHT"/>
             <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: orange;" BorderPane.alignment="CENTER">
                 <Button onAction="#logoutButtonClick" text="Logout" />
