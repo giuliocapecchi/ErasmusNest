@@ -6,43 +6,59 @@
 <?import javafx.scene.layout.*?>
 
 <StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.erasmusnest.controllers.ProfileController">
-    <SplitPane orientation="HORIZONTAL" dividerPositions="0.5">
-        <!-- Parte sinistra con i dettagli dell'utente -->
-        <VBox spacing="10" alignment="TOP_LEFT">
-            <HBox spacing="10">
-                <Label text="Email:" minWidth="75" style="-fx-font-weight: bold;" />
-                <Label fx:id="emailLabel" />
+    <BorderPane prefHeight="200.0" prefWidth="200.0">
+        <top>
+            <HBox alignment="CENTER_LEFT" style="-fx-background-color: #ff8000">
+                <Label fx:id="pageTitle" style="-fx-font-size: 25px; -fx-text-fill: white; -fx-font-style: italic;">
+                    <HBox.margin>
+                        <Insets bottom="5.0" left="20.0" right="20.0" top="5.0" />
+                    </HBox.margin>
+                </Label>
             </HBox>
-            <HBox spacing="10">
-                <Label text="Name:" minWidth="75" style="-fx-font-weight: bold;" />
-                <Label fx:id="nameLabel" />
-            </HBox>
-            <HBox spacing="10">
-                <Label text="Surname:" minWidth="75" style="-fx-font-weight: bold;" />
-                <Label fx:id="surnameLabel" />
-            </HBox>
-            <HBox spacing="10">
-                <!-- Parte destra con l'elenco delle case -->
-                <Label text="Study Field:" minWidth="75" style="-fx-font-weight: bold;" />
-                <Label fx:id="studyFieldLabel" />
-            </HBox>
-            <!-- <ScrollPane fitToWidth="true" fitToHeight="true"> -->
-                <Label text="Cities interested in:" minWidth="75" style="-fx-font-weight: bold;" />
-                <VBox fx:id="citiesOfInterestBox" spacing="5">
-                    <!-- Qui verranno inserite le checkbox -->
-
-                    <!-- Aggiungi altre checkbox se necessario -->
+        </top>
+        <center>
+            <ScrollPane fitToWidth="true" BorderPane.alignment="CENTER">
+            <!-- Parte sinistra con i dettagli dell'utente -->
+                <VBox>
+                    <padding>
+                        <Insets bottom="20" left="20" right="20" top="20" />
+                    </padding>
+                    <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Personal information" wrapText="true" />
+                    <HBox spacing="10">
+                        <Label text="Email:" minWidth="75" style="-fx-font-weight: bold;" />
+                        <Label fx:id="emailLabel" />
+                    </HBox>
+                    <HBox spacing="10">
+                        <Label text="Name:" minWidth="75" style="-fx-font-weight: bold;" />
+                        <Label fx:id="nameLabel" />
+                    </HBox>
+                    <HBox spacing="10">
+                        <Label text="Surname:" minWidth="75" style="-fx-font-weight: bold;" />
+                        <Label fx:id="surnameLabel" />
+                    </HBox>
+                    <HBox spacing="10">
+                        <Label text="Study field:" minWidth="75" style="-fx-font-weight: bold;" />
+                        <Label fx:id="studyFieldLabel" />
+                    </HBox>
+                    <HBox spacing="10">
+                        <Label text="Cities of interest:" minWidth="75" style="-fx-font-weight: bold;" />
+                        <Label fx:id="citiesLabel" />
+                    </HBox>
+                    <VBox fx:id="housesContainer" spacing="10" >
+                        <padding>
+                            <Insets top="20" />
+                        </padding>
+                        <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Apartments hosted" wrapText="true" />
+                    </VBox>
                 </VBox>
-                <!-- </ScrollPane> -->
-            <Button fx:id="backBrowseButton" text="Back to search" onAction="#backToBrowse" />
-        </VBox>
-
-        <!-- Parte destra con l'elenco delle case -->
-        <ScrollPane fitToWidth="true" fitToHeight="true">
-            <VBox fx:id="housesContainer" spacing="10" alignment="TOP_CENTER" >
-                <!-- Qui verranno aggiunte dinamicamente le case -->
-                <Label text="Houses:" style="-fx-font-size: 22px; -fx-font-weight: bold;" />
-            </VBox>
-        </ScrollPane>
-    </SplitPane>
+            </ScrollPane>
+        </center>
+        <bottom>
+            <VBox alignment="CENTER_RIGHT"/>
+            <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: orange;" BorderPane.alignment="CENTER">
+                <Button text="Back to search" onAction="#backToBrowse" />
+                <Button onAction="#backToHomepage" text="Homepage" />
+            </ToolBar>
+        </bottom>
+    </BorderPane>
 </StackPane>

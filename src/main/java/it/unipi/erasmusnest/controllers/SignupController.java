@@ -85,7 +85,7 @@ public class SignupController extends Controller{
 
     public TitledPane createTitledPane() {
         GridPane gridPane = new GridPane();
-        List<String> cities = getNeo4jConnectionManager().getAllCities();
+        List<String> cities = getSession().getCities();
         for(String city : cities)
         {
             CheckBox mainCheckBox = new CheckBox(city);

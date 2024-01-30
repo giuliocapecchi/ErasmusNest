@@ -14,20 +14,25 @@ import java.io.File;
 
 public class ModifyAparmentController extends Controller{
 
-    public VBox apartmentVBox;
-    public VBox bathroomsVBox;
-    public VBox priceVBox;
-    public VBox neighborhoodVBox;
-    public Spinner<Integer> inputAccommodates;
-    public Spinner<Double> inputBathrooms;
-    public Spinner<Double> inputPrice;
-    public VBox imageVBox;
-    public TextField textField;
-    public TextArea descriptionTextArea;
     @FXML
-    public Button updateHouse;
+    private VBox apartmentVBox;
     @FXML
-    public Button goBack;
+    private VBox bathroomsVBox;
+    @FXML
+    private VBox priceVBox;
+    @FXML
+    private VBox neighborhoodVBox;
+    private Spinner<Integer> inputAccommodates;
+    private Spinner<Double> inputBathrooms;
+    private Spinner<Double> inputPrice;
+    @FXML
+    private VBox imageVBox;
+    private TextField textField;
+    private TextArea descriptionTextArea;
+    @FXML
+    private Button updateHouse;
+    @FXML
+    private Button removeHouse;
 
     public ModifyAparmentController()
     {
@@ -38,7 +43,6 @@ public class ModifyAparmentController extends Controller{
     private void initialize()
     {
         Long apartmentId = getSession().getApartmentId();
-        System.out.println("\n\n\nApartmentId: "+apartmentId);
         Apartment apartment = getMongoConnectionManager().getApartment(apartmentId);
 
         inputAccommodates = new Spinner<>();
@@ -70,14 +74,12 @@ public class ModifyAparmentController extends Controller{
         textField = new TextField();
         textField.setText(apartment.getImageURL());
         imageVBox.getChildren().add(textField);
-        System.out.println("Apartment: "+apartment.toString());
     }
 
     public void onUpdateHouseButtonClick(ActionEvent actionEvent)
     {
         //Qua deve sparare la query su MONGO per aggiornare i dati dell'appartamento
         Long apartmentId = getSession().getApartmentId();
-        System.out.println("\n\n\n STO ANDANDO A MODIFICARE L'APPARTAMENTO: "+apartmentId+"\n\n\n");
         Apartment apartment = getMongoConnectionManager().getApartment(apartmentId);
         apartment.setMaxAccommodates(inputAccommodates.getValue());
         Double bathrooms = inputBathrooms.getValue();
@@ -85,23 +87,24 @@ public class ModifyAparmentController extends Controller{
         apartment.setBathrooms(bathroomsText);
         apartment.setDollarPriceMonth(inputPrice.getValue());
         apartment.setDescription(descriptionTextArea.getText());
-        apartment.setImageURL(textField.getText());
+        String imageUrl = textField.getText().isBlank() || textField.getText().isEmpty() ? "" : textField.getText();
+        apartment.setImageURL(imageUrl);
         apartment.setId(getSession().getApartmentId());
 
         if(getMongoConnectionManager().updateApartment(apartment))
         {
             //Print OK message
-            showConfirmationMessage("Succesfull update");
+            showConfirmationMessage("Succesfull update",updateHouse);
         }
         else
         {
             //Print error message
-            showConfirmationMessage("Update failed");
+            showConfirmationMessage("Update failed", updateHouse);
         }
 
     }
 
-    private void showConfirmationMessage(String message) {
+    private void showConfirmationMessage(String message, Button button) {
         PopOver popOver = new PopOver();
         Label label = new Label(message);
         label.setStyle("-fx-padding: 15px;");
@@ -109,11 +112,27 @@ public class ModifyAparmentController extends Controller{
         popOver.setDetachable(false);
         popOver.setAutoHide(true);
         // Mostra il messaggio di conferma
-        popOver.show(updateHouse);
+        popOver.show(button);
     }
 
     public void onGoBackButtonClick(ActionEvent actionEvent)
     {
         super.changeWindow("myProfile");
+    }
+
+    @FXML
+    private void onRemoveHouseButtonClick(ActionEvent actionEvent)
+    {
+        Long apartmentId = getSession().getApartmentId();
+        if(getMongoConnectionManager().removeApartment(apartmentId))
+        {
+            //Print OK message
+            showConfirmationMessage("Succesfull remove", removeHouse);
+        }
+        else
+        {
+            //Print error message
+            showConfirmationMessage("Remove failed", removeHouse);
+        }
     }
 }

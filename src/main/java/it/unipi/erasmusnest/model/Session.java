@@ -25,6 +25,8 @@ public class Session {
 
     private List<String> studyFields;
 
+    private List<String> cities;
+
     public Session() {
         this.user = new User();
         this.logged = false;
@@ -130,4 +132,13 @@ public class Session {
     public void setStudyFields(List<String> studyFields) {
         this.studyFields = studyFields;
     }
+
+    public List<String> getCities() {
+        return cities;
+    }
+
+    public void setCities(List<String> cities) {
+        this.cities = cities;
+    }
+
 }

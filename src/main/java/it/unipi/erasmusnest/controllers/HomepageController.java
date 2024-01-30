@@ -61,6 +61,8 @@ public class HomepageController extends Controller{
             super.changeWindow("login");
         }
 
+        getSession().setCities(CITIES);
+
         if(getSession().isLogged()) {
             System.out.println("User logged");
             welcomeText.setText("Welcome " + getSession().getUser().getEmail());
