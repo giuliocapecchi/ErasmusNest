@@ -1,17 +1,28 @@
 package it.unipi.erasmusnest.controllers;
 
+import it.unipi.erasmusnest.model.User;
+import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class HomepageController extends Controller{
+
+    @FXML
+    Button searchUserButton;
+
+    @FXML
+    RadioButton radioButtonLookForCities;
+
+    @FXML
+    RadioButton radioButtonLookForUsers;
 
     @FXML
     ImageView logoImageView;
@@ -50,6 +61,7 @@ public class HomepageController extends Controller{
 
     @FXML
     private void initialize() {
+        ToggleGroup toggleGroup = new ToggleGroup();
         cityTextField.maxWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.3));
         resultsBox.maxWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.3));
         title.maxWidthProperty().bind(super.getRootPane().widthProperty());
@@ -61,6 +73,10 @@ public class HomepageController extends Controller{
             super.changeWindow("login");
         }
 
+        radioButtonLookForCities.setToggleGroup(toggleGroup);
+        radioButtonLookForUsers.setToggleGroup(toggleGroup);
+        radioButtonLookForCities.setSelected(true);
+        searchUserButton.setVisible(false);
         getSession().setCities(CITIES);
 
         if(getSession().isLogged()) {
@@ -91,16 +107,6 @@ public class HomepageController extends Controller{
         }
 
 
-    }
-
-    @FXML
-    protected void handleSearchAction() {
-        String searchText = cityTextField.getText().toLowerCase();
-        if(searchText.isEmpty()) {
-            resultsBox.getChildren().clear();
-            return;
-        }
-        updateSearchResults(searchText);
     }
 
     private void updateSearchResults(String searchText) {
@@ -137,5 +143,49 @@ public class HomepageController extends Controller{
     {
         System.out.println("Profile");
         super.changeWindow("myProfile");
+    }
+
+    @FXML void lookForCities() {
+        System.out.println("look for cities");
+        radioButtonLookForUsers.setSelected(false);
+        cityTextField.setText("");
+        cityTextField.setOnKeyReleased(event -> handleSearchAction());
+        searchUserButton.setVisible(false);
+        resultsBox.getChildren().clear();
+    }
+
+    @FXML void lookForUsers() {
+        System.out.println("look for users");
+        radioButtonLookForCities.setSelected(false);
+        cityTextField.setText("");
+        cityTextField.setOnKeyReleased(event -> {});
+        searchUserButton.setVisible(true);
+        resultsBox.getChildren().clear();
+
+    }
+
+    public void handleSearchUserAction() {
+        System.out.println("searching user...");
+        User user = getMongoConnectionManager().findUser(cityTextField.getText());
+        if(user == null) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("User "+cityTextField.getText()+" not found");
+            alert.setContentText("The user you are looking for does not exist.");
+            alert.showAndWait();
+        }else{
+            getSession().setOtherProfileMail(user.getEmail());
+            super.changeWindow("profile");
+        }
+    }
+
+    @FXML
+    protected void handleSearchAction() {
+        String searchText = cityTextField.getText().toLowerCase();
+        if(searchText.isEmpty()) {
+            resultsBox.getChildren().clear();
+            return;
+        }
+        updateSearchResults(searchText);
     }
 }

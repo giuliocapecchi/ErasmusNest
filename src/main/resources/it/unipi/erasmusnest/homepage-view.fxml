@@ -9,7 +9,7 @@
 <StackPane fx:id="rootPane" prefHeight="348.0" prefWidth="387.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.erasmusnest.controllers.HomepageController">
    <BorderPane prefHeight="200.0" prefWidth="200.0">
        <top>
-           <VBox alignment="TOP_CENTER" spacing="10" BorderPane.alignment="CENTER" style="-fx-background-color: #ff8000;">
+           <VBox alignment="TOP_CENTER" spacing="10" style="-fx-background-color: #ff8000;" BorderPane.alignment="CENTER">
                <Label fx:id="title" style="-fx-font-size: 25px; -fx-font-style: italic; -fx-text-fill: white;" text="Apartment finder">
                    <VBox.margin>
                        <Insets bottom="5.0" left="20.0" right="5.0" top="5.0" />
@@ -29,6 +29,20 @@
                <VBox.margin>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </VBox.margin></Label>
+               <HBox alignment="CENTER" prefHeight="27.0" prefWidth="387.0">
+                   <Label text="Look for :">
+                  <HBox.margin>
+                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                  </HBox.margin></Label>
+                   <RadioButton fx:id="radioButtonLookForCities" mnemonicParsing="false" onAction="#lookForCities" text="Cities">
+                  <HBox.margin>
+                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                  </HBox.margin></RadioButton>
+                   <RadioButton fx:id="radioButtonLookForUsers" layoutX="160.0" layoutY="15.0" mnemonicParsing="false" onAction="#lookForUsers" text="Users">
+                  <HBox.margin>
+                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                  </HBox.margin></RadioButton>
+               </HBox>
                <TextField fx:id="cityTextField" onKeyReleased="#handleSearchAction">
                <VBox.margin>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -38,6 +52,7 @@
                        <Insets top="5.0" />
                    </VBox.margin>
                </VBox>
+            <Button fx:id="searchUserButton" mnemonicParsing="false" onAction="#handleSearchUserAction" text="Search" />
            </VBox>
       </center>
        <bottom>
