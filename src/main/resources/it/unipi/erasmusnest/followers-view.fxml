@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.geometry.Insets?>
+<StackPane fx:id="rootPane" prefHeight="348.0" prefWidth="387.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.erasmusnest.controllers.FollowersController">
+    <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="ALWAYS">
+    <BorderPane prefHeight="200.0" prefWidth="200.0">
+
+        <top>
+            <HBox alignment="CENTER_LEFT" style="-fx-background-color: #ff8000">
+                <Label style="-fx-font-size: 25px; -fx-text-fill: white; -fx-font-style: italic;" text="Followers view">
+                    <HBox.margin>
+                        <Insets bottom="5.0" left="20.0" right="20.0" top="5.0" />
+                    </HBox.margin>
+                </Label>
+            </HBox>
+        </top>
+        <center>
+            <VBox fx:id="followersBox">
+                <VBox.margin>
+                    <Insets top="5.0" />
+                </VBox.margin>
+                <HBox fx:id="firstHBox" alignment="CENTER">
+                    <VBox fx:id="leftFirstVBox" alignment="TOP_CENTER">
+                        <Label fx:id="followersLabel" style="-fx-font-size: 20px; -fx-text-fill: #019fe1;" text="Followers">
+                            <VBox.margin>
+                                <Insets top="5.0" />
+                            </VBox.margin>
+                        </Label>
+                        <Label fx:id="followersNumberLabel" style="-fx-font-size: 20px; -fx-text-fill: #019fe1;" text="0">
+                            <VBox.margin>
+                                <Insets top="5.0" />
+                            </VBox.margin>
+                        </Label>
+                    </VBox>
+                    <VBox fx:id="rightFirstVBox" alignment="TOP_CENTER">
+                        <Label fx:id="followsLabel" style="-fx-font-size: 20px; -fx-text-fill: #019fe1;" text="Follows">
+                            <VBox.margin>
+                                <Insets top="5.0" />
+                            </VBox.margin>
+                        </Label>
+                        <Label fx:id="followsNumberLabel" style="-fx-font-size: 20px; -fx-text-fill: #019fe1;" text="0">
+                            <VBox.margin>
+                                <Insets top="5.0" />
+                            </VBox.margin>
+                        </Label>
+                    </VBox>
+                </HBox>
+            </VBox>
+        </center>
+
+        <bottom>
+            <HBox alignment="BOTTOM_LEFT" prefHeight="15.0" prefWidth="636.0" style="-fx-background-color: orange;" BorderPane.alignment="CENTER">
+                <Button onAction="#onGoBackButtonClick" text="Go back">
+                    <HBox.margin>
+                        <Insets bottom="5.0" left="20.0" right="5.0" top="5.0" />
+                    </HBox.margin>
+                </Button>
+            </HBox>
+        </bottom>
+
+    </BorderPane>
+    </ScrollPane>
+</StackPane>
