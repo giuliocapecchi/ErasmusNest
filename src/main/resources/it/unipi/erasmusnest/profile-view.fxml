@@ -20,6 +20,10 @@
             <ScrollPane fitToWidth="true" BorderPane.alignment="CENTER">
             <!-- Parte sinistra con i dettagli dell'utente -->
                 <VBox>
+                    <padding>
+                        <Insets bottom="20" left="20" right="20" top="20" />
+                    </padding>
+                    <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Personal information" wrapText="true" />
                     <HBox spacing="10">
                         <Label text="Email:" minWidth="75" style="-fx-font-weight: bold;" />
                         <Label fx:id="emailLabel" />
@@ -33,22 +37,18 @@
                         <Label fx:id="surnameLabel" />
                     </HBox>
                     <HBox spacing="10">
-                        <!-- Parte destra con l'elenco delle case -->
-                        <Label text="Study Field:" minWidth="75" style="-fx-font-weight: bold;" />
+                        <Label text="Study field:" minWidth="75" style="-fx-font-weight: bold;" />
                         <Label fx:id="studyFieldLabel" />
                     </HBox>
-                    <!-- <ScrollPane fitToWidth="true" fitToHeight="true"> -->
-                    <Label text="Cities interested in:" minWidth="75" style="-fx-font-weight: bold;" />
-                    <VBox fx:id="citiesOfInterestBox" spacing="5">
-                        <!-- Qui verranno inserite le checkbox -->
-
-                        <!-- Aggiungi altre checkbox se necessario -->
-                    </VBox>
-
-                    <!-- Parte destra con l'elenco delle case -->
-                    <VBox fx:id="housesContainer" spacing="10" alignment="TOP_CENTER" >
-                        <!-- Qui verranno aggiunte dinamicamente le case -->
-                        <Label text="Houses:" style="-fx-font-size: 22px; -fx-font-weight: bold;" />
+                    <HBox spacing="10">
+                        <Label text="Cities of interest:" minWidth="75" style="-fx-font-weight: bold;" />
+                        <Label fx:id="citiesLabel" />
+                    </HBox>
+                    <VBox fx:id="housesContainer" spacing="10" >
+                        <padding>
+                            <Insets top="20" />
+                        </padding>
+                        <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Apartments hosted" wrapText="true" />
                     </VBox>
                 </VBox>
             </ScrollPane>

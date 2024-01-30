@@ -20,19 +20,17 @@ public class ProfileController extends Controller{
     @FXML
     private Label pageTitle;
     @FXML
-    public Label emailLabel;
+    private Label emailLabel;
     @FXML
-    public Label nameLabel;
+    private Label nameLabel;
     @FXML
-    public Label surnameLabel;
+    private Label surnameLabel;
     @FXML
-    public Label studyFieldLabel;
+    private Label studyFieldLabel;
     @FXML
-    public VBox citiesOfInterestBox;
+    private Label citiesLabel;
     @FXML
     public VBox housesContainer;
-    @FXML
-    public HBox apartmentBox;
 
     public ProfileController() {
 
@@ -48,40 +46,32 @@ public class ProfileController extends Controller{
 
             User utente = getMongoConnectionManager().findUser(session.getOtherProfileMail());
 
-            System.out.println("utente: " + utente);
             pageTitle.setText("Profile of " + utente.getName() + " " + utente.getSurname());
 
             emailLabel.setText(utente.getEmail());
             nameLabel.setText(utente.getName());
             surnameLabel.setText(utente.getSurname());
-            studyFieldLabel.setText(utente.getStudyField());
+
+            if(utente.getStudyField().isEmpty() || utente.getStudyField().isBlank())
+                studyFieldLabel.setText("not specified");
+            else
+                studyFieldLabel.setText(utente.getStudyField());
 
             List<String> userCities = utente.getPreferredCities();
 
-            if (userCities != null && !userCities.isEmpty())
-            {
-                if (userCities.size() == 1)
-                {
-                    Label cityLabel = new Label(userCities.get(0));
-                    citiesOfInterestBox.getChildren().add(cityLabel);
-                }
-                else
-                {
-                    for (String city : userCities)
-                    {
-                        Label cityLabel = new Label(city);
-                        citiesOfInterestBox.getChildren().add(cityLabel);
+            String cities = "";
+            if (userCities != null && !userCities.isEmpty()) {
+                for (String city : userCities) {
+                    cities += city;
+                    if (userCities.indexOf(city) != userCities.size() - 1) {
+                        cities += ", ";
                     }
                 }
+            } else {
+                cities = "not specified";
             }
-            else
-            {
-                // Se non ci sono città di interesse, mostra un messaggio
-                Label noCitiesLabel = new Label("Nessuna città di interesse");
-                citiesOfInterestBox.getChildren().add(noCitiesLabel);
+            citiesLabel.setText(cities);
 
-                System.out.println("userCities is null\n\n\n");
-            }
             //Adesso si deve popolare la vbox per le case dell'utente
             List<Apartment> userHouses = utente.getHouses();
             System.out.println("userHouses: " + userHouses);
@@ -90,8 +80,7 @@ public class ProfileController extends Controller{
                 for (Apartment apartment : userHouses) {
                     //QUI TUTTO CORRETTO
                     // HBox apartmentBox = new HBox(10);
-                    apartmentBox = new HBox(10);
-                    apartmentBox.setAlignment(Pos.CENTER_LEFT);
+                    HBox apartmentBox = new HBox();
 
                     ImageView apartmentImage = new ImageView();
                     apartmentImage.setFitHeight(100);
@@ -125,6 +114,8 @@ public class ProfileController extends Controller{
                     apartmentBox.getChildren().addAll(apartmentImage, apartmentButton);
                     housesContainer.getChildren().add(apartmentBox); // This should add the apartment to the UI
                 }
+            } else {
+                housesContainer.getChildren().clear();
             }
         }
     }

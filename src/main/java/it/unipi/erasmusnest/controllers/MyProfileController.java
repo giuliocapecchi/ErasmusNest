@@ -358,9 +358,7 @@ public class MyProfileController extends Controller {
         if(updateCitiesInDatabase(selectedCities))
         {
             showConfirmationMessageCities("Città di interesse aggiornate con successo!");
-        }
-        else
-        {
+        } else {
             showConfirmationMessageCities("Errore nell'aggiornamento delle città di interesse!");
         }
     }
