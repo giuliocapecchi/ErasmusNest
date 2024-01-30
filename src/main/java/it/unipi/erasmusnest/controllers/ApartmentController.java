@@ -173,7 +173,7 @@ public class ApartmentController extends Controller{
             String userEmail = getSession().getUser().getEmail();
             String houseId = String.valueOf(getSession().getApartmentId());
 
-            getRedisConnectionManager().addReservationWithAttributes(userEmail, houseId, String.valueOf(startYear), String.valueOf(startMonth), String.valueOf(numberOfMonths), getSession().getCity(), apartment.getImageURL());
+            getRedisConnectionManager().addReservation(userEmail, houseId, String.valueOf(startYear), String.valueOf(startMonth), String.valueOf(numberOfMonths), getSession().getCity(), apartment.getImageURL());
 
             super.changeWindow("myreservations");
         }
