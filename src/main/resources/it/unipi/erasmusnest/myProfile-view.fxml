@@ -78,6 +78,7 @@
                         <HBox.margin>
                             <Insets right="60.0" top="50.0" />
                         </HBox.margin>
+                        <Button onAction="#onFollowersButtonClick" style="-fx-background-color: orange; -fx-border-color: red; -fx-border-width: 1px;" text="View Followers" />
                     </VBox>
                     <VBox fx:id="apartmentsContainerVBox" spacing="10">
                         <padding>

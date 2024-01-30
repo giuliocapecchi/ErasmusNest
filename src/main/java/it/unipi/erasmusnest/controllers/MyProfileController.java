@@ -81,7 +81,7 @@ public class MyProfileController extends Controller {
         apartmentsContainerVBox.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.4));
         passwordChangeOuterBox.prefWidthProperty().bind(super.getRootPane().widthProperty());
 
-        CITIES = getNeo4jConnectionManager().getAllCities();
+        CITIES = getSession().getCities();
         String userEmail = getSession().getUser().getEmail();
 
         User utente = getMongoConnectionManager().findUser(userEmail);
@@ -403,5 +403,9 @@ public class MyProfileController extends Controller {
     @FXML
     protected void onReservationsButtonClick() {
         super.changeWindow("myreservations");
+    }
+
+    public void onFollowersButtonClick(ActionEvent actionEvent) {
+        super.changeWindow("followers");
     }
 }

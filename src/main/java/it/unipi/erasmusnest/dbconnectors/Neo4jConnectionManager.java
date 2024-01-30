@@ -2,14 +2,12 @@ package it.unipi.erasmusnest.dbconnectors;
 import it.unipi.erasmusnest.graphicmanagers.AlertDialogGraphicManager;
 import it.unipi.erasmusnest.model.Apartment;
 import it.unipi.erasmusnest.model.Review;
-import javafx.scene.control.Alert;
 import org.neo4j.driver.*;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.types.Node;
 import org.neo4j.driver.types.Relationship;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -259,7 +257,119 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         }
     }
 
+    // Method to get list of email of people followed by a user
+    public List<String> getFollowsEmail(String email)
+    {
+        List<String> followsEmail = new ArrayList<>();
+        try (Session session = driver.session())
+        {
+            return session.readTransaction((TransactionWork<List<String>>) tx -> {
+                Result result = tx.run("MATCH (u:User {email: $email})-[f:FOLLOWS]->(u2:User) RETURN u2.email",
+                        parameters("email", email));
+                while(result.hasNext())
+                {
+                    Record record = result.next();
+                    String emailFromDB = record.get("u2.email").asString();
+                    followsEmail.add(emailFromDB);
+                }
+                System.out.println("\n\n\n Follows email: " + followsEmail + "\n\n\n");
+                return followsEmail;
+            });
+        }
+        catch (Exception e)
+        {
+            System.out.println("Exception: " + e);
+            new AlertDialogGraphicManager("Neo4j connection failed").show();
+            return null;
+        }
+    }
 
+    // Method to get list of email of people following a user
+    public List<String> getFollowersEmail(String email)
+    {
+        List<String> followersEmail = new ArrayList<>();
+        try (Session session = driver.session())
+        {
+            return session.readTransaction((TransactionWork<List<String>>) tx -> {
+                Result result = tx.run("MATCH (u:User {email: $email})<-[f:FOLLOWS]-(u2:User) RETURN u2.email",
+                        parameters("email", email));
+                while(result.hasNext())
+                {
+                    Record record = result.next();
+                    String emailFromDB = record.get("u2.email").asString();
+                    followersEmail.add(emailFromDB);
+                }
+                System.out.println("\n\n\n Followers email: " + followersEmail + "\n\n\n");
+                return followersEmail;
+            });
+        }
+        catch (Exception e)
+        {
+            System.out.println("Exception: " + e);
+            new AlertDialogGraphicManager("Neo4j connection failed").show();
+            return null;
+        }
+    }
+
+    // Method to get email of suggested users
+    // Assume suggested user as user followed by a user followed by the user logged in
+    public List<String> getSuggestedUsers(String email)
+    {
+        List<String> suggestedUsers = new ArrayList<>();
+        suggestedUsers.add("NONE");
+        try (Session session = driver.session())
+        {
+            return session.readTransaction((TransactionWork<List<String>>) tx -> {
+                Result result = tx.run("MATCH (u:User {email: $email})-[:FOLLOWS]->(u2:User)-[:FOLLOWS]->(u3:User) " +
+                                "WHERE NOT (u)-[:FOLLOWS]->(u3) AND u3.email <> $email " +
+                                "RETURN u3.email",
+                        parameters("email", email));
+                while(result.hasNext())
+                {
+                    Record record = result.next();
+                    String emailFromDB = record.get("u3.email").asString();
+                    suggestedUsers.add(emailFromDB);
+                }
+                System.out.println("\n\n\n Suggested users: " + suggestedUsers + "\n\n\n");
+                return suggestedUsers;
+            });
+        }
+        catch (Exception e)
+        {
+            System.out.println("Exception: " + e);
+            new AlertDialogGraphicManager("Neo4j connection failed").show();
+            return null;
+        }
+    }
+
+
+    public void addFollow(String email, String otherEmail) {
+        try (Session session = driver.session()) {
+            session.writeTransaction((TransactionWork<Void>) tx -> {
+                tx.run("MATCH (u:User {email: $email}), (u2:User {email: $otherEmail}) " +
+                                "MERGE (u)-[:FOLLOWS]->(u2)",
+                        parameters("email", email, "otherEmail", otherEmail));
+                return null;
+            });
+        } catch (Exception e) {
+            System.out.println("Exception: " + e);
+            new AlertDialogGraphicManager("Neo4j connection failed").show();
+        }
+    }
+
+    public void removeFollow(String email, String otherEmail) {
+        try (Session session = driver.session()) {
+            session.writeTransaction((TransactionWork<Void>) tx -> {
+                tx.run("MATCH (u:User {email: $email})-[f:FOLLOWS]->(u2:User {email: $otherEmail}) " +
+                                "DELETE f",
+                        parameters("email", email, "otherEmail", otherEmail));
+                return null;
+            });
+        } catch (Exception e) {
+            System.out.println("Exception: " + e);
+            new AlertDialogGraphicManager("Neo4j connection failed").show();
+        }
+    }
 }
 
 

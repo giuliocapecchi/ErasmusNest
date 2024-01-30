@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.erasmusnest.controllers.writeReviewController">
+<StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.erasmusnest.controllers.WriteReviewController">
     <BorderPane prefHeight="683.0" prefWidth="594.0">
       <top>
          <Label fx:id="pageTitle" alignment="CENTER" contentDisplay="CENTER" prefHeight="43.0" prefWidth="609.0" text="Write a review for the apartment in  ${city.name}" textAlignment="CENTER" BorderPane.alignment="CENTER" />

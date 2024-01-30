@@ -1,19 +1,11 @@
 package it.unipi.erasmusnest.controllers;
 
-import it.unipi.erasmusnest.model.User;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.TextFlow;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class writeReviewController extends Controller{
+public class WriteReviewController extends Controller{
     @FXML
     Label pageTitle;
 
