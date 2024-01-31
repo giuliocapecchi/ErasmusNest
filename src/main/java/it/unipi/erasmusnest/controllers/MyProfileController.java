@@ -154,14 +154,19 @@ public class MyProfileController extends Controller {
                     apartmentImage.setSmooth(true);
                     apartmentImage.fitWidthProperty().bind(apartmentBox.widthProperty().multiply(0.4));
                     Button apartmentButton = new Button();
-                    apartmentButton.setText(apartment.getName());
+                    apartmentButton.setText("Modify");
                     apartmentButton.setId(apartment.getId().toString());
                     //Now add the apartment image and button to the HBox
                     apartmentButton.setOnAction(event -> {
                         // Chiamare il metodo desiderato quando il bottone viene premuto
                         onApartmentView(apartmentButton.getId());
                     });
-                    apartmentBox.getChildren().addAll(apartmentImage, apartmentButton);
+                    Button viewButton = new Button(apartment.getName());
+                    viewButton.setOnAction(event -> {
+                        onChangeView(apartmentButton.getId());
+                    });
+
+                    apartmentBox.getChildren().addAll(apartmentImage, viewButton, apartmentButton);
                     apartmentsContainer.getChildren().add(apartmentBox); // This should add the apartment to the UI
                 }
             }
@@ -185,6 +190,12 @@ public class MyProfileController extends Controller {
             adminContainer.getChildren().add(analyticsButton);
         }
         getSession().setUser(utente);
+    }
+
+    private void onChangeView(String apartmentId)
+    {
+        getSession().setApartmentId(Long.parseLong(apartmentId));
+        super.changeWindow("apartment");
     }
 
     public TitledPane createTitledPane(List<String> userCities) {
@@ -318,20 +329,6 @@ public class MyProfileController extends Controller {
         popOver.show(studyFieldComboBox);
     }
 
-    private void showConfirmationMessageEmail(String message) {
-        PopOver popOver = new PopOver();
-        Label label = new Label(message);
-        label.setStyle("-fx-padding: 10px;");
-        popOver.setContentNode(label);
-        popOver.setDetachable(false);
-        popOver.setAutoHide(true);
-    }
-
-    // Metodo per mostrare un messaggio di errore
-    private void showErrorMessage(String message) {
-        // Implementa la visualizzazione dell'errore a tua scelta (ad esempio, un messaggio di errore sullo schermo)
-    }
-
     @FXML
     private void onStudyFieldSelectionChanged(ActionEvent event)
     {
@@ -367,25 +364,12 @@ public class MyProfileController extends Controller {
         // Ottieni l'ID dell'utente corrente
         String mail = getSession().getUser().getEmail();
         User user = getMongoConnectionManager().findUser(mail);
-        if(getMongoConnectionManager().updatePreferredCities(user.getEmail(), (ArrayList<String>) cities))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return getMongoConnectionManager().updatePreferredCities(user.getEmail(), cities);
     }
 
 
     public void onUploadHouseButtonClick(ActionEvent actionEvent) {
         super.changeWindow("uploadHouse");
-    }
-
-    public void onApartmentView() {
-        // Non funziona perche c'è un errore nel RatingGraphicManager
-        getSession().setApartmentId(getSession().getUser().getHouses().get(0).getId());
-        super.changeWindow("apartment");
     }
 
     public void onApartmentView(String apartmentId) {

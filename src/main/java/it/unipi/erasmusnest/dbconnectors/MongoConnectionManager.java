@@ -268,7 +268,7 @@ public class MongoConnectionManager extends ConnectionManager{
     }
 
 
-    public boolean updatePreferredCities(String email, ArrayList<String> newPreferredCities)
+    public boolean updatePreferredCities(String email, List<String> newPreferredCities)
     {
         MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
         MongoDatabase database = mongoClient.getDatabase("ErasmusNest");

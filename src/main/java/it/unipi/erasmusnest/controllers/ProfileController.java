@@ -131,4 +131,12 @@ public class ProfileController extends Controller{
     protected void backToHomepage(ActionEvent actionEvent) {
         super.changeWindow("homepage");
     }
+
+    @FXML
+    protected void followUser(ActionEvent actionEvent)
+    {
+        String otherEmail = getSession().getOtherProfileMail();
+        String email = getSession().getUser().getEmail();
+        getNeo4jConnectionManager().addFollow(email, otherEmail);
+    }
 }

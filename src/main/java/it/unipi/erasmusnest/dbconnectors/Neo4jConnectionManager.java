@@ -370,6 +370,48 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
             new AlertDialogGraphicManager("Neo4j connection failed").show();
         }
     }
+
+    public boolean removeApartment(Long apartmentId)
+    {
+        try (Session session = driver.session())
+        {
+            session.writeTransaction((TransactionWork<Void>) tx -> {
+                tx.run("MATCH (a:Apartment {apartmentId: $apartmentId}) " +
+                                "DETACH DELETE a",
+                        parameters("apartmentId", apartmentId));
+                return null;
+            });
+            return true;
+        }
+        catch (Exception e)
+        {
+            System.out.println("Exception: " + e);
+            new AlertDialogGraphicManager("Neo4j connection failed").show();
+            return false;
+        }
+    }
+
+    // Method to update apartment information
+    public boolean updateApartment(Long apartmentId, String name, String pictureUrl)
+    {
+        try (Session session = driver.session())
+        {
+            session.writeTransaction((TransactionWork<Void>) tx -> {
+                tx.run("MATCH (a:Apartment {apartmentId: $apartmentId}) " +
+                                "SET a.name = $name, a.pictureUrl = $pictureUrl",
+                        parameters("apartmentId", apartmentId, "name", name, "pictureUrl", pictureUrl));
+                return null;
+            });
+            return true;
+        }
+        catch (Exception e)
+        {
+            System.out.println("Exception: " + e);
+            new AlertDialogGraphicManager("Neo4j connection failed").show();
+            return false;
+        }
+    }
+
 }
 
 
