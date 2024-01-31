@@ -56,8 +56,8 @@
         </center>
         <bottom>
             <VBox alignment="CENTER_RIGHT"/>
-            <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: orange;" BorderPane.alignment="CENTER">
-                <Button text="Back to search" onAction="#backToBrowse" />
+            <ToolBar fx:id="toolBar" nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: orange;" BorderPane.alignment="CENTER">
+                <Button fx:id="backToSearch" text="Back to search" onAction="#backToBrowse" />
                 <Button onAction="#backToHomepage" text="Homepage" />
             </ToolBar>
         </bottom>
