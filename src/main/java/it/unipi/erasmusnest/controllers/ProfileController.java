@@ -130,13 +130,18 @@ public class ProfileController extends Controller{
 
 
     @FXML
-    protected void backToBrowse(ActionEvent actionEvent)
+    protected void backToBrowse()
     {
         super.changeWindow("apartments");
     }
 
     @FXML
-    protected void backToHomepage(ActionEvent actionEvent) {
+    protected void backToHomepage() {
         super.changeWindow("homepage");
+    }
+
+    public void showReviews() {
+        getSession().setNextWindowName("profile");
+        super.changeWindow("reviews");
     }
 }
