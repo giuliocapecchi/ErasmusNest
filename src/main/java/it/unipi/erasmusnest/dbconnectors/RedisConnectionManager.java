@@ -236,6 +236,46 @@ public class RedisConnectionManager extends ConnectionManager{
         }
     }
 
+    public void approveReservation(Reservation reservation) {
+        try(JedisPooled jedis = new JedisPooled(super.getHost(), super.getPort())) {
+
+            String subKey = getSubKey(reservation);
+            Map<String, String> hash = new HashMap<>();;
+            hash.put("timestamp", reservation.getTimestamp().toString());
+            hash.put("city", reservation.getCity());
+            hash.put("apartmentImage", reservation.getApartmentImage());
+            hash.put("state", "approved"); // pending | approved | rejected | expired | reviewed
+            jedis.hset(subKey, hash);
+
+        } catch (Exception e) {
+            System.out.println("Connection problem: " + e.getMessage());
+            new AlertDialogGraphicManager("Redis connection failed").show();
+        }
+    }
+
+    public void rejectReservation(Reservation reservation) {
+        try(JedisPooled jedis = new JedisPooled(super.getHost(), super.getPort())) {
+
+            String subKey = "reservation:" + reservation.getStudentEmail()
+                    + ":" + reservation.getApartmentId()
+                    + ":" + reservation.getStartYear()
+                    + ":" + reservation.getStartMonth()
+                    + ":" + 0;  // note that a rejected reservation has numberOfMonths = 0
+
+            Map<String, String> hash = new HashMap<>();;
+            hash.put("timestamp", reservation.getTimestamp().toString());
+            hash.put("city", reservation.getCity());
+            hash.put("apartmentImage", reservation.getApartmentImage());
+            hash.put("state", "rejected"); // pending | approved | rejected | expired | reviewed
+            jedis.hset(subKey, hash);
+
+            deleteReservation(reservation);
+
+        } catch (Exception e) {
+            System.out.println("Connection problem: " + e.getMessage());
+            new AlertDialogGraphicManager("Redis connection failed").show();
+        }
+    }
 
     private static String getSubKey(Reservation reservation) {
         return "reservation:" + reservation.getStudentEmail()
@@ -244,5 +284,7 @@ public class RedisConnectionManager extends ConnectionManager{
                 + ":" + reservation.getStartMonth()
                 + ":" + reservation.getNumberOfMonths();
     }
+
+
 
 }

@@ -102,8 +102,6 @@ public class MyReservationsController extends Controller {
         imageVBox.setAlignment(Pos.CENTER_LEFT);
         VBox cityVBox = new VBox();
         cityVBox.setAlignment(javafx.geometry.Pos.CENTER);
-        VBox periodVBox = new VBox();
-        periodVBox.setAlignment(javafx.geometry.Pos.CENTER);
         VBox stateVBox = new VBox();
         stateVBox.setAlignment(javafx.geometry.Pos.CENTER);
         VBox buttonsVBox = new VBox();
@@ -133,7 +131,11 @@ public class MyReservationsController extends Controller {
         city.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #019fe1;");
 
         LocalDate lastDayDate = LocalDate.of(reservation.getStartYear(), reservation.getStartMonth(), 1);
-        lastDayDate = lastDayDate.plusMonths(reservation.getNumberOfMonths());
+        if(reservation.getNumberOfMonths() > 0) {
+            lastDayDate = lastDayDate.plusMonths(reservation.getNumberOfMonths());
+        }else {
+            lastDayDate = lastDayDate.plusMonths(1);
+        }
         lastDayDate = lastDayDate.minusDays(1);
 
         int startDay = 1;
@@ -148,44 +150,65 @@ public class MyReservationsController extends Controller {
         Label period = new Label(periodFromTo);
         period.setStyle("-fx-font-size: 15px; -fx-text-fill: #ff6f00;");
 
-        String state = "state: "+reservation.getState();
-        Label stateLabel = new Label(state);
-        stateLabel.setStyle("-fx-font-size: 15px; -fx-text-fill: #019fe1;");
+
 
         // remove '\n' from periodFromTo
         String msgPeriod = periodFromTo.replace("\n", " ");
 
+        buildLabels(stateVBox, reservation, userType);
         buildButtons(buttonsVBox, reservation, userType, msgPeriod);
 
         imageVBox.getChildren().add(imageView);
-        cityVBox.getChildren().add(city);
-        periodVBox.getChildren().add(period);
-        stateVBox.getChildren().add(stateLabel);
+        cityVBox.setSpacing(10);
+        cityVBox.getChildren().addAll(city, period);
 
         imageVBox.prefWidthProperty().bind(reservationHBox.widthProperty().multiply(0.5));
         cityVBox.prefWidthProperty().bind(reservationHBox.widthProperty().multiply(0.5));
-        periodVBox.prefWidthProperty().bind(reservationHBox.widthProperty().multiply(0.5));
         stateVBox.prefWidthProperty().bind(reservationHBox.widthProperty().multiply(0.5));
         buttonsVBox.prefWidthProperty().bind(reservationHBox.widthProperty().multiply(0.5));
-        reservationHBox.getChildren().addAll(imageVBox, cityVBox, periodVBox, stateVBox, buttonsVBox);
+        reservationHBox.getChildren().addAll(imageVBox, cityVBox, stateVBox, buttonsVBox);
         centerVBox.getChildren().add(reservationHBox);
 
     }
 
+    private void buildLabels(VBox stateVBox, Reservation reservation, String userType){
+        if(userType.equals("student")) {
+            String state = "state: " + reservation.getState();
+            Label stateLabel = new Label(state);
+            stateLabel.setStyle("-fx-font-size: 15px; -fx-text-fill: #019fe1;");
+            stateVBox.getChildren().add(stateLabel);
+        } else {
+            String labelText = String.format("state: " + reservation.getState()
+                    + "\n" + "student: " + reservation.getStudentEmail()
+                    + "\n" + "datetime: " + reservation.getTimestamp().getDayOfMonth()
+                    + "/" + reservation.getTimestamp().getMonthValue() + "/"
+                    + reservation.getTimestamp().getYear() + " "
+                    + reservation.getTimestamp().getHour() + ":"
+                    + (reservation.getTimestamp().getMinute()<10 ?
+                    "0"+reservation.getTimestamp().getMinute():
+                    reservation.getTimestamp().getMinute()));
+            Label label = new Label(labelText);
+            label.setStyle("-fx-font-size: 15px; -fx-text-fill: #019fe1;");
+            stateVBox.getChildren().add(label);
+        }
+    }
+
     private void buildButtons(VBox buttonsVBox, Reservation reservation, String userType, String msgPeriod){
         if(userType.equals("student")) {
-            Button deleteButton = new Button("Delete reservation");
-            deleteButton.setStyle("-fx-background-color: #ff0000; -fx-text-fill: #ffffff; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 5px;");
-            deleteButton.setOnAction(event -> {
-                boolean remove = new AlertDialogGraphicManager("Are you sure you want to delete this reservation\n"
-                        + msgPeriod + " in " + reservation.getCity()
-                        + "?", "You will not be able to recover it").showAndGetConfirmation();
-                if (remove) {
-                    getRedisConnectionManager().deleteReservation(reservation);
-                    super.changeWindow("myreservations");
-                }
-            });
-            buttonsVBox.getChildren().add(deleteButton);
+            if(!reservation.getState().equals("rejected")) {
+                Button deleteButton = new Button("Delete reservation");
+                deleteButton.setStyle("-fx-background-color: #ff0000; -fx-text-fill: #ffffff; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 5px;");
+                deleteButton.setOnAction(event -> {
+                    boolean remove = new AlertDialogGraphicManager("Are you sure you want to delete this reservation\n"
+                            + msgPeriod + " in " + reservation.getCity()
+                            + "?", "You will not be able to recover it").showAndGetConfirmation();
+                    if (remove) {
+                        getRedisConnectionManager().deleteReservation(reservation);
+                        super.changeWindow("myreservations");
+                    }
+                });
+                buttonsVBox.getChildren().add(deleteButton);
+            }
         } else if(reservation.getState().equals("pending")){
             Button approveButton = new Button("Approve reservation");
             approveButton.setStyle("-fx-background-color: #63d27f; -fx-text-fill: #ffffff; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 5px;");
@@ -194,7 +217,7 @@ public class MyReservationsController extends Controller {
                         + msgPeriod + " in " + reservation.getCity()
                         + "?", "You will not be able to reject it later").showAndGetConfirmation();
                 if (approve) {
-                    // TODO getRedisConnectionManager().approveReservation(reservation);
+                    getRedisConnectionManager().approveReservation(reservation);
                     super.changeWindow("myreservations");
                 }
             });
@@ -205,7 +228,7 @@ public class MyReservationsController extends Controller {
                         + msgPeriod + " in " + reservation.getCity()
                         + "?", "You will not be able to approve it later").showAndGetConfirmation();
                 if (approve) {
-                    // TODO getRedisConnectionManager().rejectReservation(reservation);
+                    getRedisConnectionManager().rejectReservation(reservation);
                     super.changeWindow("myreservations");
                 }
             });
