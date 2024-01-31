@@ -206,7 +206,7 @@ public class RedisConnectionManager extends ConnectionManager{
         }
     }
 
-    // OKAYy
+    // OKAY
     public void deleteReservation(Reservation reservation){
         try(JedisPooled jedis = new JedisPooled(super.getHost(), super.getPort())) {
 
