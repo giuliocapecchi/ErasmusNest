@@ -243,6 +243,51 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         }
     }
 
+    public List<Review> getReviewsForUser(String email, Integer page, Integer elementsPerPage, Integer filter) {
+        try (Session session = driver.session()) {
+            int elementsToSkip =  (page-1)*elementsPerPage;
+            List<Review> reviews = session.readTransaction((TransactionWork<List<Review>>) tx -> {
+                Result result = null;
+                if(filter==0){
+                    result = tx.run("MATCH (u:User {email: $email})-[r:REVIEW]->(a:Apartment) RETURN u, r "+
+                                    "SKIP $elementsToSkip LIMIT $elementsPerPage",
+                            parameters("email", email, "elementsToSkip", elementsToSkip, "elementsPerPage", elementsPerPage));
+                }else if(filter==1){
+                    result = tx.run("MATCH (u:User {email: $email})-[r:REVIEW]->(a:Apartment) " +
+                                    "RETURN u, r " +
+                                    "ORDER BY r.score DESC "+
+                                    "SKIP $elementsToSkip LIMIT $elementsPerPage",
+                            parameters("email", email, "elementsToSkip", elementsToSkip, "elementsPerPage", elementsPerPage));
+
+                }else if(filter==2){
+                    result = tx.run("MATCH (u:User {email: $email})-[r:REVIEW]->(a:Apartment) " +
+                                    "RETURN u, r " +
+                                    "ORDER BY r.score ASC "+
+                                    "SKIP $elementsToSkip LIMIT $elementsPerPage",
+                            parameters("email", email, "elementsToSkip", elementsToSkip, "elementsPerPage", elementsPerPage));
+
+                }
+
+                List<Review> reviewList = new ArrayList<>();
+                while (Objects.requireNonNull(result).hasNext()) {
+                    Record record = result.next();
+                    Relationship reviewRel = record.get("r").asRelationship();
+                    Long apartmentId = reviewRel.get("apartmentId").asLong();
+                    String comment = reviewRel.get("comment").asString();
+                    float rating = reviewRel.get("score").asFloat();
+                    Review review = new Review(apartmentId,email, comment,rating);
+                    reviewList.add(review);
+                }
+                return reviewList;
+            });
+            return reviews;
+        }catch (Exception e){
+            System.out.println("Exception: " + e);
+            new AlertDialogGraphicManager("Neo4j connection failed").show();
+            return null;
+        }
+    }
+
     //UPDATE
     public void updateApartmentAverageReviewScore(Long apartmentId) {
         try (Session session = driver.session()) {

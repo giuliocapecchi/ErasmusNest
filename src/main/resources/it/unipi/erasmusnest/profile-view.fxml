@@ -2,7 +2,6 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
 <StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.erasmusnest.controllers.ProfileController">
@@ -26,26 +25,31 @@
                     </padding>
                     <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Personal information" wrapText="true" />
                     <HBox spacing="10">
-                        <Label text="Email:" minWidth="75" style="-fx-font-weight: bold;" />
+                        <Label minWidth="75" style="-fx-font-weight: bold;" text="Email:" />
                         <Label fx:id="emailLabel" />
                     </HBox>
                     <HBox spacing="10">
-                        <Label text="Name:" minWidth="75" style="-fx-font-weight: bold;" />
+                        <Label minWidth="75" style="-fx-font-weight: bold;" text="Name:" />
                         <Label fx:id="nameLabel" />
                     </HBox>
                     <HBox spacing="10">
-                        <Label text="Surname:" minWidth="75" style="-fx-font-weight: bold;" />
+                        <Label minWidth="75" style="-fx-font-weight: bold;" text="Surname:" />
                         <Label fx:id="surnameLabel" />
                     </HBox>
                     <HBox spacing="10">
-                        <Label text="Study field:" minWidth="75" style="-fx-font-weight: bold;" />
+                        <Label minWidth="75" style="-fx-font-weight: bold;" text="Study field:" />
                         <Label fx:id="studyFieldLabel" />
                     </HBox>
                     <HBox spacing="10">
-                        <Label text="Cities of interest:" minWidth="75" style="-fx-font-weight: bold;" />
+                        <Label minWidth="75" style="-fx-font-weight: bold;" text="Cities of interest:" />
                         <Label fx:id="citiesLabel" />
                     </HBox>
-                    <VBox fx:id="housesContainer" spacing="10" >
+               <Button mnemonicParsing="false" text="Show reviews" onAction="#showReviews">
+                  <VBox.margin>
+                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                  </VBox.margin>
+               </Button>
+                    <VBox fx:id="housesContainer" spacing="10">
                         <padding>
                             <Insets top="20" />
                         </padding>
@@ -55,9 +59,9 @@
             </ScrollPane>
         </center>
         <bottom>
-            <VBox alignment="CENTER_RIGHT"/>
+            <VBox alignment="CENTER_RIGHT" />
             <ToolBar fx:id="toolBar" nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: orange;" BorderPane.alignment="CENTER">
-                <Button fx:id="backToSearch" text="Back to search" onAction="#backToBrowse" />
+                <Button fx:id="backToSearch" onAction="#backToBrowse" text="Back to search" />
                 <Button onAction="#backToHomepage" text="Homepage" />
             </ToolBar>
         </bottom>

@@ -82,7 +82,7 @@ public class ApartmentController extends Controller{
         apartment = getMongoConnectionManager().getApartment(getSession().getApartmentId());
         if(apartment==null){
             super.changeWindow("apartments");
-        }else{
+        }else {
             apartment.setAverageRating(getSession().getApartmentAverageRating());
 
             MapGraphicManager mapGraphicManager = new MapGraphicManager(webView, apartment.getLocation());
@@ -105,9 +105,9 @@ public class ApartmentController extends Controller{
             imageView.setSmooth(true);
             // make the image view always fit the height of the parent
             imageView.fitWidthProperty().bind(leftFirstVBox.widthProperty().multiply(0.8));
-            String information = apartment.getDescription()+"\n"+
-                    "Accommodates: "+ apartment.getMaxAccommodates()+"\n"+
-                    "Price per month: "+ apartment.getDollarPriceMonth()+"$\n";
+            String information = apartment.getDescription() + "\n" +
+                    "Accommodates: " + apartment.getMaxAccommodates() + "\n" +
+                    "Price per month: " + apartment.getDollarPriceMonth() + "$\n";
             infoText.setText(information);
             hostEmail.setText(apartment.getHostEmail());
 
@@ -142,6 +142,7 @@ public class ApartmentController extends Controller{
 
     @FXML
     protected void onShowReviewsButtonClick() {
+        getSession().setNextWindowName("apartment");
         super.changeWindow("reviews");
     }
 
