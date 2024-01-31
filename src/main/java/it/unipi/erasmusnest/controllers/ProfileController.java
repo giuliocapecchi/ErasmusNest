@@ -141,10 +141,10 @@ public class ProfileController extends Controller{
     }
 
     @FXML
-    protected void followUser(ActionEvent actionEvent)
+    protected void seeSuggested(ActionEvent actionEvent)
     {
         String otherEmail = getSession().getOtherProfileMail();
         String email = getSession().getUser().getEmail();
-        getNeo4jConnectionManager().addFollow(email, otherEmail);
+        boolean suggestedUsers =  getNeo4jConnectionManager().seeSuggested(email, otherEmail);
     }
 }

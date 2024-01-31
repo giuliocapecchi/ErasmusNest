@@ -276,7 +276,7 @@ public class MyProfileController extends Controller {
             if(getRedisConnectionManager().updateUserPassword(getSession().getUser().getEmail(), newPassword)){
                 System.out.println("Password aggiornata su Redis");
                 passwordChangeOuterBox.setVisible(false);
-                showConfirmationMessagePassword("Password aggiornata con successo!");
+                showConfirmationMessagePassword("Password aggiornata con successo!", modifyPasswordButton);
             }else{ // aggiorno su Mongo e basta / TODO : eventual consistency da gestire qui! La password rimane solo su Redis per ora
                 System.out.println("Password non aggiornata su Redis perchè non trovata la chiave. La aggiorno su MongoDB");
                 // per come è ora il codice, su mongo la password viene aggiornata a priori (errore???)
@@ -284,7 +284,7 @@ public class MyProfileController extends Controller {
                     // Nascondi il banner/pop-up e mostra un messaggio di conferma
                     //passwordChangeBox.setVisible(false);
                     passwordChangeOuterBox.setVisible(false);
-                    showConfirmationMessagePassword("Password aggiornata con successo!");
+                    showConfirmationMessagePassword("Password aggiornata con successo!", modifyPasswordButton);
                 }else{
                     // Mostra un messaggio di errore se la nuova password non è valida o la vecchia password non coincide
                     setPasswordErrorText();
@@ -299,7 +299,7 @@ public class MyProfileController extends Controller {
     }
 
     // Metodo per mostrare un messaggio di conferma
-    private void showConfirmationMessagePassword(String message) {
+    private void showConfirmationMessagePassword(String message, Button modifyPasswordButton) {
         PopOver popOver = new PopOver();
         Label label = new Label(message);
         label.setStyle("-fx-padding: 10px;");

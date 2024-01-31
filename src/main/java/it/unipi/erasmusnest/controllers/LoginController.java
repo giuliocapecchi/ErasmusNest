@@ -92,7 +92,14 @@ public class LoginController extends Controller{
                 getSession().setLogged(true);
                 getSession().getUser().setEmail(emailField.getEmailAddress());
                 logged = true;
-            }else{
+            }
+            else if(password != null && !password.equals(passwordField.getText()))
+            {
+                // Password taken different from real pw
+                showErrorMessage("Invalid email or password", errorTextFlow);
+            }
+            else
+            {
                 System.out.println("Credentials not found in Redis. Let's check in MongoDB");
                 String mongoPassword = super.getMongoConnectionManager().getPassword(emailField.getEmailAddress());
                 if(mongoPassword != null && mongoPassword.equals(passwordField.getText())) {
