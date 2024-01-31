@@ -8,8 +8,10 @@ import org.neo4j.driver.types.Node;
 import org.neo4j.driver.types.Relationship;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static org.neo4j.driver.Values.NULL;
 import static org.neo4j.driver.Values.parameters;
@@ -456,6 +458,36 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
             return false;
         }
     }
+
+    public boolean seeSuggested(String email, String otherEmail) {
+        try (Session session = driver.session()) {
+            Boolean relationshipExists = session.readTransaction((TransactionWork<Boolean>) tx -> {
+                Result result = tx.run("MATCH (u:User {email: $email})-[:FOLLOWS]->(u2:User {email: $otherEmail}) RETURN COUNT(*) > 0 AS exists",
+                        parameters("email", email, "otherEmail", otherEmail));
+                return (Boolean) result.single().get("exists", Boolean.class);
+            });
+
+            if (relationshipExists) {
+                // La relazione esiste già, quindi ritorniamo false
+                return false;
+            } else {
+                // La relazione non esiste, puoi mostrare gli account suggeriti per quell'utente qui
+                // Ad esempio, puoi chiamare una funzione per ottenere gli account suggeriti e mostrarli
+                showSuggestedAccounts(email);
+                return true;
+            }
+        } catch (Exception e) {
+            System.out.println("Exception: " + e);
+            new AlertDialogGraphicManager("Neo4j connection failed").show();
+            // Ritorna true o false a seconda di come desideri gestire l'errore
+            return false;
+        }
+    }
+
+    private void showSuggestedAccounts(String email) {
+        // Implementa la logica per mostrare gli account suggeriti per l'utente 'email' qui
+    }
+
 
 }
 

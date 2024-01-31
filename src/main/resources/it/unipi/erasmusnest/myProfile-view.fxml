@@ -34,6 +34,7 @@
                         <HBox alignment="CENTER_LEFT" spacing="10">
                             <Label minWidth="75" style="-fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Email:" />
                             <Label fx:id="emailLabel" />
+                            <Button onAction="#onFollowersButtonClick" style="-fx-background-color: orange; -fx-border-color: red; -fx-border-width: 1px;" text="View Followers" />
                         </HBox>
                         <HBox alignment="CENTER_LEFT" spacing="10">
                             <Label minWidth="75" style="-fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Password:" />
@@ -78,7 +79,6 @@
                         <HBox.margin>
                             <Insets right="60.0" top="50.0" />
                         </HBox.margin>
-                        <Button onAction="#onFollowersButtonClick" style="-fx-background-color: orange; -fx-border-color: red; -fx-border-width: 1px;" text="View Followers" />
                     </VBox>
                     <VBox fx:id="apartmentsContainerVBox" spacing="10">
                         <padding>

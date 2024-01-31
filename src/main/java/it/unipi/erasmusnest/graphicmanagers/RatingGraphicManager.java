@@ -16,6 +16,7 @@ public class RatingGraphicManager {
     }
 
     public void showRating(Double actualRating){
+        System.out.println("\n\n\n RATING: " + actualRating + "\n\n");
         for(int i = 0; i<maxRating; i++){
             setStarImage(actualRating, ratingImages.get(i));
             actualRating--;
