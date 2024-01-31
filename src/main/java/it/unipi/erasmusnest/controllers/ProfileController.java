@@ -145,7 +145,20 @@ public class ProfileController extends Controller{
     {
         String otherEmail = getSession().getOtherProfileMail();
         String email = getSession().getUser().getEmail();
-        boolean suggestedUsers =  getNeo4jConnectionManager().seeSuggested(email, otherEmail);
+        List<String> suggestedUsers =  getNeo4jConnectionManager().seeSuggested(email, otherEmail);
+        getNeo4jConnectionManager().addFollow(email, otherEmail);
+        if(suggestedUsers.isEmpty())
+        {
+            System.out.println("\n\n\n NON CI SONO CONSIGLIATI \n\n\n");
+        }
+        else
+        {
+            System.out.println("\n\n\n CI SONO CONSIGLIATI \n\n\n");
+            for(String user : suggestedUsers)
+            {
+                System.out.println("\n" + user + "\n");
+            }
+        }
     }
 
     public void showReviews() {

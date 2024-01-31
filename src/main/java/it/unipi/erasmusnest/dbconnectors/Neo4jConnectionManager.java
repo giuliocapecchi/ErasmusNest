@@ -459,34 +459,36 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         }
     }
 
-    public boolean seeSuggested(String email, String otherEmail) {
+    public List<String> seeSuggested(String emailA, String emailB) {
         try (Session session = driver.session()) {
-            Boolean relationshipExists = session.readTransaction((TransactionWork<Boolean>) tx -> {
-                Result result = tx.run("MATCH (u:User {email: $email})-[:FOLLOWS]->(u2:User {email: $otherEmail}) RETURN COUNT(*) > 0 AS exists",
-                        parameters("email", email, "otherEmail", otherEmail));
-                return (Boolean) result.single().get("exists", Boolean.class);
+            List<String> suggestedAccounts = session.readTransaction((TransactionWork<List<String>>) tx -> {
+                Result result = tx.run("MATCH (a:User {email: $emailA}) " +
+                                "MATCH (b:User {email: $emailB}) " +
+                                "MATCH (b)-[:FOLLOWS]->(suggested:User) " +
+                                "WHERE NOT (a)-[:FOLLOWS]->(suggested) " +
+                                "MATCH (a)-[:INTERESTS]->(city:City) " +
+                                "MATCH (suggested)-[:INTERESTS]->(city) " +
+                                "RETURN DISTINCT suggested.email AS suggestedEmail",
+                        parameters("emailA", emailA, "emailB", emailB));
+
+                List<String> suggestedEmails = new ArrayList<>();
+                while (result.hasNext()) {
+                    suggestedEmails.add(result.next().get("suggestedEmail").asString());
+                }
+
+                return suggestedEmails;
             });
 
-            if (relationshipExists) {
-                // La relazione esiste già, quindi ritorniamo false
-                return false;
-            } else {
-                // La relazione non esiste, puoi mostrare gli account suggeriti per quell'utente qui
-                // Ad esempio, puoi chiamare una funzione per ottenere gli account suggeriti e mostrarli
-                showSuggestedAccounts(email);
-                return true;
-            }
+            return suggestedAccounts;
         } catch (Exception e) {
             System.out.println("Exception: " + e);
             new AlertDialogGraphicManager("Neo4j connection failed").show();
-            // Ritorna true o false a seconda di come desideri gestire l'errore
-            return false;
+            // Gestisci l'errore come preferisci o ritorna una lista vuota
+            return Collections.emptyList();
         }
     }
 
-    private void showSuggestedAccounts(String email) {
-        // Implementa la logica per mostrare gli account suggeriti per l'utente 'email' qui
-    }
+
 
 
 }
