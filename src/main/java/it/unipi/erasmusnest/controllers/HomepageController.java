@@ -12,6 +12,7 @@ import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class HomepageController extends Controller{
 
@@ -174,7 +175,16 @@ public class HomepageController extends Controller{
             alert.setContentText("The user you are looking for does not exist.");
             alert.showAndWait();
         }else{
+            if(Objects.equals(getSession().getUser().getEmail(), user.getEmail())){
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("You can't search yourself");
+                alert.setContentText("Use the \"Profile\" button below.");
+                alert.showAndWait();
+                return;
+            }
             getSession().setOtherProfileMail(user.getEmail());
+            getSession().setNextWindowName("homepage");
             super.changeWindow("profile");
         }
     }
