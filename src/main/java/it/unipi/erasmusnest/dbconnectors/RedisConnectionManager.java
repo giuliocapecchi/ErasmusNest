@@ -6,10 +6,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPooled;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.ArrayList;
+import java.util.*;
 
 public class RedisConnectionManager extends ConnectionManager{
 
@@ -66,6 +63,24 @@ public class RedisConnectionManager extends ConnectionManager{
         return reservations;
     }
 
+    public ArrayList<Reservation> getReservationsForApartments(List<Long> houseIds) {
+        ArrayList<Reservation> reservations = new ArrayList<>();
+
+        for(Long houseId : houseIds) {
+            ArrayList<Reservation> reservationsForApartment = getReservationsForApartment(houseId);
+            for(Reservation reservation : reservationsForApartment){
+                ArrayList<String> attributesValues = getReservationAttributesValues(getSubKey(reservation));
+                reservation.setTimestamp(java.time.LocalDateTime.parse(attributesValues.get(0)));
+                reservation.setCity(attributesValues.get(1));
+                reservation.setApartmentImage(attributesValues.get(2));
+                reservation.setState(attributesValues.get(3));
+            }
+            reservations.addAll(reservationsForApartment);
+        }
+
+        return reservations;
+    }
+
     // OKAY
     public ArrayList<Reservation> getReservationsForUser(String  userEmail) {
         ArrayList<Reservation> reservations = new ArrayList<>();
@@ -84,7 +99,7 @@ public class RedisConnectionManager extends ConnectionManager{
                 reservations.add(new Reservation(keyParts[1], keyParts[2], Integer.parseInt(keyParts[3]),
                         Integer.parseInt(keyParts[4]), Integer.parseInt(keyParts[5]),
                         java.time.LocalDateTime.parse(attributesValues.get(0)),
-                        attributesValues.get(1), attributesValues.get(2)));
+                        attributesValues.get(1), attributesValues.get(2), attributesValues.get(3)));
             }
         } catch (Exception e) {
             System.out.println("Connection problem: " + e.getMessage());
@@ -103,6 +118,7 @@ public class RedisConnectionManager extends ConnectionManager{
             attributesValues.add(hash.get("timestamp"));
             attributesValues.add(hash.get("city"));
             attributesValues.add(hash.get("apartmentImage"));
+            attributesValues.add(hash.get("state"));
 
         } catch (Exception e) {
             System.out.println("Connection problem: " + e.getMessage());
@@ -157,6 +173,7 @@ public class RedisConnectionManager extends ConnectionManager{
             hash.put("timestamp", dateTime);
             hash.put("city", city);
             hash.put("apartmentImage", apartmentImage);
+            hash.put("state", "pending"); // pending | approved | rejected | expired | reviewed
             jedis.hset(subKey, hash);
 
         } catch (Exception e) {

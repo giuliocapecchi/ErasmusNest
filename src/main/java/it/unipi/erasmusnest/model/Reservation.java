@@ -12,6 +12,7 @@ public class Reservation {
     private LocalDateTime timestamp;
     private String city;
     private String apartmentImage;
+    private String state;
 
 
     public Reservation(String studentEmail, String apartmentId, int startYear, int startMonth, int numberOfMonths) {
@@ -22,7 +23,9 @@ public class Reservation {
         this.numberOfMonths = numberOfMonths;
     }
 
-    public Reservation(String studentEmail, String apartmentId, int startYear, int startMonth, int numberOfMonths, LocalDateTime timestamp, String city, String apartmentImage) {
+    public Reservation(String studentEmail, String apartmentId, int startYear, int startMonth,
+                       int numberOfMonths, LocalDateTime timestamp, String city,
+                       String apartmentImage, String state) {
         this.studentEmail = studentEmail;
         this.apartmentId = apartmentId;
         this.startYear = startYear;
@@ -31,6 +34,7 @@ public class Reservation {
         this.timestamp = timestamp;
         this.city = city;
         this.apartmentImage = apartmentImage;
+        this.state = state;
     }
 
     public String getStudentEmail() {
@@ -97,6 +101,14 @@ public class Reservation {
         this.apartmentImage = apartmentImage;
     }
 
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
     @Override
     public String toString() {
         return "Reservation{" +
@@ -108,6 +120,7 @@ public class Reservation {
                 ", timestamp=" + timestamp +
                 ", city='" + city + '\'' +
                 ", apartmentImage='" + apartmentImage + '\'' +
+                ", state='" + state + '\'' +
                 '}';
     }
 }

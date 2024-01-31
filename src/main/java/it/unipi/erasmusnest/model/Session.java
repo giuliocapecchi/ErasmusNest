@@ -27,6 +27,8 @@ public class Session {
 
     private List<String> cities;
 
+    private List<Long> apartmentsId;
+
     public Session() {
         this.user = new User();
         this.logged = false;
@@ -139,6 +141,14 @@ public class Session {
 
     public void setCities(List<String> cities) {
         this.cities = cities;
+    }
+
+    public List<Long> getApartmentsId() {
+        return apartmentsId;
+    }
+
+    public void setApartmentsId(List<Long> apartmentsId) {
+        this.apartmentsId = apartmentsId;
     }
 
 }

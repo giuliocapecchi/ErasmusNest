@@ -130,7 +130,8 @@ public class ApartmentController extends Controller{
                 reviewsButton.setVisible(false);
             }
 
-            new ReservationGraphicManager(startDatePicker, endDatePicker, confirmButton, getSession(), getRedisConnectionManager());
+            new ReservationGraphicManager(startDatePicker, endDatePicker, confirmButton,
+                    getSession(), getRedisConnectionManager(), apartment.getMaxAccommodates());
 
             if(!getSession().isLogged()){
                 showErrorMessage("Login required", loginMessage);

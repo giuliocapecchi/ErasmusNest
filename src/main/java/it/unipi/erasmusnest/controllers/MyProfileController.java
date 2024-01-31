@@ -21,7 +21,7 @@ public class MyProfileController extends Controller {
     @FXML
     VBox personalInfoVbox;
     public VBox cityVBox;
-    public  TitledPane cityTidlePane;
+    public  TitledPane cityTitlePane;
     @FXML
     VBox apartmentsContainerVBox;
     @FXML
@@ -56,15 +56,12 @@ public class MyProfileController extends Controller {
     @FXML
     Label passwordErrorLabel; // Etichetta per visualizzare gli errori
     @FXML
-    private VBox citiesOfInterestBox; // Contenitore per le CheckBoxes delle città di interesse
-    @FXML
     private ComboBox<String> studyFieldComboBox;
     @FXML
-    private ComboBox<String> citiesOfInterestComboBox;
+    private VBox reservationsContainerVBox;
 
     private String selectedStudyField;
-    private List<String> selectedCities = new ArrayList<>();
-    private List<String> CITIES = new ArrayList<>();
+    private final List<String> selectedCities = new ArrayList<>();
 
 
     // Metodo per impostare il testo dell'etichetta dell'errore
@@ -81,14 +78,13 @@ public class MyProfileController extends Controller {
         apartmentsContainerVBox.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.4));
         passwordChangeOuterBox.prefWidthProperty().bind(super.getRootPane().widthProperty());
 
-        CITIES = getSession().getCities();
         String userEmail = getSession().getUser().getEmail();
 
         User utente = getMongoConnectionManager().findUser(userEmail);
         passwordField.setText("******"); // Set password field to 6 asterisks
         List<String> userCities = utente.getPreferredCities();
-        cityTidlePane = createTitledPane(userCities);
-        cityVBox.getChildren().add(cityTidlePane);
+        cityTitlePane = createTitledPane(userCities);
+        cityVBox.getChildren().add(cityTitlePane);
 
         // Update preferred cities
         updateCitiesButton.setOnAction(event -> {
@@ -189,6 +185,11 @@ public class MyProfileController extends Controller {
 
             adminContainer.getChildren().add(analyticsButton);
         }
+
+        if(utente.getHouses().isEmpty()){
+            reservationsContainerVBox.getChildren().clear();
+        }
+
         getSession().setUser(utente);
     }
 
@@ -378,12 +379,24 @@ public class MyProfileController extends Controller {
         super.changeWindow("modifyApartment");
     }
 
-    public void onBack(ActionEvent actionEvent) {
+    public void onBack() {
         super.changeWindow("login");
     }
 
     @FXML
     protected void onReservationsButtonClick() {
+        getSession().setApartmentsId(null);
+        super.changeWindow("myreservations");
+    }
+
+    @FXML
+    protected void onReservationsMyApartmentsButtonClick() {
+        // mettere in sessione gli id di tutte le case
+        ArrayList<Long> ids = new ArrayList<>();
+        for(Apartment apartment : getSession().getUser().getHouses()){
+            ids.add(apartment.getId());
+        }
+        getSession().setApartmentsId(ids);
         super.changeWindow("myreservations");
     }
 

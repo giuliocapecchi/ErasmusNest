@@ -1,6 +1,7 @@
 package it.unipi.erasmusnest.graphicmanagers;
 
 import it.unipi.erasmusnest.dbconnectors.RedisConnectionManager;
+import it.unipi.erasmusnest.model.MonthlyReservations;
 import it.unipi.erasmusnest.model.Reservation;
 import it.unipi.erasmusnest.model.Session;
 import javafx.scene.control.Button;
@@ -8,8 +9,8 @@ import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
 
 import java.time.LocalDate;
-import java.time.Period;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class ReservationGraphicManager {
 
@@ -21,13 +22,16 @@ public class ReservationGraphicManager {
     private final RedisConnectionManager redisConnectionManager;
     private boolean available;
     private ArrayList<LocalDate> enabledEndDates;
+    private final Integer maxAccommodatesPerMonth;
+    private ArrayList<MonthlyReservations> monthlyReservations;
 
-    public ReservationGraphicManager(DatePicker startDatePicker, DatePicker endDatePicker, Button confirmButton, Session session, RedisConnectionManager redisConnectionManager){
+    public ReservationGraphicManager(DatePicker startDatePicker, DatePicker endDatePicker, Button confirmButton, Session session, RedisConnectionManager redisConnectionManager, Integer maxAccommodatesPerMonth){
         this.startDatePicker = startDatePicker;
         this.endDatePicker = endDatePicker;
         this.confirmButton = confirmButton;
         this.session = session;
         this.redisConnectionManager = redisConnectionManager;
+        this.maxAccommodatesPerMonth = maxAccommodatesPerMonth;
         initialize();
     }
 
@@ -42,6 +46,10 @@ public class ReservationGraphicManager {
         if(session.isLogged()){
             enabledEndDates = new ArrayList<>();
             reservations = redisConnectionManager.getReservationsForApartment(session.getApartmentId());
+
+            computeNumberOfReservationsPerMonth();
+            System.out.println(monthlyReservations);
+
             enableOnlyFutureFirstDayOfMonthsAvailable(startDatePicker, reservations);
             setHandlers();
         }else{
@@ -53,6 +61,41 @@ public class ReservationGraphicManager {
     private void setHandlers(){
         startDatePicker.setOnAction(event -> onStartDatePickerClick());
         endDatePicker.setOnAction(event -> onEndDatePickerClick());
+    }
+
+    private void computeNumberOfReservationsPerMonth(){
+        monthlyReservations = new ArrayList<>();
+        for(Reservation reservation : reservations){
+            int startYear = reservation.getStartYear();
+            int startMonth = reservation.getStartMonth();
+            int numberOfMonths = reservation.getNumberOfMonths();
+            for(int i = 0; i<numberOfMonths; i++){
+
+                MonthlyReservations monthlyReservation = getReservationsForMonth(startYear, startMonth);
+                if(monthlyReservation == null){
+                    monthlyReservations.add(new MonthlyReservations(startYear, startMonth, reservation.getStudentEmail()));
+                } else {
+                    monthlyReservation.addReservation();
+                }
+
+                startMonth++;
+                if(startMonth == 13){
+                    startMonth = 1;
+                    startYear++;
+                }
+            }
+        }
+    }
+
+    private MonthlyReservations getReservationsForMonth(int year, int month){
+        MonthlyReservations monthlyReservationResult = null;
+        for(MonthlyReservations monthlyReservation : monthlyReservations){
+            if(monthlyReservation.getYear() == year && monthlyReservation.getMonth() == month){
+                monthlyReservationResult = monthlyReservation;
+                break;
+            }
+        }
+        return monthlyReservationResult;
     }
 
     private void enableOnlyFutureFirstDayOfMonthsAvailable(DatePicker datePicker, ArrayList<Reservation> reservations){
@@ -101,14 +144,23 @@ public class ReservationGraphicManager {
     }
 
     private boolean isDateAvailable(LocalDate date, ArrayList<Reservation> reservations){
-        boolean isIn = false;
+        boolean available = true;
         for(Reservation reservation : reservations){
             int startYear = reservation.getStartYear();
             int startMonth = reservation.getStartMonth();
             int numberOfMonths = reservation.getNumberOfMonths();
-            for(int i = 0; i<numberOfMonths && !isIn; i++){
+            for(int i = 0; i<numberOfMonths && available; i++){
                 if(date.getMonthValue() == startMonth && date.getYear() == startYear){
-                    isIn = true;
+                    MonthlyReservations monthlyReservation = getReservationsForMonth(startYear, startMonth);
+                    if(monthlyReservation != null){
+                        if(Objects.equals(monthlyReservation.getNumberOfReservations(), maxAccommodatesPerMonth)){
+                            available = false;
+                        }else{
+                            if(monthlyReservation.isReservedForStudent(session.getUser().getEmail())){
+                                available = false;
+                            }
+                        }
+                    }
                 }
                 startMonth++;
                 if(startMonth == 13){
@@ -117,7 +169,7 @@ public class ReservationGraphicManager {
                 }
             }
         }
-        return !isIn;
+        return available;
     }
 
     private boolean isLastDayOfMonth(LocalDate date) {
@@ -130,6 +182,8 @@ public class ReservationGraphicManager {
 
         return nextMonth != currentMonth;
     }
+
+
 
     public void onStartDatePickerClick() {
         enabledEndDates = new ArrayList<>();
