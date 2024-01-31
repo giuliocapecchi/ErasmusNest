@@ -1,5 +1,6 @@
 package it.unipi.erasmusnest.controllers;
 
+import it.unipi.erasmusnest.graphicmanagers.AlertDialogGraphicManager;
 import it.unipi.erasmusnest.model.Apartment;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -124,15 +125,21 @@ public class ModifyAparmentController extends Controller{
     private void onRemoveHouseButtonClick(ActionEvent actionEvent)
     {
         Long apartmentId = getSession().getApartmentId();
-        if(getMongoConnectionManager().removeApartment(apartmentId))
+        boolean remove = new AlertDialogGraphicManager("Are you sure you want to remove this apartment?\n",
+                "You will not be able to recover it").showAndGetConfirmation();
+        if(remove)
         {
-            //Print OK message
-            showConfirmationMessage("Succesfull remove", removeHouse);
-        }
-        else
-        {
-            //Print error message
-            showConfirmationMessage("Remove failed", removeHouse);
+            if(getMongoConnectionManager().removeApartment(apartmentId)
+                && getNeo4jConnectionManager().removeApartment(apartmentId))
+            {
+                //Print OK message
+                showConfirmationMessage("Succesfull remove", removeHouse);
+            }
+            else
+            {
+                //Print error message
+                showConfirmationMessage("Remove failed", removeHouse);
+            }
         }
     }
 }
