@@ -8,8 +8,10 @@ import org.neo4j.driver.types.Node;
 import org.neo4j.driver.types.Relationship;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static org.neo4j.driver.Values.NULL;
 import static org.neo4j.driver.Values.parameters;
@@ -241,6 +243,51 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         }
     }
 
+    public List<Review> getReviewsForUser(String email, Integer page, Integer elementsPerPage, Integer filter) {
+        try (Session session = driver.session()) {
+            int elementsToSkip =  (page-1)*elementsPerPage;
+            List<Review> reviews = session.readTransaction((TransactionWork<List<Review>>) tx -> {
+                Result result = null;
+                if(filter==0){
+                    result = tx.run("MATCH (u:User {email: $email})-[r:REVIEW]->(a:Apartment) RETURN u, r "+
+                                    "SKIP $elementsToSkip LIMIT $elementsPerPage",
+                            parameters("email", email, "elementsToSkip", elementsToSkip, "elementsPerPage", elementsPerPage));
+                }else if(filter==1){
+                    result = tx.run("MATCH (u:User {email: $email})-[r:REVIEW]->(a:Apartment) " +
+                                    "RETURN u, r " +
+                                    "ORDER BY r.score DESC "+
+                                    "SKIP $elementsToSkip LIMIT $elementsPerPage",
+                            parameters("email", email, "elementsToSkip", elementsToSkip, "elementsPerPage", elementsPerPage));
+
+                }else if(filter==2){
+                    result = tx.run("MATCH (u:User {email: $email})-[r:REVIEW]->(a:Apartment) " +
+                                    "RETURN u, r " +
+                                    "ORDER BY r.score ASC "+
+                                    "SKIP $elementsToSkip LIMIT $elementsPerPage",
+                            parameters("email", email, "elementsToSkip", elementsToSkip, "elementsPerPage", elementsPerPage));
+
+                }
+
+                List<Review> reviewList = new ArrayList<>();
+                while (Objects.requireNonNull(result).hasNext()) {
+                    Record record = result.next();
+                    Relationship reviewRel = record.get("r").asRelationship();
+                    Long apartmentId = reviewRel.get("apartmentId").asLong();
+                    String comment = reviewRel.get("comment").asString();
+                    float rating = reviewRel.get("score").asFloat();
+                    Review review = new Review(apartmentId,email, comment,rating);
+                    reviewList.add(review);
+                }
+                return reviewList;
+            });
+            return reviews;
+        }catch (Exception e){
+            System.out.println("Exception: " + e);
+            new AlertDialogGraphicManager("Neo4j connection failed").show();
+            return null;
+        }
+    }
+
     //UPDATE
     public void updateApartmentAverageReviewScore(Long apartmentId) {
         try (Session session = driver.session()) {
@@ -370,6 +417,78 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
             new AlertDialogGraphicManager("Neo4j connection failed").show();
         }
     }
+
+    public boolean removeApartment(Long apartmentId)
+    {
+        try (Session session = driver.session())
+        {
+            session.writeTransaction((TransactionWork<Void>) tx -> {
+                tx.run("MATCH (a:Apartment {apartmentId: $apartmentId}) " +
+                                "DETACH DELETE a",
+                        parameters("apartmentId", apartmentId));
+                return null;
+            });
+            return true;
+        }
+        catch (Exception e)
+        {
+            System.out.println("Exception: " + e);
+            new AlertDialogGraphicManager("Neo4j connection failed").show();
+            return false;
+        }
+    }
+
+    // Method to update apartment information
+    public boolean updateApartment(Long apartmentId, String name, String pictureUrl)
+    {
+        try (Session session = driver.session())
+        {
+            session.writeTransaction((TransactionWork<Void>) tx -> {
+                tx.run("MATCH (a:Apartment {apartmentId: $apartmentId}) " +
+                                "SET a.name = $name, a.pictureUrl = $pictureUrl",
+                        parameters("apartmentId", apartmentId, "name", name, "pictureUrl", pictureUrl));
+                return null;
+            });
+            return true;
+        }
+        catch (Exception e)
+        {
+            System.out.println("Exception: " + e);
+            new AlertDialogGraphicManager("Neo4j connection failed").show();
+            return false;
+        }
+    }
+
+    public boolean seeSuggested(String email, String otherEmail) {
+        try (Session session = driver.session()) {
+            Boolean relationshipExists = session.readTransaction((TransactionWork<Boolean>) tx -> {
+                Result result = tx.run("MATCH (u:User {email: $email})-[:FOLLOWS]->(u2:User {email: $otherEmail}) RETURN COUNT(*) > 0 AS exists",
+                        parameters("email", email, "otherEmail", otherEmail));
+                return (Boolean) result.single().get("exists", Boolean.class);
+            });
+
+            if (relationshipExists) {
+                // La relazione esiste già, quindi ritorniamo false
+                return false;
+            } else {
+                // La relazione non esiste, puoi mostrare gli account suggeriti per quell'utente qui
+                // Ad esempio, puoi chiamare una funzione per ottenere gli account suggeriti e mostrarli
+                showSuggestedAccounts(email);
+                return true;
+            }
+        } catch (Exception e) {
+            System.out.println("Exception: " + e);
+            new AlertDialogGraphicManager("Neo4j connection failed").show();
+            // Ritorna true o false a seconda di come desideri gestire l'errore
+            return false;
+        }
+    }
+
+    private void showSuggestedAccounts(String email) {
+        // Implementa la logica per mostrare gli account suggeriti per l'utente 'email' qui
+    }
+
+
 }
 
 

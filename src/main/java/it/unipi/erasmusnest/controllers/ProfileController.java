@@ -130,13 +130,26 @@ public class ProfileController extends Controller{
 
 
     @FXML
-    protected void backToBrowse(ActionEvent actionEvent)
+    protected void backToBrowse()
     {
         super.changeWindow("apartments");
     }
 
     @FXML
-    protected void backToHomepage(ActionEvent actionEvent) {
+    protected void backToHomepage() {
         super.changeWindow("homepage");
+    }
+
+    @FXML
+    protected void seeSuggested(ActionEvent actionEvent)
+    {
+        String otherEmail = getSession().getOtherProfileMail();
+        String email = getSession().getUser().getEmail();
+        boolean suggestedUsers =  getNeo4jConnectionManager().seeSuggested(email, otherEmail);
+    }
+
+    public void showReviews() {
+        getSession().setNextWindowName("profile");
+        super.changeWindow("reviews");
     }
 }

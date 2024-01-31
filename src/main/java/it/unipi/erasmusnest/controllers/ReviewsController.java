@@ -3,6 +3,7 @@ package it.unipi.erasmusnest.controllers;
 import it.unipi.erasmusnest.model.Review;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -43,8 +44,13 @@ public class ReviewsController extends Controller{
     @FXML
     private void initialize() {
         System.out.println("ReviewsController initialize");
-        System.out.println("Session:apartment = " + getSession().getApartmentId());
-        title.setText("Reviews for the apartment selected");
+        if(Objects.equals(getSession().getNextWindowName(), "profile")){
+            System.out.println("Session:User = " + getSession().getUser().getEmail());
+            title.setText("Reviews for the selected User");
+        }else{
+            System.out.println("Session:apartment = " + getSession().getApartmentId());
+            title.setText("Reviews for the apartment selected");
+        }
         previousPageButton.setVisible(false);
         previousPageButton.setManaged(false);
         reviewsVBox.maxWidthProperty().bind(super.getRootPane().widthProperty());
@@ -55,11 +61,17 @@ public class ReviewsController extends Controller{
     public void printReviews() {
 
         int elementsPerPage = 10;
-        List <Review> reviews =  getNeo4jConnectionManager().getReviewsForApartment(getSession().getApartmentId(),page, elementsPerPage,selectedFilter);
+        List <Review> reviews;
+        if(Objects.equals(getSession().getNextWindowName(), "profile")) {
+            reviews = getNeo4jConnectionManager().getReviewsForUser(getSession().getUser().getEmail(),page, elementsPerPage,selectedFilter);
+        }else{
+            reviews = getNeo4jConnectionManager().getReviewsForApartment(getSession().getApartmentId(),page, elementsPerPage,selectedFilter);
+        }
+
         scrollPane.setVvalue(0.0);
         reviewsVBox.getChildren().clear();
         if(reviews == null || reviews.isEmpty()){
-            System.out.println("No reviews found for the desired apartment");
+            System.out.println("No reviews found for the desired entity");
             printNoMoreReviewsMessage();
             nextPageButton.setVisible(false);
             nextPageButton.setManaged(false);
@@ -108,9 +120,9 @@ public class ReviewsController extends Controller{
             // Adding elements to the horizontal box
             reviewHBox.getChildren().addAll(emailLabel, ratingLabel, commentsLabel);
             reviewHBox.setAlignment(Pos.CENTER);
-            HBox.setMargin(emailLabel, new javafx.geometry.Insets(5.0, 5.0, 5.0, 5.0));
-            HBox.setMargin(ratingLabel, new javafx.geometry.Insets(5.0, 5.0, 5.0, 5.0));
-            HBox.setMargin(commentsLabel, new javafx.geometry.Insets(5.0, 5.0, 5.0, 5.0));
+            HBox.setMargin(emailLabel, new Insets(5.0, 5.0, 5.0, 5.0));
+            HBox.setMargin(ratingLabel, new Insets(5.0, 5.0, 5.0, 5.0));
+            HBox.setMargin(commentsLabel, new Insets(5.0, 5.0, 5.0, 5.0));
 
             // Adding the apartment entry to the main VBox
             reviewsVBox.getChildren().add(reviewHBox);
@@ -133,13 +145,13 @@ public class ReviewsController extends Controller{
         textArea.setWrapText(true);
         textArea.setMaxHeight(50);
         reviewsVBox.getChildren().add(textArea);
-        VBox.setMargin(textArea, new javafx.geometry.Insets(5.0, 5.0, 5.0, 5.0));
+        VBox.setMargin(textArea, new Insets(5.0, 5.0, 5.0, 5.0));
         ImageView logoImageView = new ImageView();
         logoImageView.fitWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.1));
         logoImageView.setPickOnBounds(true);
         logoImageView.setPreserveRatio(true);
         logoImageView.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/media/logo.png"))));
-        VBox.setMargin(logoImageView, new javafx.geometry.Insets(5.0, 5.0, 5.0, 5.0));
+        VBox.setMargin(logoImageView, new Insets(5.0, 5.0, 5.0, 5.0));
         logoImageView.setSmooth(true); // Per migliorare la qualità dell'immagine ridimensionata
         reviewsVBox.getChildren().add(logoImageView);
     }
@@ -166,8 +178,8 @@ public class ReviewsController extends Controller{
         printReviews();
     }
 
-    public void onBackButtonPressed(ActionEvent actionEvent) {
-        changeWindow("apartment"); // dovrebbe andare perchè nessuno ha modificato l'appartamento dentro la session
+    public void onBackButtonPressed() {
+        changeWindow(getSession().getNextWindowName());
     }
 
     @FXML
@@ -182,7 +194,7 @@ public class ReviewsController extends Controller{
     }
 
     @FXML
-    void goToPreviousPage(ActionEvent actionEvent) {
+    void goToPreviousPage() {
         System.out.println("goToPreviousPage");
         page--;
         if(page==1){

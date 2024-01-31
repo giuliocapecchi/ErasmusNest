@@ -154,14 +154,19 @@ public class MyProfileController extends Controller {
                     apartmentImage.setSmooth(true);
                     apartmentImage.fitWidthProperty().bind(apartmentBox.widthProperty().multiply(0.4));
                     Button apartmentButton = new Button();
-                    apartmentButton.setText(apartment.getName());
+                    apartmentButton.setText("Modify");
                     apartmentButton.setId(apartment.getId().toString());
                     //Now add the apartment image and button to the HBox
                     apartmentButton.setOnAction(event -> {
                         // Chiamare il metodo desiderato quando il bottone viene premuto
                         onApartmentView(apartmentButton.getId());
                     });
-                    apartmentBox.getChildren().addAll(apartmentImage, apartmentButton);
+                    Button viewButton = new Button(apartment.getName());
+                    viewButton.setOnAction(event -> {
+                        onChangeView(apartmentButton.getId());
+                    });
+
+                    apartmentBox.getChildren().addAll(apartmentImage, viewButton, apartmentButton);
                     apartmentsContainer.getChildren().add(apartmentBox); // This should add the apartment to the UI
                 }
             }
@@ -185,6 +190,12 @@ public class MyProfileController extends Controller {
             adminContainer.getChildren().add(analyticsButton);
         }
         getSession().setUser(utente);
+    }
+
+    private void onChangeView(String apartmentId)
+    {
+        getSession().setApartmentId(Long.parseLong(apartmentId));
+        super.changeWindow("apartment");
     }
 
     public TitledPane createTitledPane(List<String> userCities) {
@@ -265,7 +276,7 @@ public class MyProfileController extends Controller {
             if(getRedisConnectionManager().updateUserPassword(getSession().getUser().getEmail(), newPassword)){
                 System.out.println("Password aggiornata su Redis");
                 passwordChangeOuterBox.setVisible(false);
-                showConfirmationMessagePassword("Password aggiornata con successo!");
+                showConfirmationMessagePassword("Password aggiornata con successo!", modifyPasswordButton);
             }else{ // aggiorno su Mongo e basta / TODO : eventual consistency da gestire qui! La password rimane solo su Redis per ora
                 System.out.println("Password non aggiornata su Redis perchè non trovata la chiave. La aggiorno su MongoDB");
                 // per come è ora il codice, su mongo la password viene aggiornata a priori (errore???)
@@ -273,7 +284,7 @@ public class MyProfileController extends Controller {
                     // Nascondi il banner/pop-up e mostra un messaggio di conferma
                     //passwordChangeBox.setVisible(false);
                     passwordChangeOuterBox.setVisible(false);
-                    showConfirmationMessagePassword("Password aggiornata con successo!");
+                    showConfirmationMessagePassword("Password aggiornata con successo!", modifyPasswordButton);
                 }else{
                     // Mostra un messaggio di errore se la nuova password non è valida o la vecchia password non coincide
                     setPasswordErrorText();
@@ -288,7 +299,7 @@ public class MyProfileController extends Controller {
     }
 
     // Metodo per mostrare un messaggio di conferma
-    private void showConfirmationMessagePassword(String message) {
+    private void showConfirmationMessagePassword(String message, Button modifyPasswordButton) {
         PopOver popOver = new PopOver();
         Label label = new Label(message);
         label.setStyle("-fx-padding: 10px;");
@@ -316,20 +327,6 @@ public class MyProfileController extends Controller {
         popOver.setDetachable(false);
         popOver.setAutoHide(true);
         popOver.show(studyFieldComboBox);
-    }
-
-    private void showConfirmationMessageEmail(String message) {
-        PopOver popOver = new PopOver();
-        Label label = new Label(message);
-        label.setStyle("-fx-padding: 10px;");
-        popOver.setContentNode(label);
-        popOver.setDetachable(false);
-        popOver.setAutoHide(true);
-    }
-
-    // Metodo per mostrare un messaggio di errore
-    private void showErrorMessage(String message) {
-        // Implementa la visualizzazione dell'errore a tua scelta (ad esempio, un messaggio di errore sullo schermo)
     }
 
     @FXML
@@ -367,25 +364,12 @@ public class MyProfileController extends Controller {
         // Ottieni l'ID dell'utente corrente
         String mail = getSession().getUser().getEmail();
         User user = getMongoConnectionManager().findUser(mail);
-        if(getMongoConnectionManager().updatePreferredCities(user.getEmail(), (ArrayList<String>) cities))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return getMongoConnectionManager().updatePreferredCities(user.getEmail(), cities);
     }
 
 
     public void onUploadHouseButtonClick(ActionEvent actionEvent) {
         super.changeWindow("uploadHouse");
-    }
-
-    public void onApartmentView() {
-        // Non funziona perche c'è un errore nel RatingGraphicManager
-        getSession().setApartmentId(getSession().getUser().getHouses().get(0).getId());
-        super.changeWindow("apartment");
     }
 
     public void onApartmentView(String apartmentId) {
