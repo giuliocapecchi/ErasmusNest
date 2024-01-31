@@ -43,13 +43,12 @@ public class ApartmentsController extends Controller{
 
     private Integer selectedFilter;
 
-    public ApartmentsController() {
-        selectedFilter = getSession().getCurrent_filter();
-        page = getSession().getCurrent_page();
-    }
+    public ApartmentsController() {}
 
     @FXML
     private void initialize() {
+        selectedFilter = getSession().getCurrent_filter();
+        page = getSession().getCurrent_page();
         System.out.println("ApartmentsController initialize");
         System.out.println("Session:city = " + getSession().getCity());
         title.setText("Apartments found in " + getSession().getCity());
@@ -93,6 +92,7 @@ public class ApartmentsController extends Controller{
      * print the apartments with the selected filter. If no filter is selected, print all the apartments. Uses global variables page, elementsPerPage and selectedFilter
      */
     private void printApartments(){
+        System.out.println("filter : "+selectedFilter);
         int elementsPerPage = 10;
         if(selectedFilter==0){
             changeFiltersButton.setText("Filter by");

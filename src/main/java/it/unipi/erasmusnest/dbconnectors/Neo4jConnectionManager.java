@@ -201,19 +201,19 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
             List<Review> reviews = session.readTransaction((TransactionWork<List<Review>>) tx -> {
                 Result result = null;
                 if(filter==0){
-                    result = tx.run("MATCH (u:User)-[r:REVIEW]->(a:Apartment {apartmentId: $apartmentId}) RETURN u, r "+
+                    result = tx.run("MATCH (u:User)-[r:REVIEW]->(a:Apartment {apartmentId: $apartmentId}) RETURN r "+
                                     "SKIP $elementsToSkip LIMIT $elementsPerPage",
                             parameters("apartmentId", apartmentId, "elementsToSkip", elementsToSkip, "elementsPerPage", elementsPerPage));
                 }else if(filter==1){
                     result = tx.run("MATCH (u:User)-[r:REVIEW]->(a:Apartment {apartmentId: $apartmentId}) " +
-                                    "RETURN u, r " +
+                                    "RETURN r " +
                                     "ORDER BY r.score DESC "+
                                     "SKIP $elementsToSkip LIMIT $elementsPerPage",
                             parameters("apartmentId", apartmentId, "elementsToSkip", elementsToSkip, "elementsPerPage", elementsPerPage));
 
                 }else if(filter==2){
                     result = tx.run("MATCH (u:User)-[r:REVIEW]->(a:Apartment {apartmentId: $apartmentId}) " +
-                                    "RETURN u, r " +
+                                    "RETURN r " +
                                     "ORDER BY r.score ASC "+
                                     "SKIP $elementsToSkip LIMIT $elementsPerPage",
                             parameters("apartmentId", apartmentId, "elementsToSkip", elementsToSkip, "elementsPerPage", elementsPerPage));
