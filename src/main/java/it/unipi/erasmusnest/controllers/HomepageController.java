@@ -56,7 +56,7 @@ public class HomepageController extends Controller{
 
     public HomepageController() {
         System.out.println("HomepageController constructor");
-        getSession().setCurrent_filter(1);
+        getSession().setCurrent_filter(0);
         getSession().setCurrent_page(1);
     }
 

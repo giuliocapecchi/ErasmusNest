@@ -219,7 +219,7 @@ public class RedisConnectionManager extends ConnectionManager{
         }
     }
 
-    // OKAY
+
     private static String getSubKey(Reservation reservation) {
         return "reservation:" + reservation.getStudentEmail()
                 + ":" + reservation.getApartmentId()
