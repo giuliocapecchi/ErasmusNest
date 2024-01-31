@@ -30,6 +30,9 @@ public class MongoConnectionManager extends ConnectionManager{
             MongoCollection<Document> collection = database.getCollection("users");
             Document userDocument = collection.find(Filters.eq("email", email)).first();
 
+            if (userDocument == null)
+                return null;
+
             Object houseObject = userDocument.get("house");
 
             // Set the user's email, password, name and surname

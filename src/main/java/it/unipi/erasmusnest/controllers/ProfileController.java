@@ -8,15 +8,21 @@ import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.util.List;
+import java.util.Objects;
 
 public class ProfileController extends Controller{
 
+    @FXML
+    ToolBar toolBar;
+    @FXML
+    Button backToSearch;
     @FXML
     private Label pageTitle;
     @FXML
@@ -113,6 +119,8 @@ public class ProfileController extends Controller{
                     //Now add the apartment image and button to the HBox
                     apartmentBox.getChildren().addAll(apartmentImage, apartmentButton);
                     housesContainer.getChildren().add(apartmentBox); // This should add the apartment to the UI
+                    if(Objects.equals(getSession().getNextWindowName(), "homepage"))
+                        toolBar.getItems().remove(backToSearch);
                 }
             } else {
                 housesContainer.getChildren().clear();
