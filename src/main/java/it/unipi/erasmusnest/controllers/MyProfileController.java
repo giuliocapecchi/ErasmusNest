@@ -124,8 +124,6 @@ public class MyProfileController extends Controller {
 
             if(utente.getHouses() != null  && !utente.getHouses().isEmpty())
             {
-                System.out.println("casa: " + utente.getHouses().get(0).getName());
-
                 // Recupera gli appartamenti dell'utente e li aggiunge al VBox apartmentsContainer
                 for (Apartment apartment : utente.getHouses())
                 {
@@ -137,13 +135,17 @@ public class MyProfileController extends Controller {
                     apartmentImage.setPreserveRatio(true);
 
                     String imageUrl = apartment.getImageURL();
-                    System.out.println("\n\n\nimage url: " + imageUrl);
-                    if(imageUrl.isEmpty())
-                    {
-                        String imagePath = "/media/no_photo_available.png"; // Path inside the classpath
-                        apartmentImage.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath))));
-                    } else {
-                        Image image = new Image(imageUrl);
+                    String noImageAvaialblePath = "/media/no_photo_available.png";
+                    if(imageUrl.isEmpty()){
+                        apartmentImage.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvaialblePath))));
+                    }else{
+                        Image image;
+                        try{
+                            image = new Image(imageUrl,true); // this can fail if the link is not valid
+                        }catch (Exception e) {
+                            System.out.println("not valid URL for the image");
+                            image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvaialblePath)));
+                        }
                         apartmentImage.setImage(image);
                     }
 

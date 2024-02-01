@@ -26,6 +26,8 @@ public class RatingGraphicManager {
         String star = "/media/full_star.png";
         String half_star = "/media/half_star.png";
         String empty_star = "/media/empty_star.png";
+        if(rating == null)
+            return;
         if(rating >= 1) {
             imageView.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(star))));
         }else if(rating > 0.5) {
