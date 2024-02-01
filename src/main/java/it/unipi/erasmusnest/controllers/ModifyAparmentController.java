@@ -94,13 +94,43 @@ public class ModifyAparmentController extends Controller{
 
         if(getMongoConnectionManager().updateApartment(apartment))
         {
-            //Print OK message
-            showConfirmationMessage("Succesfull update",updateHouse);
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Information Dialog");
+            alert.setHeaderText(null);
+            alert.setContentText("House correctly modified.");
+
+            // Aggiungi un pulsante "OK"
+            ButtonType okButton = new ButtonType("OK");
+            alert.getButtonTypes().setAll(okButton);
+
+            // Gestisci l'azione del pulsante "OK"
+            alert.setOnCloseRequest(event -> {
+                // Qui puoi aggiungere il codice per reindirizzare a un'altra pagina
+                super.changeWindow("myProfile");
+            });
+
+            // Mostra la finestra di dialogo
+            alert.showAndWait();
         }
         else
         {
-            //Print error message
-            showConfirmationMessage("Update failed", updateHouse);
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Information Dialog");
+            alert.setHeaderText(null);
+            alert.setContentText("Impossible to correctly modify the house.");
+
+            // Aggiungi un pulsante "OK"
+            ButtonType okButton = new ButtonType("OK");
+            alert.getButtonTypes().setAll(okButton);
+
+            // Gestisci l'azione del pulsante "OK"
+            alert.setOnCloseRequest(event -> {
+                // Qui puoi aggiungere il codice per reindirizzare a un'altra pagina
+                super.changeWindow("modifyApartment");
+            });
+
+            // Mostra la finestra di dialogo
+            alert.showAndWait();
         }
 
     }
@@ -129,17 +159,46 @@ public class ModifyAparmentController extends Controller{
                 "You will not be able to recover it").showAndGetConfirmation();
         if(remove)
         {
-            if(getMongoConnectionManager().removeApartment(apartmentId)
-                && getNeo4jConnectionManager().removeApartment(apartmentId))
+            if(getRedisConnectionManager().getReservationsForApartment(apartmentId).isEmpty())
             {
-                //Print OK message
-                showConfirmationMessage("Succesfull remove", removeHouse);
+                // non ci sono prenotazioni per questo appartamento
+                if(getMongoConnectionManager().removeApartment(apartmentId))
+                {
+                    // Apartment removed from MongoDB
+                    // Apartment is still available on Neo4j, apartments view
+                    // While someone try to find out more information on apartment view, this'll be removed
+                    alertDialog("House correctly removed");
+                }
+                else
+                {
+                    alertDialog("Impossible to remove house");
+                }
             }
             else
             {
-                //Print error message
                 showConfirmationMessage("Remove failed", removeHouse);
             }
+
         }
     }
+
+    private void alertDialog(String s)
+    {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Information Dialog");
+        alert.setHeaderText(null);
+        alert.setContentText("Impossible to correctly modify the house.");
+
+        ButtonType okButton = new ButtonType("OK");
+        alert.getButtonTypes().setAll(okButton);
+
+        alert.setOnCloseRequest(event -> {
+            // Qui puoi aggiungere il codice per reindirizzare a un'altra pagina
+            super.changeWindow("modifyApartment");
+        });
+
+        // Mostra la finestra di dialogo
+        alert.showAndWait();
+    }
+
 }
