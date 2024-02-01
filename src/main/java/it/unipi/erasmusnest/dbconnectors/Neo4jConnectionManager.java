@@ -7,10 +7,7 @@ import org.neo4j.driver.Record;
 import org.neo4j.driver.types.Node;
 import org.neo4j.driver.types.Relationship;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.neo4j.driver.Values.NULL;
@@ -203,27 +200,28 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
             List<Review> reviews = session.readTransaction((TransactionWork<List<Review>>) tx -> {
                 Result result = null;
                 if(filter==0){
-                    result = tx.run("MATCH (u:User)-[r:REVIEW]->(a:Apartment {apartmentId: $apartmentId}) RETURN u, r "+
+                    result = tx.run("MATCH (u:User)-[r:REVIEW]->(a:Apartment {apartmentId: $apartmentId}) RETURN u,r "+
                                     "SKIP $elementsToSkip LIMIT $elementsPerPage",
                             parameters("apartmentId", apartmentId, "elementsToSkip", elementsToSkip, "elementsPerPage", elementsPerPage));
                 }else if(filter==1){
                     result = tx.run("MATCH (u:User)-[r:REVIEW]->(a:Apartment {apartmentId: $apartmentId}) " +
-                                    "RETURN u, r " +
+                                    "RETURN u,r " +
                                     "ORDER BY r.score DESC "+
                                     "SKIP $elementsToSkip LIMIT $elementsPerPage",
                             parameters("apartmentId", apartmentId, "elementsToSkip", elementsToSkip, "elementsPerPage", elementsPerPage));
 
                 }else if(filter==2){
                     result = tx.run("MATCH (u:User)-[r:REVIEW]->(a:Apartment {apartmentId: $apartmentId}) " +
-                                    "RETURN u, r " +
+                                    "RETURN u,r " +
                                     "ORDER BY r.score ASC "+
                                     "SKIP $elementsToSkip LIMIT $elementsPerPage",
                             parameters("apartmentId", apartmentId, "elementsToSkip", elementsToSkip, "elementsPerPage", elementsPerPage));
 
                 }
-
+                if(result == null)
+                    return null;
                 List<Review> reviewList = new ArrayList<>();
-                while (Objects.requireNonNull(result).hasNext()) {
+                while (result.hasNext()) {
                     Record record = result.next();
                     Node userNode = record.get("u").asNode();
                     Relationship reviewRel = record.get("r").asRelationship();
@@ -243,39 +241,23 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         }
     }
 
-    public List<Review> getReviewsForUser(String email, Integer page, Integer elementsPerPage, Integer filter) {
+    public List<Review> getReviewsForUser(String email, Integer page, Integer elementsPerPage) {
         try (Session session = driver.session()) {
             int elementsToSkip =  (page-1)*elementsPerPage;
             List<Review> reviews = session.readTransaction((TransactionWork<List<Review>>) tx -> {
-                Result result = null;
-                if(filter==0){
-                    result = tx.run("MATCH (u:User {email: $email})-[r:REVIEW]->(a:Apartment) RETURN u, r "+
-                                    "SKIP $elementsToSkip LIMIT $elementsPerPage",
-                            parameters("email", email, "elementsToSkip", elementsToSkip, "elementsPerPage", elementsPerPage));
-                }else if(filter==1){
-                    result = tx.run("MATCH (u:User {email: $email})-[r:REVIEW]->(a:Apartment) " +
-                                    "RETURN u, r " +
-                                    "ORDER BY r.score DESC "+
-                                    "SKIP $elementsToSkip LIMIT $elementsPerPage",
-                            parameters("email", email, "elementsToSkip", elementsToSkip, "elementsPerPage", elementsPerPage));
-
-                }else if(filter==2){
-                    result = tx.run("MATCH (u:User {email: $email})-[r:REVIEW]->(a:Apartment) " +
-                                    "RETURN u, r " +
-                                    "ORDER BY r.score ASC "+
-                                    "SKIP $elementsToSkip LIMIT $elementsPerPage",
-                            parameters("email", email, "elementsToSkip", elementsToSkip, "elementsPerPage", elementsPerPage));
-
-                }
-
+                Result result;
+                //result = tx.run("MATCH (u:User {email:'"+email+"'}) return u");
+                result = tx.run("MATCH (u:User {email: '"+email+"'})-[r:REVIEW]->() RETURN r SKIP $elementsToSkip LIMIT $elementsPerPage;",
+                        parameters( "elementsToSkip", elementsToSkip, "elementsPerPage", elementsPerPage));
+                System.out.println("MATCH (u:User {email: '"+email+"'})-[r:REVIEW]->() RETURN r SKIP 0 LIMIT 10;");
                 List<Review> reviewList = new ArrayList<>();
-                while (Objects.requireNonNull(result).hasNext()) {
+                while (result.hasNext()) {
+                    System.out.println("sei qui");
                     Record record = result.next();
                     Relationship reviewRel = record.get("r").asRelationship();
-                    Long apartmentId = reviewRel.get("apartmentId").asLong();
                     String comment = reviewRel.get("comment").asString();
                     float rating = reviewRel.get("score").asFloat();
-                    Review review = new Review(apartmentId,email, comment,rating);
+                    Review review = new Review(null,email, comment,rating);
                     reviewList.add(review);
                 }
                 return reviewList;
@@ -358,38 +340,6 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         }
     }
 
-    // Method to get email of suggested users
-    // Assume suggested user as user followed by a user followed by the user logged in
-    public List<String> getSuggestedUsers(String email)
-    {
-        List<String> suggestedUsers = new ArrayList<>();
-        suggestedUsers.add("NONE");
-        try (Session session = driver.session())
-        {
-            return session.readTransaction((TransactionWork<List<String>>) tx -> {
-                Result result = tx.run("MATCH (u:User {email: $email})-[:FOLLOWS]->(u2:User)-[:FOLLOWS]->(u3:User) " +
-                                "WHERE NOT (u)-[:FOLLOWS]->(u3) AND u3.email <> $email " +
-                                "RETURN u3.email",
-                        parameters("email", email));
-                while(result.hasNext())
-                {
-                    Record record = result.next();
-                    String emailFromDB = record.get("u3.email").asString();
-                    suggestedUsers.add(emailFromDB);
-                }
-                System.out.println("\n\n\n Suggested users: " + suggestedUsers + "\n\n\n");
-                return suggestedUsers;
-            });
-        }
-        catch (Exception e)
-        {
-            System.out.println("Exception: " + e);
-            new AlertDialogGraphicManager("Neo4j connection failed").show();
-            return null;
-        }
-    }
-
-
     public void addFollow(String email, String otherEmail) {
         try (Session session = driver.session()) {
             session.writeTransaction((TransactionWork<Void>) tx -> {
@@ -459,34 +409,63 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         }
     }
 
-    public boolean seeSuggested(String email, String otherEmail) {
-        try (Session session = driver.session()) {
-            Boolean relationshipExists = session.readTransaction((TransactionWork<Boolean>) tx -> {
-                Result result = tx.run("MATCH (u:User {email: $email})-[:FOLLOWS]->(u2:User {email: $otherEmail}) RETURN COUNT(*) > 0 AS exists",
-                        parameters("email", email, "otherEmail", otherEmail));
-                return (Boolean) result.single().get("exists", Boolean.class);
+    public List<String> seeSuggested(String emailA, String emailB) {
+        try (Session session = driver.session())
+        {
+            return session.readTransaction((TransactionWork<List<String>>) tx -> {
+                Result result = tx.run("MATCH (a:User {email: $emailA}) " +
+                                "MATCH (b:User {email: $emailB}) " +
+                                "MATCH (b)-[:FOLLOWS]->(suggested:User) " +
+                                "WHERE NOT (a)-[:FOLLOWS]->(suggested) " +
+                                "MATCH (a)-[:INTERESTS]->(city:City) " +
+                                "MATCH (suggested)-[:INTERESTS]->(city) " +
+                                "RETURN DISTINCT suggested.email AS suggestedEmail",
+                        parameters("emailA", emailA, "emailB", emailB));
+                List<String> suggestedEmails = new ArrayList<>();
+                while (result.hasNext())
+                {
+                    suggestedEmails.add(result.next().get("suggestedEmail").asString());
+                }
+                return suggestedEmails;
             });
-
-            if (relationshipExists) {
-                // La relazione esiste già, quindi ritorniamo false
-                return false;
-            } else {
-                // La relazione non esiste, puoi mostrare gli account suggeriti per quell'utente qui
-                // Ad esempio, puoi chiamare una funzione per ottenere gli account suggeriti e mostrarli
-                showSuggestedAccounts(email);
-                return true;
-            }
         } catch (Exception e) {
             System.out.println("Exception: " + e);
             new AlertDialogGraphicManager("Neo4j connection failed").show();
-            // Ritorna true o false a seconda di come desideri gestire l'errore
-            return false;
+            // Gestisci l'errore come preferisci o ritorna una lista vuota
+            return Collections.emptyList();
         }
     }
 
-    private void showSuggestedAccounts(String email) {
-        // Implementa la logica per mostrare gli account suggeriti per l'utente 'email' qui
+    public List<String> vediSuggeriti(String mail, String otherMail) {
+        try (Session session = driver.session()) {
+            List<String> suggestedAccounts = session.readTransaction((TransactionWork<List<String>>) tx -> {
+                Result result = tx.run("MATCH (mailUser:User {email: $mail}) " +
+                                "MATCH (otherUser:User {email: $otherMail}) " +
+                                "MATCH (otherUser)-[:FOLLOWS]->(followed:User)-[:FOLLOWS]->(suggested:User) " +
+                                "WHERE NOT (mailUser)-[:FOLLOWS]->(suggested) " +
+                                "MATCH (suggested)-[:REVIEW]->(:Apartment)-[:LOCATED]->(:City)<-[:INTERESTS]-(mailUser) " +
+                                "RETURN DISTINCT suggested.email AS suggestedEmail",
+                        parameters("mail", mail, "otherMail", otherMail));
+
+                List<String> suggestedEmails = new ArrayList<>();
+                while (result.hasNext()) {
+                    suggestedEmails.add(result.next().get("suggestedEmail").asString());
+                }
+
+                return suggestedEmails;
+            });
+
+            return suggestedAccounts;
+        } catch (Exception e) {
+            System.out.println("Exception: " + e);
+            new AlertDialogGraphicManager("Neo4j connection failed").show();
+            // Gestisci l'errore come preferisci o ritorna una lista vuota
+            return Collections.emptyList();
+        }
     }
+
+
+
 
 
 }

@@ -7,7 +7,7 @@
 <StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.erasmusnest.controllers.ReviewsController">
     <BorderPane prefHeight="200.0" prefWidth="200.0">
         <top>
-            <HBox alignment="CENTER_LEFT">
+            <HBox fx:id="hboxTitle" alignment="CENTER_LEFT">
                 <TextField fx:id="title" alignment="CENTER" editable="false" text="Apartments found in "  HBox.hgrow="ALWAYS" />
                 <MenuButton fx:id="changeFiltersButton" text="Change results order">
                     <items>

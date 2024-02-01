@@ -6,9 +6,7 @@ import it.unipi.erasmusnest.graphicmanagers.RatingGraphicManager;
 import it.unipi.erasmusnest.graphicmanagers.ReservationGraphicManager;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -79,9 +77,53 @@ public class ApartmentController extends Controller{
     private void initialize() {
 
         apartment = getMongoConnectionManager().getApartment(getSession().getApartmentId());
-        if(apartment==null){
-            super.changeWindow("apartments");
-        }else {
+        if(apartment==null)
+        {
+            // If apartment is null seems that the apartment has been removed from Mongo
+            // and so need to be removed also from Neo4j
+            if(getNeo4jConnectionManager().removeApartment(getSession().getApartmentId()))
+            {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Information Dialog");
+                alert.setHeaderText(null);
+                alert.setContentText("Apartment not available");
+
+                // Aggiungi un pulsante "OK"
+                ButtonType okButton = new ButtonType("Back to search");
+                alert.getButtonTypes().setAll(okButton);
+
+                // Gestisci l'azione del pulsante "OK"
+                alert.setOnCloseRequest(event -> {
+                    // Qui puoi aggiungere il codice per reindirizzare a un'altra pagina
+                    super.changeWindow("apartments");
+                });
+
+                // Mostra la finestra di dialogo
+                alert.showAndWait();
+            }
+            else
+            {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Information Dialog");
+                alert.setHeaderText(null);
+                alert.setContentText("Impossible to remove the apartment from Neo4j");
+
+                // Aggiungi un pulsante "OK"
+                ButtonType okButton = new ButtonType("Back to search");
+                alert.getButtonTypes().setAll(okButton);
+
+                // Gestisci l'azione del pulsante "OK"
+                alert.setOnCloseRequest(event -> {
+                    // Qui puoi aggiungere il codice per reindirizzare a un'altra pagina
+                    super.changeWindow("apartments");
+                });
+
+                // Mostra la finestra di dialogo
+                alert.showAndWait();
+            }
+        }
+        else
+        {
             apartment.setAverageRating(getSession().getApartmentAverageRating());
 
             MapGraphicManager mapGraphicManager = new MapGraphicManager(webView, apartment.getLocation());

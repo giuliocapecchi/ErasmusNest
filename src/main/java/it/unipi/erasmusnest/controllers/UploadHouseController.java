@@ -104,9 +104,7 @@ public class UploadHouseController extends Controller {
         String houseName = houseNameTextField.getText();
         String pictureUrl = pictureUrlTextField.getText();
         if(pictureUrl.isBlank() || pictureUrl.isEmpty())
-        {
             pictureUrl = "";
-        }
         Integer accommodates = inputAccommodates.getValue();
         Double bathrooms = inputBathrooms.getValue();
         String bathroomsStr = bathrooms==1 ? bathrooms +" bath" : bathrooms +" baths";
@@ -115,9 +113,6 @@ public class UploadHouseController extends Controller {
         double latitude = mapGraphicManager.getLatitude();
         double longitude = mapGraphicManager.getLongitude();
         Point2D location = new Point2D(latitude, longitude);
-
-        // COMMENTO PER COMMIT
-
         try
         {
             String userEmail = getSession().getUser().getEmail();
@@ -131,11 +126,11 @@ public class UploadHouseController extends Controller {
                 // Call mongo to insert apartment
                 if(getMongoConnectionManager().uploadApartment(apartment))
                 {
-                    showConfirmationMessage("CASA caricata con successo");
+                    alertDialog("House correctly uploaded.");
                 }
                 else
                 {
-                    showConfirmationMessage("Errore durante il caricamento della casa");
+                    alertDialog("Impossible to upload house");
                 }
             }
         }
@@ -143,6 +138,27 @@ public class UploadHouseController extends Controller {
         {
             showConfirmationMessage("Error.");
         }
+    }
+
+    private void alertDialog(String s)
+    {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Information Dialog");
+        alert.setHeaderText(null);
+        alert.setContentText("");
+
+        // Aggiungi un pulsante "OK"
+        ButtonType okButton = new ButtonType("OK");
+        alert.getButtonTypes().setAll(okButton);
+
+        // Gestisci l'azione del pulsante "OK"
+        alert.setOnCloseRequest(event -> {
+            // Qui puoi aggiungere il codice per reindirizzare a un'altra pagina
+            super.changeWindow("modifyApartment");
+        });
+
+        // Mostra la finestra di dialogo
+        alert.showAndWait();
     }
 
     private void showConfirmationMessage(String message) {

@@ -17,6 +17,9 @@ import java.util.Objects;
 public class ReviewsController extends Controller{
 
     @FXML
+    HBox hboxTitle;
+
+    @FXML
     ScrollPane scrollPane;
 
     @FXML
@@ -45,8 +48,9 @@ public class ReviewsController extends Controller{
     private void initialize() {
         System.out.println("ReviewsController initialize");
         if(Objects.equals(getSession().getNextWindowName(), "profile")){
-            System.out.println("Session:User = " + getSession().getUser().getEmail());
+            System.out.println("Session:User = " + getSession().getOtherProfileMail());
             title.setText("Reviews for the selected User");
+            hboxTitle.getChildren().remove(changeFiltersButton);
         }else{
             System.out.println("Session:apartment = " + getSession().getApartmentId());
             title.setText("Reviews for the apartment selected");
@@ -63,7 +67,7 @@ public class ReviewsController extends Controller{
         int elementsPerPage = 10;
         List <Review> reviews;
         if(Objects.equals(getSession().getNextWindowName(), "profile")) {
-            reviews = getNeo4jConnectionManager().getReviewsForUser(getSession().getUser().getEmail(),page, elementsPerPage,selectedFilter);
+            reviews = getNeo4jConnectionManager().getReviewsForUser(getSession().getOtherProfileMail(),page, elementsPerPage);
         }else{
             reviews = getNeo4jConnectionManager().getReviewsForApartment(getSession().getApartmentId(),page, elementsPerPage,selectedFilter);
         }
@@ -87,7 +91,8 @@ public class ReviewsController extends Controller{
             }else {
                 reviewHBox.setStyle("-fx-border-color: #008000; -fx-border-width: 4;");
             }
-            reviewHBox.prefHeightProperty().bind(super.getRootPane().heightProperty().multiply(0.1));
+            reviewHBox.prefHeightProperty().bind(super.getRootPane().heightProperty().multiply(0.25));
+
 
             // Calculate width proportions for each cell
             double emailWidthRatio = 0.2; // 20% of the width
@@ -139,7 +144,7 @@ public class ReviewsController extends Controller{
     }
 
     private void printNoMoreReviewsMessage() {
-        TextArea textArea = new TextArea("Apologies, there aren't other reviews available for this apartment.");
+        TextArea textArea = new TextArea("Apologies, there aren't other reviews available.");
         textArea.setStyle("-fx-font-weight: bold; -fx-font-size: 20px;");
         textArea.setEditable(false); // Per evitare che l'utente modifichi il testo
         textArea.setWrapText(true);
