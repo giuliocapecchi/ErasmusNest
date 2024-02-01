@@ -198,9 +198,9 @@ public class MyReservationsController extends Controller {
                 Button deleteButton = new Button("Delete reservation");
                 deleteButton.setStyle("-fx-background-color: #ff0000; -fx-text-fill: #ffffff; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 5px;");
                 deleteButton.setOnAction(event -> {
-                    boolean remove = new AlertDialogGraphicManager("Are you sure you want to delete this reservation\n"
+                    boolean remove = new AlertDialogGraphicManager("Delete confirmation","Are you sure you want to delete this reservation\n"
                             + msgPeriod + " in " + reservation.getCity()
-                            + "?", "You will not be able to recover it").showAndGetConfirmation();
+                            + "?", "You will not be able to recover it","confirmation").showAndGetConfirmation();
                     if (remove) {
                         getRedisConnectionManager().deleteReservation(reservation);
                         super.changeWindow("myreservations");
@@ -212,9 +212,9 @@ public class MyReservationsController extends Controller {
             Button approveButton = new Button("Approve reservation");
             approveButton.setStyle("-fx-background-color: #63d27f; -fx-text-fill: #ffffff; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 5px;");
             approveButton.setOnAction(event -> {
-                boolean approve = new AlertDialogGraphicManager("Are you sure you want to approve this reservation\n"
+                boolean approve = new AlertDialogGraphicManager("Delete confirmation","Are you sure you want to approve this reservation\n"
                         + msgPeriod + " in " + reservation.getCity()
-                        + "?", "You will not be able to reject it later").showAndGetConfirmation();
+                        + "?", "You will not be able to reject it later","confirmation").showAndGetConfirmation();
                 if (approve) {
                     getRedisConnectionManager().approveReservation(reservation);
                     super.changeWindow("myreservations");
@@ -223,9 +223,9 @@ public class MyReservationsController extends Controller {
             Button rejectButton = new Button("Reject reservation");
             rejectButton.setStyle("-fx-background-color: #ff0000; -fx-text-fill: #ffffff; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 5px;");
             rejectButton.setOnAction(event -> {
-                boolean approve = new AlertDialogGraphicManager("Are you sure you want to reject this reservation\n"
+                boolean approve = new AlertDialogGraphicManager("Delete confirmation","Are you sure you want to reject this reservation\n"
                         + msgPeriod + " in " + reservation.getCity()
-                        + "?", "You will not be able to approve it later").showAndGetConfirmation();
+                        + "?", "You will not be able to approve it later","confirmation").showAndGetConfirmation();
                 if (approve) {
                     getRedisConnectionManager().rejectReservation(reservation);
                     super.changeWindow("myreservations");

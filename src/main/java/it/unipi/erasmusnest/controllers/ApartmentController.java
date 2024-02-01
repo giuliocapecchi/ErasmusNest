@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class ApartmentController extends Controller{
 
@@ -138,9 +139,14 @@ public class ApartmentController extends Controller{
 
             rightVBox.prefWidthProperty().bind(secondHBox.widthProperty().multiply(ratio));
             leftVBox.prefWidthProperty().bind(secondHBox.widthProperty().multiply(ratio));
-
             nameLabel.setText(apartment.getName());
-            Image image = new Image(apartment.getImageURL(), true);
+            String noImageAvaialblePath = "/media/no_photo_available.png";
+            Image image;
+            try {
+                image = new Image(apartment.getImageURL(), true);
+            }catch (IllegalArgumentException e){
+                image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvaialblePath)));
+            }
 
             imageView.setImage(image);
             imageView.setSmooth(true);

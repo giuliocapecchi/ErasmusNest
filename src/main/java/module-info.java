@@ -11,6 +11,7 @@ module it.unipi.erasmusnest {
     requires org.json;
     requires org.neo4j.driver;
     requires org.controlsfx.controls;
+    requires java.desktop;
 
 
     opens it.unipi.erasmusnest to javafx.fxml;
