@@ -95,6 +95,7 @@ public class ApartmentController extends Controller{
                 // Gestisci l'azione del pulsante "OK"
                 alert.setOnCloseRequest(event -> {
                     // Qui puoi aggiungere il codice per reindirizzare a un'altra pagina
+                    cleanAverageRatingInSession();
                     super.changeWindow("apartments");
                 });
 
@@ -115,6 +116,7 @@ public class ApartmentController extends Controller{
                 // Gestisci l'azione del pulsante "OK"
                 alert.setOnCloseRequest(event -> {
                     // Qui puoi aggiungere il codice per reindirizzare a un'altra pagina
+                    cleanAverageRatingInSession();
                     super.changeWindow("apartments");
                 });
 
@@ -152,23 +154,28 @@ public class ApartmentController extends Controller{
             infoText.setText(information);
             hostEmail.setText(apartment.getHostEmail());
 
-            ratingImage1.fitHeightProperty().bind(leftFirstVBox.heightProperty());
-            ratingImage2.fitHeightProperty().bind(leftFirstVBox.heightProperty());
-            ratingImage3.fitHeightProperty().bind(leftFirstVBox.heightProperty());
-            ratingImage4.fitHeightProperty().bind(leftFirstVBox.heightProperty());
-            ratingImage5.fitHeightProperty().bind(leftFirstVBox.heightProperty());
 
-            ArrayList<ImageView> ratingImages = new ArrayList<>();
-            ratingImages.add(ratingImage1);
-            ratingImages.add(ratingImage2);
-            ratingImages.add(ratingImage3);
-            ratingImages.add(ratingImage4);
-            ratingImages.add(ratingImage5);
+            System.out.println(">>> "+getSession().getApartmentId());
 
-            RatingGraphicManager ratingGraphicManager = new RatingGraphicManager(ratingImages, ratingImages.size());
-            ratingGraphicManager.showRating(apartment.getAverageRating());
-            if(apartment.getAverageRating() == 0){
-                reviewsButton.setVisible(false);
+            if(apartment.getAverageRating() != null) {
+                ratingImage1.fitHeightProperty().bind(leftFirstVBox.heightProperty());
+                ratingImage2.fitHeightProperty().bind(leftFirstVBox.heightProperty());
+                ratingImage3.fitHeightProperty().bind(leftFirstVBox.heightProperty());
+                ratingImage4.fitHeightProperty().bind(leftFirstVBox.heightProperty());
+                ratingImage5.fitHeightProperty().bind(leftFirstVBox.heightProperty());
+
+                ArrayList<ImageView> ratingImages = new ArrayList<>();
+                ratingImages.add(ratingImage1);
+                ratingImages.add(ratingImage2);
+                ratingImages.add(ratingImage3);
+                ratingImages.add(ratingImage4);
+                ratingImages.add(ratingImage5);
+
+                RatingGraphicManager ratingGraphicManager = new RatingGraphicManager(ratingImages, ratingImages.size());
+                ratingGraphicManager.showRating(apartment.getAverageRating());
+                if(apartment.getAverageRating() == 0){
+                    reviewsButton.setVisible(false);
+                }
             }
 
             reservationGraphicManager = new ReservationGraphicManager(startDatePicker, endDatePicker, confirmButton,
@@ -194,18 +201,21 @@ public class ApartmentController extends Controller{
     @FXML
     protected void onShowReviewsButtonClick() {
         getSession().setNextWindowName("apartment");
+        cleanAverageRatingInSession();
         super.changeWindow("reviews");
     }
 
     @FXML
     protected void onContactHostButtonClick() {
         getSession().setOtherProfileMail(hostEmail.getText());
+        cleanAverageRatingInSession();
         super.changeWindow("profile");
     }
 
     @FXML
     protected void onLoginButtonClick() throws IOException {
         getSession().setNextWindowName("apartment");
+        cleanAverageRatingInSession();
         super.changeWindow("login");
     }
 
@@ -227,11 +237,17 @@ public class ApartmentController extends Controller{
 
             getRedisConnectionManager().addReservation(userEmail, houseId, String.valueOf(startYear), String.valueOf(startMonth), String.valueOf(numberOfMonths), getSession().getCity(), apartment.getImageURL());
 
+            cleanAverageRatingInSession();
             super.changeWindow("myreservations");
         }
     }
 
-    public void onGoBackButtonClick(ActionEvent actionEvent) {
-        super.changeWindow("apartments");
+    public void onGoBackButtonClick() {
+        cleanAverageRatingInSession();
+        changeWindow(getSession().getNextWindowName());
+    }
+
+    private void cleanAverageRatingInSession(){
+        getSession().setApartmentAverageRating(null);
     }
 }

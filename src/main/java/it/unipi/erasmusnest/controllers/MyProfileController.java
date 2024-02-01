@@ -196,6 +196,7 @@ public class MyProfileController extends Controller {
     private void onChangeView(String apartmentId)
     {
         getSession().setApartmentId(Long.parseLong(apartmentId));
+        getSession().setNextWindowName("myprofile");
         super.changeWindow("apartment");
     }
 
