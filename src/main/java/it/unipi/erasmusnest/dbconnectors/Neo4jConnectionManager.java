@@ -7,10 +7,7 @@ import org.neo4j.driver.Record;
 import org.neo4j.driver.types.Node;
 import org.neo4j.driver.types.Relationship;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.neo4j.driver.Values.NULL;
@@ -203,27 +200,28 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
             List<Review> reviews = session.readTransaction((TransactionWork<List<Review>>) tx -> {
                 Result result = null;
                 if(filter==0){
-                    result = tx.run("MATCH (u:User)-[r:REVIEW]->(a:Apartment {apartmentId: $apartmentId}) RETURN r "+
+                    result = tx.run("MATCH (u:User)-[r:REVIEW]->(a:Apartment {apartmentId: $apartmentId}) RETURN u,r "+
                                     "SKIP $elementsToSkip LIMIT $elementsPerPage",
                             parameters("apartmentId", apartmentId, "elementsToSkip", elementsToSkip, "elementsPerPage", elementsPerPage));
                 }else if(filter==1){
                     result = tx.run("MATCH (u:User)-[r:REVIEW]->(a:Apartment {apartmentId: $apartmentId}) " +
-                                    "RETURN r " +
+                                    "RETURN u,r " +
                                     "ORDER BY r.score DESC "+
                                     "SKIP $elementsToSkip LIMIT $elementsPerPage",
                             parameters("apartmentId", apartmentId, "elementsToSkip", elementsToSkip, "elementsPerPage", elementsPerPage));
 
                 }else if(filter==2){
                     result = tx.run("MATCH (u:User)-[r:REVIEW]->(a:Apartment {apartmentId: $apartmentId}) " +
-                                    "RETURN r " +
+                                    "RETURN u,r " +
                                     "ORDER BY r.score ASC "+
                                     "SKIP $elementsToSkip LIMIT $elementsPerPage",
                             parameters("apartmentId", apartmentId, "elementsToSkip", elementsToSkip, "elementsPerPage", elementsPerPage));
 
                 }
-
+                if(result == null)
+                    return null;
                 List<Review> reviewList = new ArrayList<>();
-                while (Objects.requireNonNull(result).hasNext()) {
+                while (result.hasNext()) {
                     Record record = result.next();
                     Node userNode = record.get("u").asNode();
                     Relationship reviewRel = record.get("r").asRelationship();
@@ -243,39 +241,23 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         }
     }
 
-    public List<Review> getReviewsForUser(String email, Integer page, Integer elementsPerPage, Integer filter) {
+    public List<Review> getReviewsForUser(String email, Integer page, Integer elementsPerPage) {
         try (Session session = driver.session()) {
             int elementsToSkip =  (page-1)*elementsPerPage;
             List<Review> reviews = session.readTransaction((TransactionWork<List<Review>>) tx -> {
-                Result result = null;
-                if(filter==0){
-                    result = tx.run("MATCH (u:User {email: $email})-[r:REVIEW]->(a:Apartment) RETURN u, r "+
-                                    "SKIP $elementsToSkip LIMIT $elementsPerPage",
-                            parameters("email", email, "elementsToSkip", elementsToSkip, "elementsPerPage", elementsPerPage));
-                }else if(filter==1){
-                    result = tx.run("MATCH (u:User {email: $email})-[r:REVIEW]->(a:Apartment) " +
-                                    "RETURN u, r " +
-                                    "ORDER BY r.score DESC "+
-                                    "SKIP $elementsToSkip LIMIT $elementsPerPage",
-                            parameters("email", email, "elementsToSkip", elementsToSkip, "elementsPerPage", elementsPerPage));
-
-                }else if(filter==2){
-                    result = tx.run("MATCH (u:User {email: $email})-[r:REVIEW]->(a:Apartment) " +
-                                    "RETURN u, r " +
-                                    "ORDER BY r.score ASC "+
-                                    "SKIP $elementsToSkip LIMIT $elementsPerPage",
-                            parameters("email", email, "elementsToSkip", elementsToSkip, "elementsPerPage", elementsPerPage));
-
-                }
-
+                Result result;
+                //result = tx.run("MATCH (u:User {email:'"+email+"'}) return u");
+                result = tx.run("MATCH (u:User {email: '"+email+"'})-[r:REVIEW]->() RETURN r SKIP $elementsToSkip LIMIT $elementsPerPage;",
+                        parameters( "elementsToSkip", elementsToSkip, "elementsPerPage", elementsPerPage));
+                System.out.println("MATCH (u:User {email: '"+email+"'})-[r:REVIEW]->() RETURN r SKIP 0 LIMIT 10;");
                 List<Review> reviewList = new ArrayList<>();
-                while (Objects.requireNonNull(result).hasNext()) {
+                while (result.hasNext()) {
+                    System.out.println("sei qui");
                     Record record = result.next();
                     Relationship reviewRel = record.get("r").asRelationship();
-                    Long apartmentId = reviewRel.get("apartmentId").asLong();
                     String comment = reviewRel.get("comment").asString();
                     float rating = reviewRel.get("score").asFloat();
-                    Review review = new Review(apartmentId,email, comment,rating);
+                    Review review = new Review(null,email, comment,rating);
                     reviewList.add(review);
                 }
                 return reviewList;

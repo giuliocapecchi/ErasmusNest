@@ -130,7 +130,6 @@ public class ApartmentsController extends Controller{
             nameLabel.prefWidthProperty().bind(apartmentHBox.widthProperty().multiply(nameWidthRatio));
             nameLabel.setWrapText(true);
 
-
             // Average rating
             Label ratingLabel = new Label( "Average rating: " + apartment.getAverageRating().toString()+"\nNumber of reviews: "+apartment.getNumberOfReviews().toString());
             ratingLabel.setStyle("-fx-font-size: 18px;");
