@@ -149,12 +149,25 @@ public class ProfileController extends Controller{
         getNeo4jConnectionManager().addFollow(email, otherEmail);
         if(suggestedUsers.isEmpty())
         {
-            System.out.println("\n\n\n NON CI SONO CONSIGLIATI \n\n\n");
+            System.out.println("\n\n\n 1 NON CI SONO CONSIGLIATI \n\n\n");
         }
         else
         {
-            System.out.println("\n\n\n CI SONO CONSIGLIATI \n\n\n");
+            System.out.println("\n\n\n 1 CI SONO CONSIGLIATI \n\n\n");
             for(String user : suggestedUsers)
+            {
+                System.out.println("\n" + user + "\n");
+            }
+        }
+        List<String> suggeriti = getNeo4jConnectionManager().vediSuggeriti(email, otherEmail);
+        if(suggeriti.isEmpty())
+        {
+            System.out.println("\n\n\n 2 NON CI SONO CONSIGLIATI \n\n\n");
+        }
+        else
+        {
+            System.out.println("\n\n\n 2 CI SONO CONSIGLIATI \n\n\n");
+            for(String user : suggeriti)
             {
                 System.out.println("\n" + user + "\n");
             }
