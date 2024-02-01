@@ -42,7 +42,9 @@ public class ReservationGraphicManager {
         endDatePicker.setEditable(false);
         endDatePicker.setDisable(true);
         confirmButton.setDisable(true);
+    }
 
+    public void loadReservations(){
         if(session.isLogged()){
             enabledEndDates = new ArrayList<>();
             reservations = redisConnectionManager.getReservationsForApartment(session.getApartmentId());
@@ -55,7 +57,6 @@ public class ReservationGraphicManager {
         }else{
             startDatePicker.setDisable(true);
         }
-
     }
 
     private void setHandlers(){

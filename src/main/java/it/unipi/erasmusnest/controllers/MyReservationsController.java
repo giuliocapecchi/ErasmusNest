@@ -53,7 +53,6 @@ public class MyReservationsController extends Controller {
             sortReservationsByTimestampAsc();
 
             for(Reservation reservation : reservations){
-                System.out.println(">>> "+reservation.getApartmentId()+" "+reservation.getTimestamp());
                 add(reservation, "host");
             }
 

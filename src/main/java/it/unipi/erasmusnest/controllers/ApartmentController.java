@@ -72,9 +72,8 @@ public class ApartmentController extends Controller{
     private TextFlow loginMessage;
 
     private Apartment apartment;
-
-    public ApartmentController() {
-    }
+    private ReservationGraphicManager reservationGraphicManager;
+    private boolean reservationsLoaded;
 
     @FXML
     private void initialize() {
@@ -130,14 +129,23 @@ public class ApartmentController extends Controller{
                 reviewsButton.setVisible(false);
             }
 
-            new ReservationGraphicManager(startDatePicker, endDatePicker, confirmButton,
+            reservationGraphicManager = new ReservationGraphicManager(startDatePicker, endDatePicker, confirmButton,
                     getSession(), getRedisConnectionManager(), apartment.getMaxAccommodates());
+            reservationsLoaded = false;
+            startDatePicker.setOnMousePressed(event -> onStartDatePickerFirstClick());
 
             if(!getSession().isLogged()){
                 showErrorMessage("Login required", loginMessage);
             }else{
                 loginButton.setVisible(false);
             }
+        }
+    }
+
+    private void onStartDatePickerFirstClick(){
+        if(!reservationsLoaded){
+            reservationGraphicManager.loadReservations();
+            reservationsLoaded = true;
         }
     }
 
