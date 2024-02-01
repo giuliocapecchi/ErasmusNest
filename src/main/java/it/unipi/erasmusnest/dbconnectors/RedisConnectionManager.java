@@ -6,6 +6,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPooled;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class RedisConnectionManager extends ConnectionManager{
@@ -79,6 +80,38 @@ public class RedisConnectionManager extends ConnectionManager{
         }
 
         return reservations;
+    }
+
+    public boolean isApartmentReserved(Long houseId) {
+        boolean isReserved = false;
+
+        try (JedisPooled jedis = new JedisPooled(super.getHost(), super.getPort())) {
+
+            String houseIdToSearch = houseId.toString();
+            // key design: reservation:<userEmail>:<houseId>:<startYear>:<startMonth>:<numberOfMonths>
+            Set<String> keys = jedis.keys("reservation:*:" + houseIdToSearch + ":*:*:*");
+
+            for (String key : keys) {
+                String[] keyParts = key.split(":");
+
+                // if !keyParts[5].equals("0") && the reservation is not expired then set isReserved = true
+                // to know if a reservation is expired check if the current date is after the reservation date
+                // the reservation date is computed using the startYear and startMonth
+                if(!keyParts[5].equals("0")) {
+                    int startYear = Integer.parseInt(keyParts[3]);
+                    int startMonth = Integer.parseInt(keyParts[4]);
+                    LocalDateTime reservationDate = java.time.LocalDateTime.of(startYear, startMonth, 1, 0, 0);
+                    if(LocalDateTime.now().isBefore(reservationDate)) {
+                        isReserved = true;
+                    }
+                }
+
+            }
+        } catch (Exception e) {
+            System.out.println("Connection problem: " + e.getMessage());
+            new AlertDialogGraphicManager("Redis connection failed").show();
+        }
+        return isReserved;
     }
 
     // OKAY
