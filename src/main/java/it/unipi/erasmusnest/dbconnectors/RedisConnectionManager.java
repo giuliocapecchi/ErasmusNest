@@ -7,9 +7,13 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPooled;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class RedisConnectionManager extends ConnectionManager{
+
+    private static final int trashWeeksInterval = 1; // TODO period "x"
+    private static final int reservationMonthsInterval = 2; // #month to keep a reservation alive after the expiration date
 
     public RedisConnectionManager() {
         super("localhost", 6379);
@@ -42,7 +46,7 @@ public class RedisConnectionManager extends ConnectionManager{
         return value;
     }
 
-    // OKAY
+    // DID: get only the reservations that are not in the trash period
     public ArrayList<Reservation> getReservationsForApartment(Long houseId) {
         ArrayList<Reservation> reservations = new ArrayList<>();
 
@@ -54,8 +58,10 @@ public class RedisConnectionManager extends ConnectionManager{
             Set<String> keys = jedis.keys("reservation:*:" + houseIdToSearch + ":*:*:*");
 
             for (String key : keys) {
-                String[] keyParts = key.split(":");
-                reservations.add(new Reservation(keyParts[1], keyParts[2], Integer.parseInt(keyParts[3]), Integer.parseInt(keyParts[4]), Integer.parseInt(keyParts[5])));
+                if(!isReservationInTrashPeriod(key)) {
+                    String[] keyParts = key.split(":");
+                    reservations.add(new Reservation(keyParts[1], keyParts[2], Integer.parseInt(keyParts[3]), Integer.parseInt(keyParts[4]), Integer.parseInt(keyParts[5])));
+                }
             }
         } catch (Exception e) {
             System.out.println("Connection problem: " + e.getMessage());
@@ -64,6 +70,7 @@ public class RedisConnectionManager extends ConnectionManager{
         return reservations;
     }
 
+    // DID: get only the reservations that are not in the trash period (already did in the used method)
     public ArrayList<Reservation> getReservationsForApartments(List<Long> houseIds) {
         ArrayList<Reservation> reservations = new ArrayList<>();
 
@@ -114,7 +121,7 @@ public class RedisConnectionManager extends ConnectionManager{
         return isReserved;
     }
 
-    // OKAY
+    // DID: get only the reservations that are not in the trash period
     public ArrayList<Reservation> getReservationsForUser(String  userEmail) {
         ArrayList<Reservation> reservations = new ArrayList<>();
 
@@ -125,14 +132,15 @@ public class RedisConnectionManager extends ConnectionManager{
             Set<String> keys = jedis.keys(subKey);
 
             for (String key : keys) {
+                if (!isReservationInTrashPeriod(key)) {
+                    ArrayList<String> attributesValues = getReservationAttributesValues(key);
+                    String[] keyParts = key.split(":");
+                    reservations.add(new Reservation(keyParts[1], keyParts[2], Integer.parseInt(keyParts[3]),
+                            Integer.parseInt(keyParts[4]), Integer.parseInt(keyParts[5]),
+                            java.time.LocalDateTime.parse(attributesValues.get(0)),
+                            attributesValues.get(1), attributesValues.get(2), attributesValues.get(3)));
 
-                ArrayList<String> attributesValues = getReservationAttributesValues(key);
-
-                String[] keyParts = key.split(":");
-                reservations.add(new Reservation(keyParts[1], keyParts[2], Integer.parseInt(keyParts[3]),
-                        Integer.parseInt(keyParts[4]), Integer.parseInt(keyParts[5]),
-                        java.time.LocalDateTime.parse(attributesValues.get(0)),
-                        attributesValues.get(1), attributesValues.get(2), attributesValues.get(3)));
+                }
             }
         } catch (Exception e) {
             System.out.println("Connection problem: " + e.getMessage());
@@ -141,7 +149,6 @@ public class RedisConnectionManager extends ConnectionManager{
         return reservations;
     }
 
-    // OKAY
     private ArrayList<String> getReservationAttributesValues(String subKey) {
 
         ArrayList<String> attributesValues = new ArrayList<>();
@@ -179,10 +186,10 @@ public class RedisConnectionManager extends ConnectionManager{
                 // set the key
                 jedis.set(key, password);
 
-                // get the key
-                String value = jedis.get(key);
-
-                // jedis.close(); // not needed with try-with-resources
+                // compute the seconds between now and trashWeeksInterval
+                long seconds = LocalDateTime.now().until(LocalDateTime.now().plusWeeks(trashWeeksInterval), ChronoUnit.SECONDS);
+                // set expiration time on the key equal to the seconds
+                jedis.expire(key, seconds);
 
             } catch (Exception e) {
                 System.out.println("Connection problem: " + e.getMessage());
@@ -199,7 +206,7 @@ public class RedisConnectionManager extends ConnectionManager{
 
         try(JedisPooled jedis = new JedisPooled(super.getHost(), super.getPort())) {
 
-            String dateTime = java.time.LocalDateTime.now().toString();
+            String dateTime = LocalDateTime.now().toString();
             String subKey = "reservation:" + userEmail + ":" + houseId + ":" + startYear + ":" + startMonth + ":" + numberOfMonths;
 
             Map<String, String> hash = new HashMap<>();;
@@ -208,6 +215,15 @@ public class RedisConnectionManager extends ConnectionManager{
             hash.put("apartmentImage", apartmentImage);
             hash.put("state", "pending"); // pending | approved | rejected | expired | reviewed
             jedis.hset(subKey, hash);
+
+            // get the first day after the whole reservation period is expired
+            LocalDateTime expirationDate = LocalDateTime.of(Integer.parseInt(startYear), Integer.parseInt(startMonth), 1, 0, 0).plusMonths(Long.parseLong(numberOfMonths));
+            // add the "still alive months" and the "trash week" to the expiration date
+            expirationDate = expirationDate.plusMonths(reservationMonthsInterval).plusWeeks(trashWeeksInterval);
+            // compute the seconds between the dateTime timestamp and the end of the reservation
+            long seconds = LocalDateTime.now().until(expirationDate, ChronoUnit.SECONDS);
+            // set expiration time on the key equal to the seconds
+            jedis.expire(subKey, seconds);
 
         } catch (Exception e) {
             System.out.println("Connection problem: " + e.getMessage());
@@ -316,6 +332,21 @@ public class RedisConnectionManager extends ConnectionManager{
                 + ":" + reservation.getStartYear()
                 + ":" + reservation.getStartMonth()
                 + ":" + reservation.getNumberOfMonths();
+    }
+
+    private boolean isReservationInTrashPeriod(String reservationKey){
+        boolean isInTrash = false;
+        try(JedisPooled jedis = new JedisPooled(super.getHost(), super.getPort())) {
+            long ttl = jedis.ttl(reservationKey);
+            // if the ttl of the key is less than the trashWeeksInterval then set isInTrash = true
+            if(ttl > 0 && ttl < (long) trashWeeksInterval * 7 * 24 * 60 * 60) {
+                isInTrash = true;
+            }
+        } catch (Exception e) {
+            System.out.println("Connection problem: " + e.getMessage());
+            new AlertDialogGraphicManager("Redis connection failed").show();
+        }
+        return isInTrash;
     }
 
 
