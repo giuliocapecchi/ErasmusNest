@@ -31,6 +31,7 @@ public class Controller implements Validator{
     public Controller() {
     }
 
+    // TODO add actualWindowName that becomes the previous window name
     protected void changeWindow(String nextWindowName) {
 
         try {
