@@ -59,6 +59,8 @@ public class MyProfileController extends Controller {
     private ComboBox<String> studyFieldComboBox;
     @FXML
     private VBox reservationsContainerVBox;
+    @FXML
+    private VBox favouritesContainerVBox;
 
     private String selectedStudyField;
     private final List<String> selectedCities = new ArrayList<>();
@@ -405,5 +407,27 @@ public class MyProfileController extends Controller {
 
     public void onFollowersButtonClick(ActionEvent actionEvent) {
         super.changeWindow("followers");
+    }
+
+    public void onFavouritesButtonClick(ActionEvent actionEvent) {
+        System.out.println("Favourites button clicked");
+        List<Long> favourites = getNeo4jConnectionManager().getFavourites(getSession().getUser().getEmail());
+        if(favourites==null || favourites.isEmpty()){
+            favouritesContainerVBox.getChildren().clear();
+            favouritesContainerVBox.getChildren().add(new Label("No favourites found"));
+        }
+        else {
+            for(Long favourite : favourites){
+                Button button = new Button("favourite");
+                System.out.println("\n\n\nfavourite: "+favourite);
+                String name = getMongoConnectionManager().getApartment(favourite).getName();
+                button.setText(name);
+                button.setOnAction(event -> {
+                    getSession().setApartmentId(favourite);
+                    super.changeWindow("apartment");
+                });
+                favouritesContainerVBox.getChildren().add(button);
+            }
+        }
     }
 }

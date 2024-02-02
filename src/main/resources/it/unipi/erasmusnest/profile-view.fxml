@@ -13,7 +13,7 @@
                         <Insets bottom="5.0" left="20.0" right="20.0" top="5.0" />
                     </HBox.margin>
                 </Label>
-                <Button onAction="#seeSuggested" text="Follow" />
+                <Button fx:id="followButton" onAction="#seeSuggested" disable="true" text="Follow" />
             </HBox>
         </top>
         <center>
@@ -54,6 +54,14 @@
                             <Insets top="20" />
                         </padding>
                         <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Apartments hosted" wrapText="true" />
+                    </VBox>
+                    <VBox fx:id="suggestedOuterBox" alignment="TOP_CENTER" spacing="10" visible="false">
+                        <VBox fx:id="suggestedVBox" spacing="10">
+                            <padding>
+                                <Insets top="20" />
+                            </padding>
+                            <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Suggested Users" wrapText="true" />
+                        </VBox>
                     </VBox>
                 </VBox>
             </ScrollPane>

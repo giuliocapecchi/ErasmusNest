@@ -13,7 +13,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import org.controlsfx.control.PopOver;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -37,6 +39,12 @@ public class ProfileController extends Controller{
     private Label citiesLabel;
     @FXML
     public VBox housesContainer;
+    @FXML
+    private VBox suggestedOuterBox;
+    @FXML
+    private VBox suggestedVBox;
+    @FXML
+    private Button followButton;
 
     public ProfileController() {
 
@@ -57,6 +65,10 @@ public class ProfileController extends Controller{
             emailLabel.setText(utente.getEmail());
             nameLabel.setText(utente.getName());
             surnameLabel.setText(utente.getSurname());
+
+            followButton.setDisable(!getSession().isLogged());
+            suggestedOuterBox.prefWidthProperty().bind(super.getRootPane().widthProperty());
+            suggestedOuterBox.setVisible(false);
 
             if(utente.getStudyField().isEmpty() || utente.getStudyField().isBlank())
                 studyFieldLabel.setText("not specified");
@@ -80,7 +92,6 @@ public class ProfileController extends Controller{
 
             //Adesso si deve popolare la vbox per le case dell'utente
             List<Apartment> userHouses = utente.getHouses();
-            System.out.println("userHouses: " + userHouses);
             // Recupera gli appartamenti dell'utente e li aggiunge al VBox apartmentsContainer
             if (userHouses != null && !userHouses.isEmpty()) {
                 for (Apartment apartment : userHouses) {
@@ -107,7 +118,6 @@ public class ProfileController extends Controller{
 
                     Button apartmentButton = new Button();
                     apartmentButton.setText(apartment.getName());
-                    System.out.println("Testo bottone:" + apartmentButton.getText());
                     apartmentButton.setOnAction(event -> {
                         // Handle the apartment button click
                         System.out.println("Apartment button clicked");
@@ -147,33 +157,36 @@ public class ProfileController extends Controller{
     {
         String otherEmail = getSession().getOtherProfileMail();
         String email = getSession().getUser().getEmail();
-        List<String> suggestedUsers =  getNeo4jConnectionManager().seeSuggested(email, otherEmail);
         getNeo4jConnectionManager().addFollow(email, otherEmail);
-        if(suggestedUsers.isEmpty())
-        {
-            System.out.println("\n\n\n 1 NON CI SONO CONSIGLIATI \n\n\n");
-        }
-        else
-        {
-            System.out.println("\n\n\n 1 CI SONO CONSIGLIATI \n\n\n");
-            for(String user : suggestedUsers)
-            {
-                System.out.println("\n" + user + "\n");
+        List<String> suggestedUsers =  getNeo4jConnectionManager().seeSuggestedUsers(email, otherEmail);
+        // Show pop up with suggested users
+        suggestedVBox.setVisible(true);
+        suggestedOuterBox.setVisible(true);
+        if (suggestedUsers != null && !suggestedUsers.isEmpty()) {
+            for (String suggestedUser : suggestedUsers) {
+                Button suggestedUserButton = new Button(suggestedUser);
+                suggestedVBox.getChildren().add(suggestedUserButton);
+                suggestedUserButton.setOnAction(event -> {
+                    getSession().setOtherProfileMail(suggestedUser);
+                    super.changeWindow("profile");
+                });
             }
+            showConfirmationMessage("Started follow", followButton);
+            followButton.setDisable(true);
+        } else {
+            suggestedOuterBox.getChildren().addAll(new Label("No suggested users"));
+            followButton.setDisable(true);
         }
-        List<String> suggeriti = getNeo4jConnectionManager().vediSuggeriti(email, otherEmail);
-        if(suggeriti.isEmpty())
-        {
-            System.out.println("\n\n\n 2 NON CI SONO CONSIGLIATI \n\n\n");
-        }
-        else
-        {
-            System.out.println("\n\n\n 2 CI SONO CONSIGLIATI \n\n\n");
-            for(String user : suggeriti)
-            {
-                System.out.println("\n" + user + "\n");
-            }
-        }
+    }
+
+    private void showConfirmationMessage(String message, Button likeButton) {
+        PopOver popOver = new PopOver();
+        Label label = new Label(message);
+        label.setStyle("-fx-padding: 10px;");
+        popOver.setContentNode(label);
+        popOver.setDetachable(false);
+        popOver.setAutoHide(true);
+        popOver.show(likeButton);
     }
 
     public void showReviews() {

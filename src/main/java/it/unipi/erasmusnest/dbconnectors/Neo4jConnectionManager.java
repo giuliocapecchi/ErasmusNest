@@ -8,7 +8,6 @@ import org.neo4j.driver.types.Node;
 import org.neo4j.driver.types.Relationship;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.neo4j.driver.Values.NULL;
 import static org.neo4j.driver.Values.parameters;
@@ -409,53 +408,24 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         }
     }
 
-    public List<String> seeSuggested(String emailA, String emailB) {
-        try (Session session = driver.session())
-        {
+    public List<String> seeSuggestedUsers(String emailA, String emailB) {
+        try (Session session = driver.session()) {
             return session.readTransaction((TransactionWork<List<String>>) tx -> {
                 Result result = tx.run("MATCH (a:User {email: $emailA}) " +
                                 "MATCH (b:User {email: $emailB}) " +
                                 "MATCH (b)-[:FOLLOWS]->(suggested:User) " +
                                 "WHERE NOT (a)-[:FOLLOWS]->(suggested) " +
+                                "AND suggested.email <> $emailA " + // Aggiunta clausola WHERE per escludere l'utente attuale
                                 "MATCH (a)-[:INTERESTS]->(city:City) " +
                                 "MATCH (suggested)-[:INTERESTS]->(city) " +
                                 "RETURN DISTINCT suggested.email AS suggestedEmail",
                         parameters("emailA", emailA, "emailB", emailB));
                 List<String> suggestedEmails = new ArrayList<>();
-                while (result.hasNext())
-                {
-                    suggestedEmails.add(result.next().get("suggestedEmail").asString());
-                }
-                return suggestedEmails;
-            });
-        } catch (Exception e) {
-            System.out.println("Exception: " + e);
-            new AlertDialogGraphicManager("Neo4j connection failed").show();
-            // Gestisci l'errore come preferisci o ritorna una lista vuota
-            return Collections.emptyList();
-        }
-    }
-
-    public List<String> vediSuggeriti(String mail, String otherMail) {
-        try (Session session = driver.session()) {
-            List<String> suggestedAccounts = session.readTransaction((TransactionWork<List<String>>) tx -> {
-                Result result = tx.run("MATCH (mailUser:User {email: $mail}) " +
-                                "MATCH (otherUser:User {email: $otherMail}) " +
-                                "MATCH (otherUser)-[:FOLLOWS]->(followed:User)-[:FOLLOWS]->(suggested:User) " +
-                                "WHERE NOT (mailUser)-[:FOLLOWS]->(suggested) " +
-                                "MATCH (suggested)-[:REVIEW]->(:Apartment)-[:LOCATED]->(:City)<-[:INTERESTS]-(mailUser) " +
-                                "RETURN DISTINCT suggested.email AS suggestedEmail",
-                        parameters("mail", mail, "otherMail", otherMail));
-
-                List<String> suggestedEmails = new ArrayList<>();
                 while (result.hasNext()) {
                     suggestedEmails.add(result.next().get("suggestedEmail").asString());
                 }
-
                 return suggestedEmails;
             });
-
-            return suggestedAccounts;
         } catch (Exception e) {
             System.out.println("Exception: " + e);
             new AlertDialogGraphicManager("Neo4j connection failed").show();
@@ -464,10 +434,47 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         }
     }
 
+    public boolean likeApartment(Long id, String email) {
+        if (!getFavourites(email).contains(id)) {
+            try (Session session = driver.session()) {
+                session.writeTransaction((TransactionWork<Void>) tx -> {
+                    tx.run(
+                            "MATCH (u:User {email: $email}) " +
+                                    "MATCH (a:Apartment {apartmentId: $id}) " +
+                                    "MERGE (u)-[:LIKES]->(a)",
+                            parameters("email", email, "id", id));
+                    return null;
+                });
+                return true; // Relazione creata
+            } catch (Exception e) {
+                e.printStackTrace();
+                new AlertDialogGraphicManager("Neo4j connection failed").show();
+                return false; // Errore durante l'operazione
+            }
+        } else {
+            return false; // Relazione già esistente
+        }
+    }
 
-
-
-
+    public List<Long> getFavourites(String email) {
+        try (Session session = driver.session()) {
+            return session.readTransaction((TransactionWork<List<Long>>) tx -> {
+                Result result = tx.run("MATCH (u:User {email: '"+email+"'})-[l:LIKES]->(a:Apartment) RETURN a.apartmentId");
+                List<Long> favourites = new ArrayList<Long>();
+                while (result.hasNext()) {
+                    Record record = result.next();
+                    Long s = record.get("a.apartmentId").asLong();
+                    favourites.add(s);
+                }
+                return favourites;
+            });
+        } catch (Exception e) {
+            System.out.println("Exception: " + e);
+            new AlertDialogGraphicManager("Neo4j connection failed").show();
+            // Gestisci l'errore come preferisci o ritorna una lista vuota
+            return Collections.emptyList();
+        }
+    }
 }
 
 
