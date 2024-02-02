@@ -50,7 +50,7 @@ public class LoginController extends Controller{
         }
 
         if(getSession().isLogged()){
-            super.changeWindow("homepage");
+            super.changeWindow("login","homepage");
         }
 
         if(super.getActualWindowName() == null) {
@@ -80,7 +80,7 @@ public class LoginController extends Controller{
 
     @FXML
     protected void onSignupButtonClick(){
-        super.changeWindow("signup");
+        super.changeWindow("login","signup");
     }
 
     @FXML
@@ -112,11 +112,10 @@ public class LoginController extends Controller{
                 }
             }
             if(logged){
-                if(getSession().getNextWindowName() != null) {
-                    super.changeWindow(getSession().getNextWindowName());
-                    getSession().setNextWindowName(null);
+                if(getPreviousWindowName() != null) {
+                    super.backToPreviousWindow();
                 } else {
-                    super.changeWindow("homepage");
+                    super.changeWindow("login","homepage");
                 }
             }
         }
@@ -126,11 +125,10 @@ public class LoginController extends Controller{
     @FXML
     protected void onContinueButtonClick(){
         getSession().setLogged(false);
-        if(getSession().getNextWindowName() != null) {
-            super.changeWindow(getSession().getNextWindowName());
-            getSession().setNextWindowName(null);
+        if(getPreviousWindowName() != null) {
+            super.backToPreviousWindow();
         } else {
-            super.changeWindow("homepage");
+            super.changeWindow("login","homepage");
         }
     }
 

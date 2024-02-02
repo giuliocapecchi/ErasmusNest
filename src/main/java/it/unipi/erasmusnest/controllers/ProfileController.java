@@ -123,15 +123,14 @@ public class ProfileController extends Controller{
                         System.out.println("Apartment button clicked");
                         // Setto l'id dell'appartamento nella sessione
                         getSession().setApartmentId(apartment.getId());
-                        getSession().setNextWindowName("profile");
-                        super.changeWindow("apartment");
+                        super.changeWindow("profile","apartment");
                     });
 
                     //Now add the apartment image and button to the HBox
                     apartmentBox.getChildren().addAll(apartmentImage, apartmentButton);
                     housesContainer.getChildren().add(apartmentBox); // This should add the apartment to the UI
-                    if(Objects.equals(getSession().getNextWindowName(), "homepage")
-                            || Objects.equals(getSession().getNextWindowName(), "profile")) {
+                    if(Objects.equals(getPreviousWindowName(), "homepage")
+                            || Objects.equals(getPreviousWindowName(), "profile")) {
                         toolBar.getItems().remove(backToSearch);
                     }
                 }
@@ -144,12 +143,12 @@ public class ProfileController extends Controller{
 
     @FXML
     protected void backToBrowse() {
-        super.changeWindow("apartments");
+        super.changeWindow("profile","apartments");
     }
 
     @FXML
     protected void backToHomepage() {
-        super.changeWindow("homepage");
+        super.changeWindow("profile","homepage");
     }
 
     @FXML
@@ -168,7 +167,7 @@ public class ProfileController extends Controller{
                 suggestedVBox.getChildren().add(suggestedUserButton);
                 suggestedUserButton.setOnAction(event -> {
                     getSession().setOtherProfileMail(suggestedUser);
-                    super.changeWindow("profile");
+                    super.refreshWindow();
                 });
             }
             showConfirmationMessage("Started follow", followButton);
@@ -190,7 +189,6 @@ public class ProfileController extends Controller{
     }
 
     public void showReviews() {
-        getSession().setNextWindowName("profile");
-        super.changeWindow("reviews");
+        super.changeWindow("profile","reviews");
     }
 }

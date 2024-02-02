@@ -184,7 +184,7 @@ public class MyProfileController extends Controller {
             analyticsButton.setOnAction(event -> {
                 // Handle the analytics button click
                 System.out.println("Analytics button clicked");
-                super.changeWindow("analytics");
+                super.changeWindow("myProfile","analytics");
             });
 
             adminContainer.getChildren().add(analyticsButton);
@@ -200,8 +200,7 @@ public class MyProfileController extends Controller {
     private void onChangeView(String apartmentId)
     {
         getSession().setApartmentId(Long.parseLong(apartmentId));
-        getSession().setNextWindowName("myprofile");
-        super.changeWindow("apartment");
+        super.changeWindow("myprofile","apartment");
     }
 
     public TitledPane createTitledPane(List<String> userCities) {
@@ -237,7 +236,7 @@ public class MyProfileController extends Controller {
     @FXML
     protected void logoutButtonClick(){
         getSession().reset();
-        super.changeWindow("login");
+        super.changeWindow("myprofile","login");
     }
 
     @FXML
@@ -375,23 +374,23 @@ public class MyProfileController extends Controller {
 
 
     public void onUploadHouseButtonClick(ActionEvent actionEvent) {
-        super.changeWindow("uploadHouse");
+        super.changeWindow("myprofile","uploadHouse");
     }
 
     public void onApartmentView(String apartmentId) {
         getSession().setApartmentId(Long.parseLong(apartmentId));
         System.out.println("\n\n\nApartment ID: " + apartmentId);
-        super.changeWindow("modifyApartment");
+        super.changeWindow("myprofile","modifyApartment");
     }
 
     public void onBack() {
-        super.changeWindow("login");
+        super.changeWindow("myprofile","login");
     }
 
     @FXML
     protected void onReservationsButtonClick() {
         getSession().setApartmentsId(null);
-        super.changeWindow("myreservations");
+        super.changeWindow("myprofile","myreservations");
     }
 
     @FXML
@@ -402,11 +401,11 @@ public class MyProfileController extends Controller {
             ids.add(apartment.getId());
         }
         getSession().setApartmentsId(ids);
-        super.changeWindow("myreservations");
+        super.changeWindow("myprofile","myreservations");
     }
 
     public void onFollowersButtonClick(ActionEvent actionEvent) {
-        super.changeWindow("followers");
+        super.changeWindow("myprofile","followers");
     }
 
     public void onFavouritesButtonClick(ActionEvent actionEvent) {
@@ -424,7 +423,7 @@ public class MyProfileController extends Controller {
                 button.setText(name);
                 button.setOnAction(event -> {
                     getSession().setApartmentId(favourite);
-                    super.changeWindow("apartment");
+                    super.changeWindow("myprofile","apartment");
                 });
                 favouritesContainerVBox.getChildren().add(button);
             }

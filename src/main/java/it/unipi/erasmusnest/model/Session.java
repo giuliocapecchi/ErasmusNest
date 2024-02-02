@@ -21,8 +21,6 @@ public class Session {
 
     private String otherProfileMail;
 
-    private String nextWindowName;
-
     private List<String> studyFields;
 
     private List<String> cities;
@@ -117,14 +115,6 @@ public class Session {
 
     public void setCurrent_filter(Integer current_filter) {
         this.current_filter = current_filter;
-    }
-
-    public String getNextWindowName() {
-        return nextWindowName;
-    }
-
-    public void setNextWindowName(String nextWindowName) {
-        this.nextWindowName = nextWindowName;
     }
 
     public List<String> getStudyFields() {

@@ -56,16 +56,18 @@ public class WriteReviewController extends Controller{
        // super.changeWindow("profile");
     }
 
-    @FXML void goToTheHomePage(ActionEvent actionEvent) {
+    @FXML
+    void goToTheHomePage() {
         System.out.println("go to the home page action");
-        super.changeWindow("homepage");
+        super.changeWindow("writeReview","homepage");
     }
 
-    @FXML void submit(ActionEvent actionEvent) {
+    @FXML
+    void submit() {
         System.out.println("submit action");
         System.out.println("MANCA IL REDIRECT AL PROFILE DELL'UTENTE");
         //super.changeWindow("profile");
         getNeo4jConnectionManager().addReview(getSession().getUser().getEmail(), getSession().getApartmentId(),textArea.getText(), (int)ratingSlider.getValue());
-        super.changeWindow("homepage");
+        super.changeWindow("writeReview","homepage");
     }
 }

@@ -106,7 +106,7 @@ public class ModifyAparmentController extends Controller{
             // Gestisci l'azione del pulsante "OK"
             alert.setOnCloseRequest(event -> {
                 // Qui puoi aggiungere il codice per reindirizzare a un'altra pagina
-                super.changeWindow("myProfile");
+                super.changeWindow("modifyApartment","myProfile");
             });
 
             // Mostra la finestra di dialogo
@@ -126,7 +126,7 @@ public class ModifyAparmentController extends Controller{
             // Gestisci l'azione del pulsante "OK"
             alert.setOnCloseRequest(event -> {
                 // Qui puoi aggiungere il codice per reindirizzare a un'altra pagina
-                super.changeWindow("modifyApartment");
+                super.refreshWindow();
             });
 
             // Mostra la finestra di dialogo
@@ -148,7 +148,7 @@ public class ModifyAparmentController extends Controller{
 
     public void onGoBackButtonClick(ActionEvent actionEvent)
     {
-        super.changeWindow("myProfile");
+        super.changeWindow("modifyApartment","myProfile");
     }
 
     @FXML
@@ -194,7 +194,7 @@ public class ModifyAparmentController extends Controller{
 
         alert.setOnCloseRequest(event -> {
             // Qui puoi aggiungere il codice per reindirizzare a un'altra pagina
-            super.changeWindow("modifyApartment");
+            super.refreshWindow();
         });
 
         // Mostra la finestra di dialogo

@@ -49,12 +49,13 @@ public class AnalyticsController extends Controller {
         hboxButton.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.1));
     }
 
-    @FXML void goBack(ActionEvent actionEvent) {
-        super.changeWindow("myProfile");
+    @FXML
+    void goBack() {
+        super.changeWindow("analytics","myProfile");
     }
 
-    public void goToTheHomePage(ActionEvent actionEvent) {
-        super.changeWindow("homepage");
+    public void goToTheHomePage() {
+        super.changeWindow("analytics","homepage");
     }
 
     public void analytics1(ActionEvent actionEvent) {

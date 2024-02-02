@@ -71,7 +71,7 @@ public class HomepageController extends Controller{
         if(CITIES == null){
             getSession().reset();
             getSession().setConnectionError(true);
-            super.changeWindow("login");
+            super.changeWindow("homepage","login");
         }
 
         radioButtonLookForCities.setToggleGroup(toggleGroup);
@@ -124,26 +124,24 @@ public class HomepageController extends Controller{
 
     private void handleCitySelection(String city) {
         getSession().setCity(city);
-        super.changeWindow("apartments");
+        super.changeWindow("homepage","apartments");
     }
 
     @FXML void handleLogoutAction() {
         getSession().reset();
-        super.changeWindow("login");
+        super.changeWindow("homepage","login");
     }
 
     @FXML void handleSignupAction() {
-        super.changeWindow("signup");
+        super.changeWindow("homepage","signup");
     }
 
     @FXML void handleLoginAction() {
-        super.changeWindow("login");
+        super.changeWindow("homepage","login");
     }
 
-    @FXML void handleProfileAction()
-    {
-        System.out.println("Profile");
-        super.changeWindow("myProfile");
+    @FXML void handleProfileAction() {
+        super.changeWindow("homepage","myProfile");
     }
 
     @FXML void lookForCities() {
@@ -184,8 +182,7 @@ public class HomepageController extends Controller{
                 return;
             }
             getSession().setOtherProfileMail(user.getEmail());
-            getSession().setNextWindowName("homepage");
-            super.changeWindow("profile");
+            super.changeWindow("homepage","profile");
         }
     }
 

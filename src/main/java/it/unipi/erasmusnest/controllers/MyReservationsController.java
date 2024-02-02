@@ -203,7 +203,7 @@ public class MyReservationsController extends Controller {
                             + "?", "You will not be able to recover it","confirmation").showAndGetConfirmation();
                     if (remove) {
                         getRedisConnectionManager().deleteReservation(reservation);
-                        super.changeWindow("myreservations");
+                        super.refreshWindow();
                     }
                 });
                 buttonsVBox.getChildren().add(deleteButton);
@@ -217,7 +217,7 @@ public class MyReservationsController extends Controller {
                         + "?", "You will not be able to reject it later","confirmation").showAndGetConfirmation();
                 if (approve) {
                     getRedisConnectionManager().approveReservation(reservation);
-                    super.changeWindow("myreservations");
+                    super.refreshWindow();
                 }
             });
             Button rejectButton = new Button("Reject reservation");
@@ -228,7 +228,7 @@ public class MyReservationsController extends Controller {
                         + "?", "You will not be able to approve it later","confirmation").showAndGetConfirmation();
                 if (approve) {
                     getRedisConnectionManager().rejectReservation(reservation);
-                    super.changeWindow("myreservations");
+                    super.refreshWindow();
                 }
             });
             VBox vBox = new VBox();
@@ -242,16 +242,16 @@ public class MyReservationsController extends Controller {
     @FXML
     protected void logoutButtonClick(){
         getSession().reset();
-        super.changeWindow("login");
+        super.changeWindow("myreservations","login");
     }
 
     @FXML
     protected void homepageButtonClick(){
-        super.changeWindow("homepage");
+        super.changeWindow("myreservations","homepage");
     }
 
     @FXML
     protected void profileButtonClick(){
-        super.changeWindow("myProfile");
+        super.changeWindow("myreservations","myProfile");
     }
 }

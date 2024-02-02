@@ -47,7 +47,7 @@ public class ReviewsController extends Controller{
     @FXML
     private void initialize() {
         System.out.println("ReviewsController initialize");
-        if(Objects.equals(getSession().getNextWindowName(), "profile")){
+        if(Objects.equals(getPreviousWindowName(), "profile")){
             System.out.println("Session:User = " + getSession().getOtherProfileMail());
             title.setText("Reviews for the selected User");
             hboxTitle.getChildren().remove(changeFiltersButton);
@@ -66,7 +66,7 @@ public class ReviewsController extends Controller{
 
         int elementsPerPage = 10;
         List <Review> reviews;
-        if(Objects.equals(getSession().getNextWindowName(), "profile")) {
+        if(Objects.equals(getPreviousWindowName(), "profile")) {
             reviews = getNeo4jConnectionManager().getReviewsForUser(getSession().getOtherProfileMail(),page, elementsPerPage);
         }else{
             reviews = getNeo4jConnectionManager().getReviewsForApartment(getSession().getApartmentId(),page, elementsPerPage,selectedFilter);
@@ -184,7 +184,7 @@ public class ReviewsController extends Controller{
     }
 
     public void onBackButtonPressed() {
-        changeWindow(getSession().getNextWindowName());
+        super.backToPreviousWindow();
     }
 
     @FXML

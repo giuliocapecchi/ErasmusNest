@@ -22,8 +22,9 @@ public class Controller implements Validator{
     // managed by controllers that extend this class
     @FXML
     private StackPane rootPane;
-    private static Session session = new Session();
+    private static final Session session = new Session();
     private static String actualWindowName;
+    private static String previousWindowName;
     private static final RedisConnectionManager redisConnectionManager = new RedisConnectionManager();
     private static final MongoConnectionManager mongoConnectionManager = new MongoConnectionManager();
     private static final Neo4jConnectionManager neo4jConnectionManager = new Neo4jConnectionManager();
@@ -31,11 +32,25 @@ public class Controller implements Validator{
     public Controller() {
     }
 
-    // TODO add actualWindowName that becomes the previous window name
-    protected void changeWindow(String nextWindowName) {
+    protected void backToPreviousWindow() {
+        System.out.println("GOING BACK TO PREVIOUS WINDOW");
+        changeWindow(actualWindowName, previousWindowName);
+    }
+
+    protected void refreshWindow() {
+        try {
+            StackPane pane = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/it/unipi/erasmusnest/" + actualWindowName + "-view.fxml")));
+            rootPane.getChildren().setAll(pane);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected void changeWindow(String actualWindowName, String nextWindowName) {
 
         try {
-            actualWindowName = nextWindowName;
+            Controller.previousWindowName = actualWindowName;
+            Controller.actualWindowName = nextWindowName;
             StackPane pane = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/it/unipi/erasmusnest/" + nextWindowName + "-view.fxml")));
             rootPane.getChildren().setAll(pane);
         } catch (IOException e) {
@@ -51,6 +66,8 @@ public class Controller implements Validator{
     protected String getActualWindowName() {
         return actualWindowName;
     }
+
+    protected String getPreviousWindowName() { return previousWindowName; }
 
     RedisConnectionManager getRedisConnectionManager() {
         return redisConnectionManager;

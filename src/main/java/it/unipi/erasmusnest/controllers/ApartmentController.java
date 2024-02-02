@@ -79,6 +79,7 @@ public class ApartmentController extends Controller{
     private void initialize() {
 
         apartment = getMongoConnectionManager().getApartment(getSession().getApartmentId());
+        System.out.println("Apartment: "+apartment);
         if(apartment==null)
         {
             // If apartment is null seems that the apartment has been removed from Mongo
@@ -98,7 +99,7 @@ public class ApartmentController extends Controller{
                 alert.setOnCloseRequest(event -> {
                     // Qui puoi aggiungere il codice per reindirizzare a un'altra pagina
                     cleanAverageRatingInSession();
-                    super.changeWindow("apartments");
+                    super.changeWindow("apartment","apartments");
                 });
 
                 // Mostra la finestra di dialogo
@@ -119,7 +120,7 @@ public class ApartmentController extends Controller{
                 alert.setOnCloseRequest(event -> {
                     // Qui puoi aggiungere il codice per reindirizzare a un'altra pagina
                     cleanAverageRatingInSession();
-                    super.changeWindow("apartments");
+                    super.changeWindow("apartment","apartments");
                 });
 
                 // Mostra la finestra di dialogo
@@ -143,12 +144,12 @@ public class ApartmentController extends Controller{
             rightVBox.prefWidthProperty().bind(secondHBox.widthProperty().multiply(ratio));
             leftVBox.prefWidthProperty().bind(secondHBox.widthProperty().multiply(ratio));
             nameLabel.setText(apartment.getName());
-            String noImageAvaialblePath = "/media/no_photo_available.png";
+            String noImageAvailablePath = "/media/no_photo_available.png";
             Image image;
             try {
                 image = new Image(apartment.getImageURL(), true);
             }catch (IllegalArgumentException e){
-                image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvaialblePath)));
+                image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvailablePath)));
             }
 
             imageView.setImage(image);
@@ -161,28 +162,10 @@ public class ApartmentController extends Controller{
             infoText.setText(information);
             hostEmail.setText(apartment.getHostEmail());
 
-            Button likeButton = new Button("Like");
-            likeButton.setDisable(!getSession().isLogged());
-            likeButton.setPrefWidth(150);
-            likeButton.setPrefHeight(40);
-            likeButton.setOnAction(event -> {
-                if (getNeo4jConnectionManager().likeApartment(getSession().getApartmentId(), getSession().getUser().getEmail())) {
-                    showConfirmationMessage("Like added", likeButton);
-                    likeButton.setText("Dislike");
-                } else {
-                    showConfirmationMessage("Already liked, go to My Profile section to delete", likeButton);
-                    likeButton.setText("Dislike");
-                }
-            });
+            Button likeButton = getLikeButton();
 
             // button.setGraphic(view);
             leftFirstVBox.getChildren().add(likeButton);
-
-            ratingImage1.fitHeightProperty().bind(leftFirstVBox.heightProperty());
-            ratingImage2.fitHeightProperty().bind(leftFirstVBox.heightProperty());
-            ratingImage3.fitHeightProperty().bind(leftFirstVBox.heightProperty());
-            ratingImage4.fitHeightProperty().bind(leftFirstVBox.heightProperty());
-            ratingImage5.fitHeightProperty().bind(leftFirstVBox.heightProperty());
 
             System.out.println(">>> "+getSession().getApartmentId());
 
@@ -220,6 +203,23 @@ public class ApartmentController extends Controller{
         }
     }
 
+    // TODO fix it
+    private Button getLikeButton() {
+        Button likeButton = new Button();
+        likeButton.setText("Like");
+        likeButton.setDisable(!getSession().isLogged());
+        likeButton.setOnAction(event -> {
+            if (getNeo4jConnectionManager().likeApartment(getSession().getApartmentId(), getSession().getUser().getEmail())) {
+                showConfirmationMessage("Like added", likeButton);
+                likeButton.setText("Dislike");
+            } else {
+                showConfirmationMessage("Already liked, go to My Profile section to delete", likeButton);
+                likeButton.setText("Dislike");
+            }
+        });
+        return likeButton;
+    }
+
     private void onStartDatePickerFirstClick(){
         if(!reservationsLoaded){
             reservationGraphicManager.loadReservations();
@@ -229,23 +229,21 @@ public class ApartmentController extends Controller{
 
     @FXML
     protected void onShowReviewsButtonClick() {
-        getSession().setNextWindowName("apartment");
         cleanAverageRatingInSession();
-        super.changeWindow("reviews");
+        super.changeWindow("apartment","reviews");
     }
 
     @FXML
     protected void onContactHostButtonClick() {
         getSession().setOtherProfileMail(hostEmail.getText());
         cleanAverageRatingInSession();
-        super.changeWindow("profile");
+        super.changeWindow("apartment","profile");
     }
 
     @FXML
     protected void onLoginButtonClick() throws IOException {
-        getSession().setNextWindowName("apartment");
         cleanAverageRatingInSession();
-        super.changeWindow("login");
+        super.changeWindow("apartment","login");
     }
 
     @FXML
@@ -267,13 +265,13 @@ public class ApartmentController extends Controller{
             getRedisConnectionManager().addReservation(userEmail, houseId, String.valueOf(startYear), String.valueOf(startMonth), String.valueOf(numberOfMonths), getSession().getCity(), apartment.getImageURL());
 
             cleanAverageRatingInSession();
-            super.changeWindow("myreservations");
+            super.changeWindow("apartment","myreservations");
         }
     }
 
     public void onGoBackButtonClick() {
         cleanAverageRatingInSession();
-        changeWindow(getSession().getNextWindowName());
+        super.backToPreviousWindow();
     }
 
     private void cleanAverageRatingInSession(){

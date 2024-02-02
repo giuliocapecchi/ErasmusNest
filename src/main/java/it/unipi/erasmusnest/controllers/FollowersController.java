@@ -90,7 +90,7 @@ public class FollowersController extends Controller{
     private void onUserPageButtonClick(ActionEvent actionEvent)
     {
         getSession().setOtherProfileMail(((Button)actionEvent.getSource()).getText());
-        super.changeWindow("profile");
+        super.changeWindow("followers","profile");
     }
 
     private void onFollowerButtonClick(Button followButton, String otherEmail)
@@ -107,12 +107,12 @@ public class FollowersController extends Controller{
             neo4jConnectionManager.removeFollow(email, otherEmail);
             followButton.setText("Follow Back");
         }
-        super.changeWindow("followers");
+        super.refreshWindow();
     }
 
 
     public void onGoBackButtonClick(ActionEvent actionEvent)
     {
-        super.changeWindow("myProfile");
+        super.changeWindow("followers","myProfile");
     }
 }
