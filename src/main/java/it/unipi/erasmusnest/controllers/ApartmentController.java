@@ -211,11 +211,11 @@ public class ApartmentController extends Controller{
         likeButton.setOnAction(event -> {
             if (getNeo4jConnectionManager().likeApartment(getSession().getApartmentId(), getSession().getUser().getEmail())) {
                 showConfirmationMessage("Like added", likeButton);
-                likeButton.setText("Dislike");
             } else {
                 showConfirmationMessage("Already liked, go to My Profile section to delete", likeButton);
-                likeButton.setText("Dislike");
             }
+            likeButton.setText("Already liked");
+            likeButton.setDisable(true);
         });
         return likeButton;
     }

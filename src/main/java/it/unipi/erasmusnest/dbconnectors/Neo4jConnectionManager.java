@@ -435,6 +435,7 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
     }
 
     public boolean likeApartment(Long id, String email) {
+        boolean queryExecuted = false;
         if (!getFavourites(email).contains(id)) {
             try (Session session = driver.session()) {
                 session.writeTransaction((TransactionWork<Void>) tx -> {
@@ -445,22 +446,20 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
                             parameters("email", email, "id", id));
                     return null;
                 });
-                return true; // Relazione creata
+                queryExecuted = true;
             } catch (Exception e) {
                 e.printStackTrace();
                 new AlertDialogGraphicManager("Neo4j connection failed").show();
-                return false; // Errore durante l'operazione
             }
-        } else {
-            return false; // Relazione già esistente
         }
+        return queryExecuted;
     }
 
     public List<Long> getFavourites(String email) {
         try (Session session = driver.session()) {
-            return session.readTransaction((TransactionWork<List<Long>>) tx -> {
+            return session.readTransaction(tx -> {
                 Result result = tx.run("MATCH (u:User {email: '"+email+"'})-[l:LIKES]->(a:Apartment) RETURN a.apartmentId");
-                List<Long> favourites = new ArrayList<Long>();
+                List<Long> favourites = new ArrayList<>();
                 while (result.hasNext()) {
                     Record record = result.next();
                     Long s = record.get("a.apartmentId").asLong();
