@@ -14,11 +14,13 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.scene.web.WebView;
+import org.controlsfx.control.PopOver;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class ApartmentController extends Controller{
 
@@ -152,6 +154,23 @@ public class ApartmentController extends Controller{
             infoText.setText(information);
             hostEmail.setText(apartment.getHostEmail());
 
+            Button likeButton = new Button("Like");
+            likeButton.setDisable(!getSession().isLogged());
+            likeButton.setPrefWidth(150);
+            likeButton.setPrefHeight(40);
+            likeButton.setOnAction(event -> {
+                if (getNeo4jConnectionManager().likeApartment(getSession().getApartmentId(), getSession().getUser().getEmail())) {
+                    showConfirmationMessage("Like added", likeButton);
+                    likeButton.setText("Dislike");
+                } else {
+                    showConfirmationMessage("Already liked, go to My Profile section to delete", likeButton);
+                    likeButton.setText("Dislike");
+                }
+            });
+
+            // button.setGraphic(view);
+            leftFirstVBox.getChildren().add(likeButton);
+
             ratingImage1.fitHeightProperty().bind(leftFirstVBox.heightProperty());
             ratingImage2.fitHeightProperty().bind(leftFirstVBox.heightProperty());
             ratingImage3.fitHeightProperty().bind(leftFirstVBox.heightProperty());
@@ -234,4 +253,15 @@ public class ApartmentController extends Controller{
     public void onGoBackButtonClick(ActionEvent actionEvent) {
         super.changeWindow("apartments");
     }
+
+    private void showConfirmationMessage(String message, Button likeButton) {
+        PopOver popOver = new PopOver();
+        Label label = new Label(message);
+        label.setStyle("-fx-padding: 10px;");
+        popOver.setContentNode(label);
+        popOver.setDetachable(false);
+        popOver.setAutoHide(true);
+        popOver.show(likeButton);
+    }
+
 }

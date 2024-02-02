@@ -159,7 +159,7 @@ public class ModifyAparmentController extends Controller{
                 "You will not be able to recover it").showAndGetConfirmation();
         if(remove)
         {
-            if(getRedisConnectionManager().getReservationsForApartment(apartmentId).isEmpty())
+            if(getRedisConnectionManager().isApartmentReserved(apartmentId))
             {
                 // non ci sono prenotazioni per questo appartamento
                 if(getMongoConnectionManager().removeApartment(apartmentId))
