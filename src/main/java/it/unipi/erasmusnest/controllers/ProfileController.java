@@ -123,14 +123,17 @@ public class ProfileController extends Controller{
                         System.out.println("Apartment button clicked");
                         // Setto l'id dell'appartamento nella sessione
                         getSession().setApartmentId(apartment.getId());
+                        getSession().setNextWindowName("profile");
                         super.changeWindow("apartment");
                     });
 
                     //Now add the apartment image and button to the HBox
                     apartmentBox.getChildren().addAll(apartmentImage, apartmentButton);
                     housesContainer.getChildren().add(apartmentBox); // This should add the apartment to the UI
-                    if(Objects.equals(getSession().getNextWindowName(), "homepage"))
+                    if(Objects.equals(getSession().getNextWindowName(), "homepage")
+                            || Objects.equals(getSession().getNextWindowName(), "profile")) {
                         toolBar.getItems().remove(backToSearch);
+                    }
                 }
             } else {
                 housesContainer.getChildren().clear();
@@ -140,8 +143,7 @@ public class ProfileController extends Controller{
 
 
     @FXML
-    protected void backToBrowse()
-    {
+    protected void backToBrowse() {
         super.changeWindow("apartments");
     }
 

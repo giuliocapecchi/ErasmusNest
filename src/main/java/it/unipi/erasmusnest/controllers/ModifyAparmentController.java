@@ -155,8 +155,8 @@ public class ModifyAparmentController extends Controller{
     private void onRemoveHouseButtonClick(ActionEvent actionEvent)
     {
         Long apartmentId = getSession().getApartmentId();
-        boolean remove = new AlertDialogGraphicManager("Are you sure you want to remove this apartment?\n",
-                "You will not be able to recover it").showAndGetConfirmation();
+        boolean remove = new AlertDialogGraphicManager("Delete confirmation","Are you sure you want to remove this apartment?\n",
+                "You will not be able to recover it","confirmation").showAndGetConfirmation();
         if(remove)
         {
             if(getRedisConnectionManager().isApartmentReserved(apartmentId))
