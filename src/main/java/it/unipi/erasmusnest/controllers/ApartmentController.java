@@ -167,8 +167,6 @@ public class ApartmentController extends Controller{
             // button.setGraphic(view);
             leftFirstVBox.getChildren().add(likeButton);
 
-            System.out.println(">>> "+getSession().getApartmentId());
-
             if(apartment.getAverageRating() != null) {
                 ratingImage1.fitHeightProperty().bind(leftFirstVBox.heightProperty());
                 ratingImage2.fitHeightProperty().bind(leftFirstVBox.heightProperty());

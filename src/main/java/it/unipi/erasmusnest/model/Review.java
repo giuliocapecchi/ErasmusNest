@@ -2,15 +2,6 @@ package it.unipi.erasmusnest.model;
 
 public class Review {
     private Long apartmentId;
-
-    public String getUserEmail() {
-        return userEmail;
-    }
-
-    public void setUserEmail(String userEmail) {
-        this.userEmail = userEmail;
-    }
-
     private String userEmail;
     private String comments;
     private float rating;
@@ -22,6 +13,14 @@ public class Review {
         this.rating = rating;
     }
 
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
+    }
 
     public Long getApartmentId() {
         return apartmentId;
