@@ -162,15 +162,9 @@ public class MongoConnectionManager extends ConnectionManager{
             MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
             MongoCollection<Document> collection = database.getCollection("apartments");
 
-            //ObjectId objectId = new ObjectId(apartmentId);
-
-            // Verifica se la casa da eliminare è l'ultima associata all'utente
-            //MongoCollection<Document> userCollection = database.getCollection("users");
-            //long apartmentsCount = userCollection.countDocuments(Filters.eq("house._id", objectId));
-
-            ObjectId objectId = new ObjectId(apartmentId);
-            Document apartment = collection.find(eq("_id", apartmentId)).first();
-            //System.out.println("Apartment: " + apartment.toJson());
+            // find one document with new Document that have the object id field equal to the apartmentId
+            Document apartment = collection.find(eq("_id", new ObjectId(apartmentId))).first();
+            System.out.println("Apartment: " + apartment.toJson());
 
             String coordinates = apartment.getString("position");
             // remove space from coordinates
@@ -199,6 +193,16 @@ public class MongoConnectionManager extends ConnectionManager{
             else
                 id = (Long) apartment.get("id");
             */
+            ArrayList<String> pictureURLs = new ArrayList<>();
+            Object urlObj = apartment.get("picture_url");
+            if(urlObj instanceof String) {
+                pictureURLs.add((String) urlObj);
+            }
+            else if(urlObj instanceof ArrayList<?>) {
+                for(Object o : (ArrayList<?>) urlObj) {
+                    pictureURLs.add((String) o);
+                }
+            }
 
             // to retrieve also studyFields
             resultApartment = new Apartment(
@@ -207,10 +211,10 @@ public class MongoConnectionManager extends ConnectionManager{
                     //description,
                     apartment.getString("description"),
                     new Point2D(Double.parseDouble(latLong[0]), Double.parseDouble(latLong[1])),
-                    apartment.getDouble("price"),
+                    apartment.getInteger("price"),
                     apartment.getInteger("accommodates"),
                     apartment.getString("email"),
-                    apartment.getString("picture_url"),
+                    pictureURLs,
                     apartment.getInteger("bathrooms")
             );
 

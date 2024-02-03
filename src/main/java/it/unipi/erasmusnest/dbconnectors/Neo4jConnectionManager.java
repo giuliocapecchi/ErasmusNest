@@ -163,6 +163,7 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
             });
             return apartments;
         }catch (Exception e){
+            e.printStackTrace();
             System.out.println("Exception: " + e);
             new AlertDialogGraphicManager("Neo4j connection failed").show();
             return null;

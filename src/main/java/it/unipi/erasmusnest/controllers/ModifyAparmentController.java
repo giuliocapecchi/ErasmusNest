@@ -26,7 +26,7 @@ public class ModifyAparmentController extends Controller{
     private VBox neighborhoodVBox;
     private Spinner<Integer> inputAccommodates;
     private Spinner<Integer> inputBathrooms;
-    private Spinner<Double> inputPrice;
+    private Spinner<Integer> inputPrice;
     @FXML
     private VBox imageVBox;
     private TextField textField;
@@ -54,7 +54,7 @@ public class ModifyAparmentController extends Controller{
 
         SpinnerValueFactory<Integer> valoriAccommodates = new SpinnerValueFactory.IntegerSpinnerValueFactory(1,10,apartment.getMaxAccommodates());
         SpinnerValueFactory<Integer> valoriBathrooms = new SpinnerValueFactory.IntegerSpinnerValueFactory(1,10,apartment.getBathrooms());
-        SpinnerValueFactory<Double> valoriPrice = new SpinnerValueFactory.DoubleSpinnerValueFactory(1,1000,apartment.getDollarPriceMonth(),0.5);
+        SpinnerValueFactory<Integer> valoriPrice = new SpinnerValueFactory.IntegerSpinnerValueFactory(1,1000,apartment.getDollarPriceMonth());
         // setting suitable values for the spinners
         inputAccommodates.setValueFactory(valoriAccommodates);
         inputBathrooms.setValueFactory(valoriBathrooms);
