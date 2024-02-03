@@ -2,11 +2,13 @@ package it.unipi.erasmusnest.dbconnectors;
 
 import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
 import it.unipi.erasmusnest.graphicmanagers.AlertDialogGraphicManager;
 import it.unipi.erasmusnest.model.Apartment;
 import it.unipi.erasmusnest.model.User;
 import javafx.geometry.Point2D;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,16 +75,13 @@ public class MongoConnectionManager extends ConnectionManager{
             List<Apartment> houses = new ArrayList<>();
             for(Document d : houseDocuments)
             {
-                Long id;
-                if(d.get("house_id") instanceof Integer)
-                    id = ((Integer) d.get("house_id")).longValue();
-                else
-                    id = (Long) d.get("house_id");
+                String id = d.getObjectId("_id").toHexString();
                 Double rating;
                 if(d.get("review_scores_rating") instanceof Integer)
                     rating = ((Integer) d.get("review_scores_rating")).doubleValue();
                 else
                     rating = (Double) d.get("review_scores_rating");
+                // TODO CAMBIARE LA GET DELLE IMMAGINI
                 Apartment casa = new Apartment(id, d.getString("name"), d.getString("picture_url"), rating);
                 houses.add(casa);
             }
@@ -104,8 +103,7 @@ public class MongoConnectionManager extends ConnectionManager{
         {
             MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
             MongoCollection<Document> collection = database.getCollection("apartments");
-            Document newApartment = new Document("house_id", apartment.getId())
-                    .append("house_name", apartment.getName())
+            Document newApartment = new Document("house_name", apartment.getName())
                     .append("host_name",apartment.getHostName())
                     .append("host_surname",apartment.getHostSurname())
                     .append("host_email", apartment.getHostEmail())
@@ -118,40 +116,34 @@ public class MongoConnectionManager extends ConnectionManager{
             if(description!=null && !description.isEmpty() && !description.isBlank()) {
                 newApartment.append("description", apartment.getDescription());
             }
-            if(apartment.getImageURL()!=null && !apartment.getImageURL().isEmpty() && !apartment.getImageURL().isBlank()) {
+            if(apartment.getImageURL()!=null && !apartment.getImageURL().isEmpty()) {
                 newApartment.append("picture_url", apartment.getImageURL());
             }
             collection.insertOne(newApartment);
+            String insertedObjectId = newApartment.getObjectId("_id").toHexString();
             // Update the user's house list
             MongoCollection<Document> userCollection = database.getCollection("users");
             Document userDocument = userCollection.find(Filters.eq("email", apartment.getHostEmail())).first();
-            Document houseDocument = new Document()
-                    .append("house_id", apartment.getId())
-                    .append("name", apartment.getName())
-                    .append("review_scores_rating", 0.0);
-            // Prepare houses list
-            String imageurl = apartment.getImageURL();
-            if(!imageurl.isEmpty() && !imageurl.isBlank())
-                houseDocument.append("picture_url", imageurl);
-            List<Document> userApartments = new ArrayList<>();
-            // NEW VERSION
-            if(userDocument.containsKey("house"))
-            {
-                if (userDocument.get("house") instanceof Document)
-                {
-                    userApartments.add((Document) userDocument.get("house"));
+            if (userDocument != null) {
+                Document houseDocument = new Document()
+                        .append("object_id", insertedObjectId)
+                        .append("house_name", apartment.getName());
+                if(apartment.getImageURL()!=null && !apartment.getImageURL().isEmpty()) {
+                    // Taking only the first image of the list
+                    houseDocument.append("picture_url", apartment.getImageURL().get(0));
                 }
-                else
-                {
-                    userApartments = (List<Document>) userDocument.get("house");
-                }
+                ArrayList<Document> houseArray = new ArrayList<>();
+                // Controlla se il campo "house" non esiste o è vuoto
+                if (userDocument.containsKey("house") && userDocument.get("house") != null)
+                    houseArray = (ArrayList<Document>) userDocument.get("house");
+                houseArray.add(houseDocument);
+                userDocument.put("house", houseArray);
+                userCollection.replaceOne(Filters.eq("email", apartment.getHostEmail()), userDocument);
+
+                System.out.println("Casa aggiunta o creata con successo.");
+            } else {
+                System.out.println("Documento utente non trovato.");
             }
-            // Add houseDocument to List<Document>
-            userApartments.add(houseDocument);
-            // Add the updated list to the userDocument
-            userDocument.put("house", userApartments);
-            // update user collection inserting new house
-            userCollection.replaceOne(Filters.eq("email", apartment.getHostEmail()), userDocument);
             result = true;
         }
         catch (Exception e)
@@ -164,7 +156,7 @@ public class MongoConnectionManager extends ConnectionManager{
         return result;
     }
 
-    public Apartment getApartment(Long apartmentId){
+    public Apartment getApartment(String apartmentId){
 
         Apartment resultApartment = null;
 
@@ -173,7 +165,7 @@ public class MongoConnectionManager extends ConnectionManager{
             MongoCollection<Document> collection = database.getCollection("apartments");
 
             // find one document with new Document
-            Document apartment = collection.find(eq("house_id", apartmentId)).first();
+            Document apartment = collection.find(eq("_id", apartmentId)).first();
             //System.out.println("Apartment: " + apartment.toJson());
 
             String coordinates = apartment.getString("position");
@@ -195,7 +187,7 @@ public class MongoConnectionManager extends ConnectionManager{
 
             // description += "Bathrooms: "+apartment.getString("bathrooms_text");
 
-            Long id = apartment.getLong("house_id");
+            String id = apartment.get("_id").toString();
             // if apartment.get("id") return an integer, it is necessary to cast it to Long
             /*
             if(apartment.get("id") instanceof Integer)
@@ -205,9 +197,8 @@ public class MongoConnectionManager extends ConnectionManager{
             */
 
             // to retrieve also studyFields
-            System.out.println("\n\n\nI BAGNI SONO: "+apartment.getInteger("bathrooms")+"\n\n\n");
             resultApartment = new Apartment(
-                    id,
+                    apartmentId,
                     apartment.getString("house_name"),
                     //description,
                     apartment.getString("description"),
@@ -342,8 +333,6 @@ public class MongoConnectionManager extends ConnectionManager{
                         .append("last_name", utente.getSurname());
                 if(!utente.getStudyField().equals("None"))
                     newUser.append("SF", utente.getStudyField());
-                if(!utente.getPreferredCities().contains("None"))
-                    newUser.append("CoI", utente.getPreferredCities());
                 collection.insertOne(newUser);
             }
             catch (Exception e)
@@ -388,18 +377,23 @@ public class MongoConnectionManager extends ConnectionManager{
         {
             MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
             MongoCollection<Document> collection = database.getCollection("apartments");
-            Document updatedHouseDocument = new Document("house_id", updatedHouse.getId())
-                    .append("house_name", updatedHouse.getName())
+            Document updatedHouseDocument = new Document("house_name", updatedHouse.getName())
                     .append("price", updatedHouse.getDollarPriceMonth())
                     .append("accommodates", updatedHouse.getMaxAccommodates())
                     .append("host_email", updatedHouse.getHostEmail())
                     .append("position", updatedHouse.getLocation().getX() + ", " + updatedHouse.getLocation().getY())
                     .append("bathrooms", updatedHouse.getBathrooms());
-            if(updatedHouse.getImageURL()!=null && !updatedHouse.getImageURL().isEmpty() && !updatedHouse.getImageURL().isBlank()) {
-                updatedHouseDocument.append("picture_url", updatedHouse.getImageURL());
+            if(updatedHouse.getImageURL()!=null) {
+                if(updatedHouse.getImageURL().isEmpty() || updatedHouse.getDescription().equals(" "))
+                    updatedHouseDocument.remove("picture_url");
+                else
+                    updatedHouseDocument.append("picture_url", updatedHouse.getImageURL());
             }
-            if(updatedHouse.getDescription()!=null && !updatedHouse.getDescription().isEmpty() && !updatedHouse.getDescription().isBlank()) {
-                updatedHouseDocument.append("description", updatedHouse.getDescription());
+            if(updatedHouse.getDescription()!=null) {
+                if(updatedHouse.getDescription().isEmpty() || updatedHouse.getDescription().isBlank() || updatedHouse.getDescription().equals(" "))
+                    updatedHouseDocument.remove("description");
+                else
+                    updatedHouseDocument.append("description", updatedHouse.getDescription());
             }
             collection.updateOne(Filters.eq("house_id", updatedHouse.getId()), new Document("$set", updatedHouseDocument));
             updated = true;
@@ -413,21 +407,31 @@ public class MongoConnectionManager extends ConnectionManager{
         return updated;
     }
 
-    public boolean removeApartment(Long apartmentId)
+    public boolean removeApartment(String apartmentId)
     {
         boolean removed = false;
-        try(MongoClient mongoClient = MongoClients.create("mongodb://"+super.getHost()+":"+super.getPort()))
-        {
+        try (MongoClient mongoClient = MongoClients.create("mongodb://" + super.getHost() + ":" + super.getPort())) {
             MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
             MongoCollection<Document> collection = database.getCollection("apartments");
-            collection.deleteOne(Filters.eq("house_id", apartmentId));
-            // remove apartment also from users collection
+            // Converti l'apartmentId in un ObjectId
+            ObjectId objectId = new ObjectId(apartmentId);
+
+            // Verifica se la casa da eliminare è l'ultima associata all'utente
             MongoCollection<Document> userCollection = database.getCollection("users");
-            userCollection.updateOne(Filters.eq("house.house_id", apartmentId), new Document("$pull", new Document("house", new Document("house_id", apartmentId))));
-            removed = true;
-        }
-        catch (Exception e)
-        {
+            long apartmentsCount = userCollection.countDocuments(Filters.eq("house._id", objectId));
+
+            if (apartmentsCount > 1) {
+                collection.deleteOne(Filters.eq("_id", objectId));
+                userCollection.updateOne(Filters.eq("house._id", objectId), Updates.pull("house", new Document("_id", objectId)));
+                removed = true;
+            } else if (apartmentsCount == 1) {
+                collection.deleteOne(Filters.eq("_id", objectId));
+                userCollection.deleteOne(Filters.eq("house._id", objectId));
+                removed = true;
+            } else {
+                System.out.println("L'appartamento con l'ObjectId specificato non è stato trovato negli utenti.");
+            }
+        } catch (Exception e) {
             e.printStackTrace();
             new AlertDialogGraphicManager("MongoDB REMOVE failed").show();
             System.out.println("Error in removeApartment: " + e.getMessage());

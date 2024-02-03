@@ -69,7 +69,9 @@ public class UploadHouseController extends Controller {
         User user = getMongoConnectionManager().findUser(userEmail);
         if (user != null) {
             //Create new apartment //todo : perchè a tutti assegna id 7L????
-            Apartment apartment = new Apartment(7L, houseName, houseDescription, location, price, accommodates, userEmail,
+            //Apartment apartment = new Apartment(7L, houseName, houseDescription, location, price, accommodates, userEmail,
+            //                    arrayList, 0.0, 0, bathrooms, user.getName(), user.getSurname());
+            Apartment apartment = new Apartment(houseName, houseDescription, location, price, accommodates, userEmail,
                     arrayList, 0.0, 0, bathrooms, user.getName(), user.getSurname());
 
             // Call Mongo to insert apartment

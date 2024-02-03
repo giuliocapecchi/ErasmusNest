@@ -155,7 +155,8 @@ public class MyProfileController extends Controller {
                     apartmentImage.fitWidthProperty().bind(apartmentBox.widthProperty().multiply(0.4));
                     Button apartmentButton = new Button();
                     apartmentButton.setText("Modify");
-                    apartmentButton.setId(apartment.getId().toString());
+
+                    apartmentButton.setId(apartment.getId());
                     //Now add the apartment image and button to the HBox
                     apartmentButton.setOnAction(event -> {
                         // Chiamare il metodo desiderato quando il bottone viene premuto
@@ -199,7 +200,7 @@ public class MyProfileController extends Controller {
 
     private void onChangeView(String apartmentId)
     {
-        getSession().setApartmentId(Long.parseLong(apartmentId));
+        getSession().setApartmentId(apartmentId);
         super.changeWindow("myprofile","apartment");
     }
 
@@ -377,7 +378,7 @@ public class MyProfileController extends Controller {
     }
 
     public void onApartmentView(String apartmentId) {
-        getSession().setApartmentId(Long.parseLong(apartmentId));
+        getSession().setApartmentId(apartmentId);
         super.changeWindow("myprofile","modifyApartment");
     }
 
@@ -394,7 +395,7 @@ public class MyProfileController extends Controller {
     @FXML
     protected void onReservationsMyApartmentsButtonClick() {
         // mettere in sessione gli id di tutte le case
-        ArrayList<Long> ids = new ArrayList<>();
+        ArrayList<String> ids = new ArrayList<>();
         for(Apartment apartment : getSession().getUser().getHouses()){
             ids.add(apartment.getId());
         }
@@ -408,13 +409,13 @@ public class MyProfileController extends Controller {
 
     public void onFavouritesButtonClick(ActionEvent actionEvent) {
         System.out.println("Favourites button clicked");
-        List<Long> favourites = getNeo4jConnectionManager().getFavourites(getSession().getUser().getEmail());
+        List<String> favourites = getNeo4jConnectionManager().getFavourites(getSession().getUser().getEmail());
         if(favourites==null || favourites.isEmpty()){
             favouritesContainerVBox.getChildren().clear();
             favouritesContainerVBox.getChildren().add(new Label("No favourites found"));
         }
         else {
-            for(Long favourite : favourites){
+            for(String favourite : favourites){
                 Button button = new Button("favourite");
                 System.out.println("\n\n\nfavourite: "+favourite);
                 String name = getMongoConnectionManager().getApartment(favourite).getName();

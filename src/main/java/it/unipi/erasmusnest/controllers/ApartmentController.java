@@ -203,7 +203,6 @@ public class ApartmentController extends Controller{
         }
     }
 
-    // TODO fix it
     private Button getLikeButton() {
         Button likeButton = new Button();
         likeButton.setText("Like");

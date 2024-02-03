@@ -9,7 +9,7 @@ public class Session {
     private User user;
     private String city;
     private boolean logged;
-    private Long apartmentId;
+    private String apartmentId;
 
     private Double apartmentAverageRating;
 
@@ -25,7 +25,7 @@ public class Session {
 
     private List<String> cities;
 
-    private List<Long> apartmentsId;
+    private List<String> apartmentsId;
 
     public Session() {
         this.user = new User();
@@ -82,11 +82,11 @@ public class Session {
         this.city = city;
     }
 
-    public Long getApartmentId() {
+    public String getApartmentId() {
         return apartmentId;
     }
 
-    public void setApartmentId(Long apartmentId) {
+    public void setApartmentId(String apartmentId) {
         this.apartmentId = apartmentId;
     }
 
@@ -142,11 +142,11 @@ public class Session {
         this.cities = cities;
     }
 
-    public List<Long> getApartmentsId() {
+    public List<String> getApartmentsId() {
         return apartmentsId;
     }
 
-    public void setApartmentsId(List<Long> apartmentsId) {
+    public void setApartmentsId(List<String> apartmentsId) {
         this.apartmentsId = apartmentsId;
     }
 
