@@ -12,7 +12,7 @@ public class Apartment {
     private String description;
     private Point2D location;
     private ArrayList<String> studyFields;
-    private Double dollarPriceMonth;
+    private Integer dollarPriceMonth;
     private Integer maxAccommodates;
     private String hostEmail;
     private ArrayList<String> imageUrls;        // embedded in User (host)
@@ -141,7 +141,7 @@ public class Apartment {
     */
 
 
-    public Apartment(String id, String houseName, String description, Point2D point2D, double price, Integer accommodates, String hostEmail, String imageURL, Integer bathroomsNumber)
+    public Apartment(String id, String houseName, String description, Point2D point2D, Integer price, Integer accommodates, String hostEmail, String imageURL, Integer bathroomsNumber)
     {
         this.id = id;
         this.name = houseName;
@@ -152,6 +152,19 @@ public class Apartment {
         this.hostEmail = hostEmail;
         this.imageUrls = new ArrayList<>();
         this.imageUrls.add(imageURL);
+        this.bathrooms = bathroomsNumber;
+    }
+
+    public Apartment(String id, String houseName, String description, Point2D point2D, Integer price, Integer accommodates, String hostEmail, ArrayList<String> imageUrls, Integer bathroomsNumber)
+    {
+        this.id = id;
+        this.name = houseName;
+        this.description = description;
+        this.location = point2D;
+        this.dollarPriceMonth = price;
+        this.maxAccommodates = accommodates;
+        this.hostEmail = hostEmail;
+        this.imageUrls = imageUrls;
         this.bathrooms = bathroomsNumber;
     }
 
@@ -178,7 +191,7 @@ public class Apartment {
     */
 
     // TODO COSTRUTTORE DI CAPE MODIFICATO METTENDO BATHROOMS A INTEGER E USANDO ARRAYLIST DI STRINGHE PER GLI URL
-    public Apartment(String id, String houseName, String neighborhood, Point2D location, Double price, Integer accommodates, String userEmail, ArrayList<String> imagesURL, double averageRating, int numberOfReviews, Integer bathrooms, String name, String surname) {
+    public Apartment(String id, String houseName, String neighborhood, Point2D location, Integer price, Integer accommodates, String userEmail, ArrayList<String> imagesURL, double averageRating, int numberOfReviews, Integer bathrooms, String name, String surname) {
         this.id = id;
         this.name = houseName;
         this.description = neighborhood;
@@ -197,7 +210,7 @@ public class Apartment {
     }
 
     // TODO NUOVO COSTRUTTORE SENZA ID
-    public Apartment(String houseName, String houseDescription, Point2D location, Double price, Integer accommodates, String userEmail, ArrayList<String> arrayList, double v, int i, Integer bathrooms, String name, String surname) {
+    public Apartment(String houseName, String houseDescription, Point2D location, Integer price, Integer accommodates, String userEmail, ArrayList<String> arrayList, double v, int i, Integer bathrooms, String name, String surname) {
         this.name = houseName;
         this.description = houseDescription;
         this.location = location;
@@ -305,7 +318,7 @@ public class Apartment {
         this.hostEmail = hostEmail;
     }
 
-    public Double getDollarPriceMonth() {
+    public Integer getDollarPriceMonth() {
         return dollarPriceMonth;
     }
 
@@ -317,7 +330,7 @@ public class Apartment {
         this.maxAccommodates = maxAccommodates;
     }
 
-    public void setDollarPriceMonth(Double dollarPriceMonth) {
+    public void setDollarPriceMonth(Integer dollarPriceMonth) {
         this.dollarPriceMonth = dollarPriceMonth;
     }
 

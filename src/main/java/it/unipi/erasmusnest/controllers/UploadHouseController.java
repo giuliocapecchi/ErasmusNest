@@ -31,7 +31,7 @@ public class UploadHouseController extends Controller {
     @FXML
     Spinner<Integer> inputBathrooms;
     @FXML
-    Spinner<Double> inputPrice;
+    Spinner<Integer> inputPrice;
     @FXML
     TextField houseDescriptionTextField;
 
@@ -112,7 +112,7 @@ public class UploadHouseController extends Controller {
         Integer accommodates = inputAccommodates.getValue();
         Integer bathrooms = inputBathrooms.getValue();
         // String bathrooms = String.valueOf(inputBathrooms.getValue()); //TODO: I BAGNI DOVREBBERO ESSERE INTERI, NON STRINGHE
-        Double price = inputPrice.getValue();
+        Integer price = inputPrice.getValue();
         String houseDescription = houseDescriptionTextField.getText();
         double latitude = mapGraphicManager.getLatitude();
         double longitude = mapGraphicManager.getLongitude();

@@ -97,7 +97,7 @@ public class MongoConnectionManager extends ConnectionManager{
             Document newApartment = new Document("house_name", apartment.getName())
                     .append("host_name",apartment.getHostName())
                     .append("host_surname",apartment.getHostSurname())
-                    .append("host_email", apartment.getHostEmail())
+                    .append("email", apartment.getHostEmail())
                     .append("accommodates", apartment.getMaxAccommodates())
                     .append("bathrooms", apartment.getBathrooms())
                     .append("price", apartment.getDollarPriceMonth())
@@ -155,9 +155,9 @@ public class MongoConnectionManager extends ConnectionManager{
             MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
             MongoCollection<Document> collection = database.getCollection("apartments");
 
-            // find one document with new Document
-            Document apartment = collection.find(eq("_id", apartmentId)).first();
-            //System.out.println("Apartment: " + apartment.toJson());
+            // find one document with new Document that have the object id field equal to the apartmentId
+            Document apartment = collection.find(eq("_id", new ObjectId(apartmentId))).first();
+            System.out.println("Apartment: " + apartment.toJson());
 
             String coordinates = apartment.getString("position");
             // remove space from coordinates
@@ -186,6 +186,16 @@ public class MongoConnectionManager extends ConnectionManager{
             else
                 id = (Long) apartment.get("id");
             */
+            ArrayList<String> pictureURLs = new ArrayList<>();
+            Object urlObj = apartment.get("picture_url");
+            if(urlObj instanceof String) {
+                pictureURLs.add((String) urlObj);
+            }
+            else if(urlObj instanceof ArrayList<?>) {
+                for(Object o : (ArrayList<?>) urlObj) {
+                    pictureURLs.add((String) o);
+                }
+            }
 
             // to retrieve also studyFields
             resultApartment = new Apartment(
@@ -194,10 +204,10 @@ public class MongoConnectionManager extends ConnectionManager{
                     //description,
                     apartment.getString("description"),
                     new Point2D(Double.parseDouble(latLong[0]), Double.parseDouble(latLong[1])),
-                    apartment.getDouble("price"),
+                    apartment.getInteger("price"),
                     apartment.getInteger("accommodates"),
-                    apartment.getString("host_email"),
-                    apartment.getString("picture_url"),
+                    apartment.getString("email"),
+                    pictureURLs,
                     apartment.getInteger("bathrooms")
             );
 
@@ -371,7 +381,7 @@ public class MongoConnectionManager extends ConnectionManager{
             Document updatedHouseDocument = new Document("house_name", updatedHouse.getName())
                     .append("price", updatedHouse.getDollarPriceMonth())
                     .append("accommodates", updatedHouse.getMaxAccommodates())
-                    .append("host_email", updatedHouse.getHostEmail())
+                    .append("email", updatedHouse.getHostEmail())
                     .append("position", updatedHouse.getLocation().getX() + ", " + updatedHouse.getLocation().getY())
                     .append("bathrooms", updatedHouse.getBathrooms());
             if(updatedHouse.getImageURL()!=null) {
