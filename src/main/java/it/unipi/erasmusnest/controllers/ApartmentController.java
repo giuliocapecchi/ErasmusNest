@@ -147,7 +147,7 @@ public class ApartmentController extends Controller{
             String noImageAvailablePath = "/media/no_photo_available.png";
             Image image;
             try {
-                image = new Image(apartment.getImageURL(), true);
+                image = new Image(apartment.getImageURL().get(0), true);
             }catch (IllegalArgumentException e){
                 image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvailablePath)));
             }
@@ -201,7 +201,6 @@ public class ApartmentController extends Controller{
         }
     }
 
-    // TODO fix it
     private Button getLikeButton() {
         Button likeButton = new Button();
         likeButton.setText("Like");
@@ -260,7 +259,7 @@ public class ApartmentController extends Controller{
             String userEmail = getSession().getUser().getEmail();
             String houseId = String.valueOf(getSession().getApartmentId());
 
-            getRedisConnectionManager().addReservation(userEmail, houseId, String.valueOf(startYear), String.valueOf(startMonth), String.valueOf(numberOfMonths), getSession().getCity(), apartment.getImageURL());
+            getRedisConnectionManager().addReservation(userEmail, houseId, String.valueOf(startYear), String.valueOf(startMonth), String.valueOf(numberOfMonths), getSession().getCity(), apartment.getImageURL().get(0));
 
             cleanAverageRatingInSession();
             super.changeWindow("apartment","myreservations");

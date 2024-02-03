@@ -12,6 +12,7 @@ import javafx.stage.FileChooser;
 import org.controlsfx.control.PopOver;
 
 import java.io.File;
+import java.util.ArrayList;
 
 public class ModifyAparmentController extends Controller{
 
@@ -43,7 +44,7 @@ public class ModifyAparmentController extends Controller{
     @FXML
     private void initialize()
     {
-        Long apartmentId = getSession().getApartmentId();
+        String apartmentId = getSession().getApartmentId();
         Apartment apartment = getMongoConnectionManager().getApartment(apartmentId);
         System.out.println("\n\n\n"+apartment.toString());
 
@@ -69,22 +70,24 @@ public class ModifyAparmentController extends Controller{
         //Aggiunta foto:
         // Creazione di un campo di input di testo
         textField = new TextField();
-        textField.setText(apartment.getImageURL());
+        // textField.setText(apartment.getImageURL());
+        textField.setText("");
         imageVBox.getChildren().add(textField);
     }
 
     public void onUpdateHouseButtonClick(ActionEvent actionEvent)
     {
         //Qua deve sparare la query su MONGO per aggiornare i dati dell'appartamento
-        Long apartmentId = getSession().getApartmentId();
+        String apartmentId = getSession().getApartmentId();
         Apartment apartment = getMongoConnectionManager().getApartment(apartmentId);
         apartment.setMaxAccommodates(inputAccommodates.getValue());
         Integer bathrooms = inputBathrooms.getValue();
         apartment.setBathrooms(bathrooms);
         apartment.setDollarPriceMonth(inputPrice.getValue());
         apartment.setDescription(descriptionTextArea.getText());
-        System.out.println("\n\n\nNUOVA DESCRIZIONE: "+descriptionTextArea.getText());
-        String imageUrl = textField.getText()==null || textField.getText().isBlank() || textField.getText().isEmpty() ? "" : textField.getText();
+        // String imageUrl = textField.getText()==null || textField.getText().isBlank() || textField.getText().isEmpty() ? "" : textField.getText();
+        ArrayList<String> imageUrl = new ArrayList<>();
+        imageUrl.add(textField.getText());
         apartment.setImageURL(imageUrl);
         apartment.setId(getSession().getApartmentId());
 
@@ -150,7 +153,7 @@ public class ModifyAparmentController extends Controller{
     @FXML
     private void onRemoveHouseButtonClick(ActionEvent actionEvent)
     {
-        Long apartmentId = getSession().getApartmentId();
+        String apartmentId = getSession().getApartmentId();
         boolean remove = new AlertDialogGraphicManager("Delete confirmation","Are you sure you want to remove this apartment?\n",
                 "You will not be able to recover it","confirmation").showAndGetConfirmation();
         if(remove)

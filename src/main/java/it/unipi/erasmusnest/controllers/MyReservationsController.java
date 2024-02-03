@@ -46,7 +46,7 @@ public class MyReservationsController extends Controller {
             }
         } else {
             // get the reservations for the apartments
-            List<Long> apartmentsId = getSession().getApartmentsId();
+            List<String> apartmentsId = getSession().getApartmentsId();
             reservations = getRedisConnectionManager().getReservationsForApartments(apartmentsId);
 
             // ordering the reservations by timestamp

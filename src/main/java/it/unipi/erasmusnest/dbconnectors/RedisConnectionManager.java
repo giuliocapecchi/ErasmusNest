@@ -47,12 +47,10 @@ public class RedisConnectionManager extends ConnectionManager{
     }
 
     // DID: get only the reservations that are not in the trash period
-    public ArrayList<Reservation> getReservationsForApartment(Long houseId) {
+    public ArrayList<Reservation> getReservationsForApartment(String houseIdToSearch) {
         ArrayList<Reservation> reservations = new ArrayList<>();
 
         try (JedisPooled jedis = new JedisPooled(super.getHost(), super.getPort())) {
-
-            String houseIdToSearch = houseId.toString();
             // key design: <entity>:<userEmail>:<houseId>:<startYear>:<startMonth>:<numberOfMonths>:<dateTime>
             // Use the KEYS command to get all keys matching the pattern
             Set<String> keys = jedis.keys("reservation:*:" + houseIdToSearch + ":*:*:*");
@@ -71,10 +69,10 @@ public class RedisConnectionManager extends ConnectionManager{
     }
 
     // DID: get only the reservations that are not in the trash period (already did in the used method)
-    public ArrayList<Reservation> getReservationsForApartments(List<Long> houseIds) {
+    public ArrayList<Reservation> getReservationsForApartments(List<String> houseIds) {
         ArrayList<Reservation> reservations = new ArrayList<>();
 
-        for(Long houseId : houseIds) {
+        for(String houseId : houseIds) {
             ArrayList<Reservation> reservationsForApartment = getReservationsForApartment(houseId);
             for(Reservation reservation : reservationsForApartment){
                 ArrayList<String> attributesValues = getReservationAttributesValues(getSubKey(reservation));
@@ -89,12 +87,11 @@ public class RedisConnectionManager extends ConnectionManager{
         return reservations;
     }
 
-    public boolean isApartmentReserved(Long houseId) {
+    public boolean isApartmentReserved(String houseIdToSearch) {
         boolean isReserved = false;
 
         try (JedisPooled jedis = new JedisPooled(super.getHost(), super.getPort())) {
 
-            String houseIdToSearch = houseId.toString();
             // key design: reservation:<userEmail>:<houseId>:<startYear>:<startMonth>:<numberOfMonths>
             Set<String> keys = jedis.keys("reservation:*:" + houseIdToSearch + ":*:*:*");
 

@@ -1,18 +1,7 @@
 package it.unipi.erasmusnest.model;
 
 public class Review {
-    private Long apartmentId;
-    private String userEmail;
-    private String comments;
-    private float rating;
-
-    public Review(Long apartmentId, String userEmail, String text, float rating) {
-        this.apartmentId = apartmentId;
-        this.userEmail = userEmail;
-        this.comments = text;
-        this.rating = rating;
-    }
-
+    private String apartmentId;
 
     public String getUserEmail() {
         return userEmail;
@@ -22,11 +11,23 @@ public class Review {
         this.userEmail = userEmail;
     }
 
-    public Long getApartmentId() {
+    private String userEmail;
+    private String comments;
+    private float rating;
+
+    public Review(String apartmentId, String userEmail, String text, float rating) {
+        this.apartmentId = apartmentId;
+        this.userEmail = userEmail;
+        this.comments = text;
+        this.rating = rating;
+    }
+
+
+    public String getApartmentId() {
         return apartmentId;
     }
 
-    public void setApartmentId(Long apartmentId) {
+    public void setApartmentId(String apartmentId) {
         this.apartmentId = apartmentId;
     }
 

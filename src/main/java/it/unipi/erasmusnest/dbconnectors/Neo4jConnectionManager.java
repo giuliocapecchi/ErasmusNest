@@ -87,7 +87,7 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         }
     }
 
-    public void addReview(final String email, Long apartmentId, String comment,Integer score) {
+    public void addReview(final String email, String apartmentId, String comment,Integer score) {
         System.out.println("email:" + email + " apartmentId:" + apartmentId + " comment:" + comment + " score:" + score);
         try (Session session = driver.session()) {
             session.writeTransaction((TransactionWork<Void>) tx -> {
@@ -148,7 +148,7 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
                     Record record = result.next();
                     Node apartmentNode = record.get("a").asNode();
                     Integer reviewCount = record.get("reviewCount").asInt();
-                    Long apartmentId = apartmentNode.get("apartmentId").asLong();
+                    String apartmentId = apartmentNode.get("apartmentId").asString();
                     String apartmentName = apartmentNode.get("name").asString();
                     String pictureUrl = apartmentNode.get("pictureUrl").asString();
                     double averageReviewScore = 0.0;
@@ -193,7 +193,7 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
     }
 
 
-    public List<Review> getReviewsForApartment(Long apartmentId, Integer page, Integer elementsPerPage, Integer filter) {
+    public List<Review> getReviewsForApartment(String apartmentId, Integer page, Integer elementsPerPage, Integer filter) {
         try (Session session = driver.session()) {
             int elementsToSkip =  (page-1)*elementsPerPage;
             List<Review> reviews = session.readTransaction((TransactionWork<List<Review>>) tx -> {
@@ -270,7 +270,7 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
     }
 
     //UPDATE
-    public void updateApartmentAverageReviewScore(Long apartmentId) {
+    public void updateApartmentAverageReviewScore(String apartmentId) {
         try (Session session = driver.session()) {
             session.writeTransaction((TransactionWork<Void>) tx -> {
                 tx.run("MATCH ()-[r:REVIEW]->(a:Apartment {apartmentId:$apartmentId}) " +
@@ -367,7 +367,7 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         }
     }
 
-    public boolean removeApartment(Long apartmentId)
+    public boolean removeApartment(String apartmentId)
     {
         try (Session session = driver.session())
         {
@@ -434,7 +434,7 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         }
     }
 
-    public boolean likeApartment(Long id, String email) {
+    public boolean likeApartment(String id, String email) {
         boolean queryExecuted = false;
         if (!getFavourites(email).contains(id)) {
             try (Session session = driver.session()) {
@@ -455,14 +455,14 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         return queryExecuted;
     }
 
-    public List<Long> getFavourites(String email) {
+    public List<String> getFavourites(String email) {
         try (Session session = driver.session()) {
             return session.readTransaction(tx -> {
                 Result result = tx.run("MATCH (u:User {email: '"+email+"'})-[l:LIKES]->(a:Apartment) RETURN a.apartmentId");
-                List<Long> favourites = new ArrayList<>();
+                List<String> favourites = new ArrayList<>();
                 while (result.hasNext()) {
                     Record record = result.next();
-                    Long s = record.get("a.apartmentId").asLong();
+                    String s = String.valueOf(record.get("a.apartmentId"));
                     favourites.add(s);
                 }
                 return favourites;

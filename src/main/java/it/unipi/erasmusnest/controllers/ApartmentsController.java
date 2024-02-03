@@ -141,7 +141,8 @@ public class ApartmentsController extends Controller{
             // Image
             ImageView imageView = new ImageView();
             try {
-                Image image = new Image(apartment.getImageURL(), true); //true let the application continue without waiting for the image to fully load
+                //Image image = new Image(apartment.getImageURL(), true); //true let the application continue without waiting for the image to fully load
+                Image image = new Image(apartment.getImageURL().get(0), true); //true let the application continue without waiting for the image to fully load
                 imageView.setImage(image);
                 imageView.setPreserveRatio(true);
             } catch (Exception e) {
