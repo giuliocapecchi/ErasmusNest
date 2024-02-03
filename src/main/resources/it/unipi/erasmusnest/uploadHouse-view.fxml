@@ -8,12 +8,16 @@
         <VBox spacing="10" style="-fx-border-color: orange; -fx-border-width: 2px; -fx-padding: 10px;">
             <Label text="House Name:" />
             <TextField fx:id="houseNameTextField" onKeyReleased="#checkFields" />
-            <HBox prefHeight="22.0" prefWidth="611.0">
-                <Label prefHeight="23.0" prefWidth="397.0" text="Picture Urls, report them here semi-colon separated [you can use for example :" />
-                <Hyperlink contentDisplay="RIGHT" onAction="#openLinkInBrowser" prefHeight="6.0" prefWidth="107.0" text="https://imgbb.com" />
-                <Label prefHeight="29.0" prefWidth="14.0" text="]" />
+            <HBox>
+                <Label text="Picture Urls [you can use for example :" />
+                <Hyperlink onAction="#openLinkInBrowser" text="https://imgbb.com" />
+                <Label text="]" />
             </HBox>
-            <TextField fx:id="pictureUrlTextField" onKeyReleased="#checkFields" />
+            <VBox fx:id="pictureUrlsVBox" />
+            <HBox spacing="5">
+                <Button fx:id="morePictureButton" onAction="#onMorePictureButtonClick" style="-fx-background-color: orange; -fx-text-fill: white; -fx-padding: 5px 10px;" text="Upload one more picture" />
+                <Button fx:id="lessPictureButton" onAction="#onLessPictureButtonClick" style="-fx-background-color: #ff2600; -fx-text-fill: white; -fx-padding: 5px 10px;" text="Upload less pictures" />
+            </HBox>
             <Label text="Accommodates:" />
                 <Spinner fx:id="inputAccommodates" amountToStepBy="1" max="20" min="1" />
             <Label text="Bathrooms:" />
