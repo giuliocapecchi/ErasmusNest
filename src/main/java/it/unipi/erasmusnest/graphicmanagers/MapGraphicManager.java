@@ -129,4 +129,7 @@ public class MapGraphicManager {
     }
 
 
+    public void setLocation(Point2D location) {
+        this.location = location;
+    }
 }

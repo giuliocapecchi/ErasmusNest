@@ -97,7 +97,7 @@ public class MongoConnectionManager extends ConnectionManager{
             Document newApartment = new Document("house_name", apartment.getName())
                     .append("host_name",apartment.getHostName())
                     .append("host_surname",apartment.getHostSurname())
-                    .append("host_email", apartment.getHostEmail())
+                    .append("email", apartment.getHostEmail())
                     .append("accommodates", apartment.getMaxAccommodates())
                     .append("bathrooms", apartment.getBathrooms())
                     .append("price", apartment.getDollarPriceMonth())
@@ -196,7 +196,7 @@ public class MongoConnectionManager extends ConnectionManager{
                     new Point2D(Double.parseDouble(latLong[0]), Double.parseDouble(latLong[1])),
                     apartment.getDouble("price"),
                     apartment.getInteger("accommodates"),
-                    apartment.getString("host_email"),
+                    apartment.getString("email"),
                     apartment.getString("picture_url"),
                     apartment.getInteger("bathrooms")
             );
@@ -371,7 +371,7 @@ public class MongoConnectionManager extends ConnectionManager{
             Document updatedHouseDocument = new Document("house_name", updatedHouse.getName())
                     .append("price", updatedHouse.getDollarPriceMonth())
                     .append("accommodates", updatedHouse.getMaxAccommodates())
-                    .append("host_email", updatedHouse.getHostEmail())
+                    .append("email", updatedHouse.getHostEmail())
                     .append("position", updatedHouse.getLocation().getX() + ", " + updatedHouse.getLocation().getY())
                     .append("bathrooms", updatedHouse.getBathrooms());
             if(updatedHouse.getImageURL()!=null) {

@@ -9,9 +9,9 @@
             <Label text="House Name:" />
             <TextField fx:id="houseNameTextField" onKeyReleased="#checkFields" />
             <HBox>
-                <Label text="Picture Urls [you can use for example :" />
+                <Label prefHeight="24.0" prefWidth="202.0" text="Picture Urls [you can use for example :" />
                 <Hyperlink onAction="#openLinkInBrowser" text="https://imgbb.com" />
-                <Label text="]" />
+                <Label prefHeight="24.0" prefWidth="10.0" text="]" />
             </HBox>
             <VBox fx:id="pictureUrlsVBox" />
             <HBox spacing="5">
