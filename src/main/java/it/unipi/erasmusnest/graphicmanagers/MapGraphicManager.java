@@ -78,6 +78,7 @@ public class MapGraphicManager {
      */
     public boolean geocodeAddress(String address, WebView webView, Label resultLabel) {
         try {
+            System.out.println("\n\n\nADDRESS:"+address);
             String encoded_address = URLEncoder.encode(address, StandardCharsets.UTF_8);
             JSONArray results = getObjects(encoded_address);
             if (!results.isEmpty()) {

@@ -88,6 +88,10 @@ public class SignupController extends Controller{
         List<String> cities = getSession().getCities();
         for(String city : cities)
         {
+            System.out.println("\n"+city);
+        }
+        for(String city : cities)
+        {
             CheckBox mainCheckBox = new CheckBox(city);
             mainCheckBox.setText(city);
             mainCheckBox.setOnAction(e -> {

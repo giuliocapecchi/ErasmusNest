@@ -24,7 +24,7 @@ public class ModifyAparmentController extends Controller{
     @FXML
     private VBox neighborhoodVBox;
     private Spinner<Integer> inputAccommodates;
-    private Spinner<Double> inputBathrooms;
+    private Spinner<Integer> inputBathrooms;
     private Spinner<Double> inputPrice;
     @FXML
     private VBox imageVBox;
@@ -45,18 +45,14 @@ public class ModifyAparmentController extends Controller{
     {
         Long apartmentId = getSession().getApartmentId();
         Apartment apartment = getMongoConnectionManager().getApartment(apartmentId);
+        System.out.println("\n\n\n"+apartment.toString());
 
         inputAccommodates = new Spinner<>();
         inputBathrooms = new Spinner<>();
         inputPrice = new Spinner<>();
 
         SpinnerValueFactory<Integer> valoriAccommodates = new SpinnerValueFactory.IntegerSpinnerValueFactory(1,10,apartment.getMaxAccommodates());
-        // Retrive number of bathrooms from the String field
-        String bathStr = apartment.getBathrooms();
-        String[] bathSplit = bathStr.split("\\s+");
-        String bathsNumber = bathSplit[0];
-        String bathroomsNumber = Double.parseDouble(bathsNumber) == 1.0 ? bathsNumber + " bath" : bathsNumber + " baths";
-        SpinnerValueFactory<Double> valoriBathrooms = new SpinnerValueFactory.DoubleSpinnerValueFactory(1,10,Double.parseDouble(bathsNumber),0.5);
+        SpinnerValueFactory<Integer> valoriBathrooms = new SpinnerValueFactory.IntegerSpinnerValueFactory(1,10,apartment.getBathrooms());
         SpinnerValueFactory<Double> valoriPrice = new SpinnerValueFactory.DoubleSpinnerValueFactory(1,1000,apartment.getDollarPriceMonth(),0.5);
         // setting suitable values for the spinners
         inputAccommodates.setValueFactory(valoriAccommodates);
@@ -83,12 +79,12 @@ public class ModifyAparmentController extends Controller{
         Long apartmentId = getSession().getApartmentId();
         Apartment apartment = getMongoConnectionManager().getApartment(apartmentId);
         apartment.setMaxAccommodates(inputAccommodates.getValue());
-        Double bathrooms = inputBathrooms.getValue();
-        String bathroomsText = bathrooms == 1.0 ? bathrooms + " bath" : bathrooms + " baths";
-        apartment.setBathrooms(bathroomsText);
+        Integer bathrooms = inputBathrooms.getValue();
+        apartment.setBathrooms(bathrooms);
         apartment.setDollarPriceMonth(inputPrice.getValue());
         apartment.setDescription(descriptionTextArea.getText());
-        String imageUrl = textField.getText().isBlank() || textField.getText().isEmpty() ? "" : textField.getText();
+        System.out.println("\n\n\nNUOVA DESCRIZIONE: "+descriptionTextArea.getText());
+        String imageUrl = textField.getText()==null || textField.getText().isBlank() || textField.getText().isEmpty() ? "" : textField.getText();
         apartment.setImageURL(imageUrl);
         apartment.setId(getSession().getApartmentId());
 

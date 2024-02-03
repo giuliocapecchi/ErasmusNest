@@ -138,7 +138,7 @@ public class MyProfileController extends Controller {
 
                     String imageUrl = apartment.getImageURL();
                     String noImageAvaialblePath = "/media/no_photo_available.png";
-                    if(imageUrl.isEmpty()){
+                    if(imageUrl==null || imageUrl.isEmpty()){
                         apartmentImage.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvaialblePath))));
                     }else{
                         Image image;
@@ -356,7 +356,6 @@ public class MyProfileController extends Controller {
     @FXML
     private void onUpdateButtonClick() {
         // Aggiorna le città di interesse dell'utente nel database con selectedCities
-        updateCitiesInDatabase(selectedCities);
         if(updateCitiesInDatabase(selectedCities))
         {
             showConfirmationMessageCities("Città di interesse aggiornate con successo!");
@@ -379,7 +378,6 @@ public class MyProfileController extends Controller {
 
     public void onApartmentView(String apartmentId) {
         getSession().setApartmentId(Long.parseLong(apartmentId));
-        System.out.println("\n\n\nApartment ID: " + apartmentId);
         super.changeWindow("myprofile","modifyApartment");
     }
 

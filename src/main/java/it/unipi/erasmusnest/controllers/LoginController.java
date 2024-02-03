@@ -88,6 +88,7 @@ public class LoginController extends Controller{
         boolean logged = false;
         if(isEmailFieldValid(emailField) && isTextFieldValid(passwordField)) {
             String password = super.getRedisConnectionManager().getPassword(emailField.getEmailAddress());
+            System.out.println("\n\n\nREDIS Password: " + password);
             if(password != null && password.equals(passwordField.getText())) {
                 getSession().setLogged(true);
                 getSession().getUser().setEmail(emailField.getEmailAddress());
@@ -102,6 +103,7 @@ public class LoginController extends Controller{
             {
                 System.out.println("Credentials not found in Redis. Let's check in MongoDB");
                 String mongoPassword = super.getMongoConnectionManager().getPassword(emailField.getEmailAddress());
+                System.out.println("\n\n\nREDIS Password: " + mongoPassword);
                 if(mongoPassword != null && mongoPassword.equals(passwordField.getText())) {
                     getSession().setLogged(true);
                     getSession().getUser().setEmail(emailField.getEmailAddress());
@@ -112,7 +114,7 @@ public class LoginController extends Controller{
                 }
             }
             if(logged){
-                if(getPreviousWindowName() != null) {
+                if(getPreviousWindowName() != null && !getPreviousWindowName().equals("signup")) {
                     super.backToPreviousWindow();
                 } else {
                     super.changeWindow("login","homepage");

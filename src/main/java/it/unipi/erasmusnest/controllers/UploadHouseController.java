@@ -11,6 +11,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 
 public class UploadHouseController extends Controller {
@@ -23,7 +25,7 @@ public class UploadHouseController extends Controller {
     @FXML
     Spinner<Integer> inputAccommodates;
     @FXML
-    Spinner<Double> inputBathrooms;
+    Spinner<Integer> inputBathrooms;
     @FXML
     Spinner<Double> inputPrice;
     @FXML
@@ -53,9 +55,11 @@ public class UploadHouseController extends Controller {
     @FXML
     void onUploadButtonClick() {
         String houseName = houseNameTextField.getText();
-        String [] pictureUrlArray = pictureUrlTextField.getText().split(";"); //Todo : gli url devono essere scomposti in un array di stringhe prima di essere passati a mongoDB
+        // String [] pictureUrlArray = pictureUrlTextField.getText().split(";"); //Todo CAPE : gli url devono essere scomposti in un array di stringhe prima di essere passati a mongoDB
+        ArrayList<String> arrayList = new ArrayList<>(Arrays.asList(pictureUrlTextField.getText().split(";")));
         Integer accommodates = inputAccommodates.getValue();
-        String bathrooms = String.valueOf(inputBathrooms.getValue()); //TODO: I BAGNI DOVREBBERO ESSERE INTERI, NON STRINGHE
+        Integer bathrooms = inputBathrooms.getValue();
+        // String bathrooms = String.valueOf(inputBathrooms.getValue()); //TODO: I BAGNI DOVREBBERO ESSERE INTERI, NON STRINGHE
         Double price = inputPrice.getValue();
         String houseDescription = houseDescriptionTextField.getText();
         double latitude = mapGraphicManager.getLatitude();
@@ -66,7 +70,7 @@ public class UploadHouseController extends Controller {
         if (user != null) {
             //Create new apartment //todo : perchè a tutti assegna id 7L????
             Apartment apartment = new Apartment(7L, houseName, houseDescription, location, price, accommodates, userEmail,
-                    pictureUrlArray, 0.0, 0, bathrooms, user.getName(), user.getSurname());
+                    arrayList, 0.0, 0, bathrooms, user.getName(), user.getSurname());
 
             // Call Mongo to insert apartment
             if (getMongoConnectionManager().uploadApartment(apartment)) {

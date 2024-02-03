@@ -33,6 +33,15 @@ public class Session {
         this.connectionError = false;
         studyFields = new ArrayList<>();
         studyFields = StudyFieldsLoader.getStudyFields();
+        cities = new ArrayList<>();
+        cities.add("None");
+        cities.add("Amsterdam");
+        cities.add("Pisa");
+        cities.add("Florence");
+        cities.add("Siena");
+        cities.add("Lucca");
+        cities.add("Livorno");
+        cities.add("Grosseto");
     }
 
     public void reset() {
