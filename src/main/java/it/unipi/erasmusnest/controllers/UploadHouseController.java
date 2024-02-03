@@ -21,7 +21,11 @@ public class UploadHouseController extends Controller {
     @FXML
     TextField houseNameTextField;
     @FXML
-    TextField pictureUrlTextField;
+    VBox pictureUrlsVBox;
+    @FXML
+    Button morePictureButton;
+    @FXML
+    Button lessPictureButton;
     @FXML
     Spinner<Integer> inputAccommodates;
     @FXML
@@ -43,6 +47,8 @@ public class UploadHouseController extends Controller {
     Button uploadButton;
     MapGraphicManager mapGraphicManager;
 
+    private ArrayList<TextField> pictureUrlsTextField;
+
     public UploadHouseController() {
     }
 
@@ -50,13 +56,59 @@ public class UploadHouseController extends Controller {
     private void initialize() {
         mapGraphicManager = new MapGraphicManager();
         uploadButton.setDisable(true);
+
+        TextField pictureUrlTextField = new TextField();
+        pictureUrlTextField.onKeyReleasedProperty().set(event -> checkFields());
+        pictureUrlTextField.setPromptText("Insert picture URL");
+        pictureUrlsVBox.getChildren().add(pictureUrlTextField);
+        pictureUrlsTextField = new ArrayList<>();
+        pictureUrlsTextField.add(pictureUrlTextField);
+        pictureUrlsVBox.setSpacing(5);
+        lessPictureButton.setDisable(true);
+
+    }
+
+    @FXML
+    protected void onMorePictureButtonClick() {
+        if(pictureUrlsTextField.size() <= 5) {
+            TextField pictureUrlTextField = new TextField();
+            pictureUrlTextField.onKeyReleasedProperty().set(event -> checkFields());
+            pictureUrlTextField.setPromptText("Insert picture URL");
+            pictureUrlsVBox.getChildren().add(pictureUrlTextField);
+            pictureUrlsTextField.add(pictureUrlTextField);
+        }
+        if(pictureUrlsTextField.size() == 5) {
+            morePictureButton.setDisable(true);
+        }
+        if(!pictureUrlsTextField.isEmpty()) {
+            lessPictureButton.setDisable(false);
+        }
+    }
+
+    @FXML
+    protected void onLessPictureButtonClick(){
+        if(!pictureUrlsTextField.isEmpty()) {
+            pictureUrlsVBox.getChildren().remove(pictureUrlsTextField.get(pictureUrlsTextField.size() - 1));
+            pictureUrlsTextField.remove(pictureUrlsTextField.size() - 1);
+        }
+        if(pictureUrlsTextField.size() < 5) {
+            morePictureButton.setDisable(false);
+        }
+        if(pictureUrlsTextField.isEmpty()) {
+            lessPictureButton.setDisable(true);
+        }
     }
 
     @FXML
     void onUploadButtonClick() {
         String houseName = houseNameTextField.getText();
-        // String [] pictureUrlArray = pictureUrlTextField.getText().split(";"); //Todo CAPE : gli url devono essere scomposti in un array di stringhe prima di essere passati a mongoDB
-        ArrayList<String> arrayList = new ArrayList<>(Arrays.asList(pictureUrlTextField.getText().split(";")));
+        // String [] pictureUrlArray = pictureUrlTextField.getText().split(";");
+        //ArrayList<String> arrayList = new ArrayList<>(Arrays.asList(pictureUrlTextField.getText().split(";")));
+        ArrayList<String> pictureUrls = new ArrayList<>();
+        for (TextField pictureUrlTextField : pictureUrlsTextField) {
+            if(pictureUrlTextField.getText() != null && !pictureUrlTextField.getText().isEmpty() && !pictureUrlTextField.getText().isBlank())
+                pictureUrls.add(pictureUrlTextField.getText());
+        }
         Integer accommodates = inputAccommodates.getValue();
         Integer bathrooms = inputBathrooms.getValue();
         // String bathrooms = String.valueOf(inputBathrooms.getValue()); //TODO: I BAGNI DOVREBBERO ESSERE INTERI, NON STRINGHE
@@ -69,10 +121,8 @@ public class UploadHouseController extends Controller {
         User user = getMongoConnectionManager().findUser(userEmail);
         if (user != null) {
             //Create new apartment //todo : perchè a tutti assegna id 7L????
-            //Apartment apartment = new Apartment(7L, houseName, houseDescription, location, price, accommodates, userEmail,
-            //                    arrayList, 0.0, 0, bathrooms, user.getName(), user.getSurname());
             Apartment apartment = new Apartment(houseName, houseDescription, location, price, accommodates, userEmail,
-                    arrayList, 0.0, 0, bathrooms, user.getName(), user.getSurname());
+                    pictureUrls, 0.0, 0, bathrooms, user.getName(), user.getSurname());
 
             // Call Mongo to insert apartment
             if (getMongoConnectionManager().uploadApartment(apartment)) {
@@ -110,7 +160,15 @@ public class UploadHouseController extends Controller {
 
     @FXML
     private void checkFields() {
-        uploadButton.setDisable(Objects.equals(houseNameTextField.getText(), "") || Objects.equals(pictureUrlTextField.getText(), "") || Objects.equals(houseDescriptionTextField.getText(),"")||(mapGraphicManager.getLocation() == null));
+        uploadButton.setDisable(Objects.equals(houseNameTextField.getText(), "") || wrongPictureUrls() || Objects.equals(houseDescriptionTextField.getText(),"")||(mapGraphicManager.getLocation() == null));
+    }
+
+    private boolean wrongPictureUrls() {
+        for (TextField pictureUrlTextField : pictureUrlsTextField) {
+            if(pictureUrlTextField.getText() == null || pictureUrlTextField.getText().isEmpty() || pictureUrlTextField.getText().isBlank())
+                return true;
+        }
+        return false;
     }
 
     @FXML
