@@ -191,9 +191,11 @@ public class MyProfileController extends Controller {
             adminContainer.getChildren().add(analyticsButton);
         }
 
+        /*
         if(utente.getHouses().isEmpty()){
             reservationsContainerVBox.getChildren().clear();
         }
+        */
 
         getSession().setUser(utente);
     }

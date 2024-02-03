@@ -59,23 +59,28 @@ public class MongoConnectionManager extends ConnectionManager{
             user.setPreferredCities(preferredCities);
             */
             //LOgica per controllare se document o list
-            ArrayList<Document> houseArray = (ArrayList<Document>) userDocument.get("house");
-            if(houseArray!=null && !houseArray.isEmpty()) {
-                ArrayList<Apartment> houses = new ArrayList<>();
-                for(Document d : houseArray)
-                {
-                    String id = d.get("object_id").toString();
-                    System.out.println("\n\n\nID: " + id);
-                    Apartment casa = new Apartment(id, d.getString("house_name"));
-                    String imageURL = d.get("picture_url").toString();
-                    if(imageURL!=null && !imageURL.isEmpty()) {
-                        ArrayList<String> urlList = new ArrayList<>();
-                        urlList.add(imageURL);
-                        casa.setImageURL(urlList);
+            // Check if the document house exists and is not empty
+            if(userDocument.containsKey("houses") && userDocument.get("houses")!=null)
+            {
+                System.out.println("\n\n\nHouse document found.");
+                ArrayList<Document> houseArray = (ArrayList<Document>) userDocument.get("houses");
+                if(houseArray!=null && !houseArray.isEmpty()) {
+                    ArrayList<Apartment> houses = new ArrayList<>();
+                    for(Document d : houseArray)
+                    {
+                        String id = d.getObjectId("object_id").toHexString();
+                        System.out.println("\n\n\nID: " + id);
+                        Apartment casa = new Apartment(id, d.getString("house_name"));
+                        String imageURL = d.get("picture_url").toString();
+                        if(imageURL!=null && !imageURL.isEmpty()) {
+                            ArrayList<String> urlList = new ArrayList<>();
+                            urlList.add(imageURL);
+                            casa.setImageURL(urlList);
+                        }
+                        houses.add(casa);
                     }
-                    houses.add(casa);
+                    user.setHouses(houses);
                 }
-                user.setHouses(houses);
             }
         }
         catch (Exception e)
@@ -97,7 +102,7 @@ public class MongoConnectionManager extends ConnectionManager{
             Document newApartment = new Document("house_name", apartment.getName())
                     .append("host_name",apartment.getHostName())
                     .append("host_surname",apartment.getHostSurname())
-                    .append("host_email", apartment.getHostEmail())
+                    .append("email", apartment.getHostEmail())
                     .append("accommodates", apartment.getMaxAccommodates())
                     .append("bathrooms", apartment.getBathrooms())
                     .append("price", apartment.getDollarPriceMonth())
@@ -111,6 +116,8 @@ public class MongoConnectionManager extends ConnectionManager{
                 newApartment.append("picture_url", apartment.getImageURL());
             }
             collection.insertOne(newApartment);
+            ObjectId objectId = newApartment.getObjectId("_id");
+            System.out.println("\n\n\nObjectId: " + objectId);
             String insertedObjectId = newApartment.getObjectId("_id").toHexString();
             // Update the user's house list
             MongoCollection<Document> userCollection = database.getCollection("users");
@@ -155,7 +162,13 @@ public class MongoConnectionManager extends ConnectionManager{
             MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
             MongoCollection<Document> collection = database.getCollection("apartments");
 
-            // find one document with new Document
+            //ObjectId objectId = new ObjectId(apartmentId);
+
+            // Verifica se la casa da eliminare è l'ultima associata all'utente
+            //MongoCollection<Document> userCollection = database.getCollection("users");
+            //long apartmentsCount = userCollection.countDocuments(Filters.eq("house._id", objectId));
+
+            ObjectId objectId = new ObjectId(apartmentId);
             Document apartment = collection.find(eq("_id", apartmentId)).first();
             //System.out.println("Apartment: " + apartment.toJson());
 
@@ -196,7 +209,7 @@ public class MongoConnectionManager extends ConnectionManager{
                     new Point2D(Double.parseDouble(latLong[0]), Double.parseDouble(latLong[1])),
                     apartment.getDouble("price"),
                     apartment.getInteger("accommodates"),
-                    apartment.getString("host_email"),
+                    apartment.getString("email"),
                     apartment.getString("picture_url"),
                     apartment.getInteger("bathrooms")
             );
@@ -371,7 +384,7 @@ public class MongoConnectionManager extends ConnectionManager{
             Document updatedHouseDocument = new Document("house_name", updatedHouse.getName())
                     .append("price", updatedHouse.getDollarPriceMonth())
                     .append("accommodates", updatedHouse.getMaxAccommodates())
-                    .append("host_email", updatedHouse.getHostEmail())
+                    .append("email", updatedHouse.getHostEmail())
                     .append("position", updatedHouse.getLocation().getX() + ", " + updatedHouse.getLocation().getY())
                     .append("bathrooms", updatedHouse.getBathrooms());
             if(updatedHouse.getImageURL()!=null) {
