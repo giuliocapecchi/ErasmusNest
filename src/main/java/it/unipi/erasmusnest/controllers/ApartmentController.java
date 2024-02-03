@@ -12,6 +12,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import javafx.scene.web.WebView;
 import org.controlsfx.control.PopOver;
@@ -160,6 +161,13 @@ public class ApartmentController extends Controller{
                     "Accommodates: " + apartment.getMaxAccommodates() + "\n" +
                     "Price per month: " + apartment.getDollarPriceMonth() + "$\n";
             infoText.setText(information);
+            if(apartment.getDescription().length() > 100){
+                infoText.setTextAlignment(TextAlignment.JUSTIFY);
+                infoText.wrappingWidthProperty().bind(leftFirstVBox.widthProperty().multiply(0.8));
+            }else{
+                infoText.setTextAlignment(TextAlignment.CENTER);
+            }
+
             hostEmail.setText(apartment.getHostEmail());
 
             Button likeButton = getLikeButton();
