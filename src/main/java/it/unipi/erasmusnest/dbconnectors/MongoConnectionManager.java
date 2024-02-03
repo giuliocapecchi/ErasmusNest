@@ -10,6 +10,7 @@ import javafx.geometry.Point2D;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -35,7 +36,7 @@ public class MongoConnectionManager extends ConnectionManager{
             if (userDocument == null)
                 return null;
 
-            Object houseObject = userDocument.get("house");
+            // Object houseObject = userDocument.get("house");
 
             // Set the user's email, password, name and surname
             user.setEmail(userDocument.getString("email"));
@@ -45,6 +46,7 @@ public class MongoConnectionManager extends ConnectionManager{
             user.setStudyField(userDocument.getString("SF"));
 
             // Retrieve the list of preferred cities
+            /*
             ArrayList<String> preferredCities = new ArrayList<>();
             Object preferredCitiesObject = userDocument.get("CoI");
             if(preferredCitiesObject instanceof List<?>)
@@ -55,37 +57,26 @@ public class MongoConnectionManager extends ConnectionManager{
                 }
             }
             user.setPreferredCities(preferredCities);
-
-            List<Document> houseDocuments = new ArrayList<>();
-
+            */
             //LOgica per controllare se document o list
-            if (houseObject instanceof Document)
-            {
-                houseDocuments.add((Document) houseObject);
-            }
-            else if(houseObject instanceof List<?>)
-            {
-                for(Object o : (List<?>) houseObject)
+            ArrayList<Document> houseArray = (ArrayList<Document>) userDocument.get("house");
+            if(houseArray!=null && !houseArray.isEmpty()) {
+                ArrayList<Apartment> houses = new ArrayList<>();
+                for(Document d : houseArray)
                 {
-                    houseDocuments.add((Document) o);
+                    String id = d.get("object_id").toString();
+                    System.out.println("\n\n\nID: " + id);
+                    Apartment casa = new Apartment(id, d.getString("house_name"));
+                    String imageURL = d.get("picture_url").toString();
+                    if(imageURL!=null && !imageURL.isEmpty()) {
+                        ArrayList<String> urlList = new ArrayList<>();
+                        urlList.add(imageURL);
+                        casa.setImageURL(urlList);
+                    }
+                    houses.add(casa);
                 }
+                user.setHouses(houses);
             }
-            //Adesso che ho ottenuto i documenti
-            // Devo ottenere una lista di Apartment
-            List<Apartment> houses = new ArrayList<>();
-            for(Document d : houseDocuments)
-            {
-                String id = d.getObjectId("_id").toHexString();
-                Double rating;
-                if(d.get("review_scores_rating") instanceof Integer)
-                    rating = ((Integer) d.get("review_scores_rating")).doubleValue();
-                else
-                    rating = (Double) d.get("review_scores_rating");
-                // TODO CAMBIARE LA GET DELLE IMMAGINI
-                Apartment casa = new Apartment(id, d.getString("name"), d.getString("picture_url"), rating);
-                houses.add(casa);
-            }
-            user.setHouses(houses);
         }
         catch (Exception e)
         {

@@ -212,6 +212,11 @@ public class Apartment {
         this.hostSurname = surname;
     }
 
+    public Apartment(String id, String houseName) {
+        this.id = id;
+        this.name = houseName;
+    }
+
     public String getHostName() {
         return hostName;
     }

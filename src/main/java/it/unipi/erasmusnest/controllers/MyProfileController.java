@@ -84,9 +84,9 @@ public class MyProfileController extends Controller {
 
         User utente = getMongoConnectionManager().findUser(userEmail);
         passwordField.setText("******"); // Set password field to 6 asterisks
-        List<String> userCities = utente.getPreferredCities();
-        cityTitlePane = createTitledPane(userCities);
-        cityVBox.getChildren().add(cityTitlePane);
+        // List<String> userCities = utente.getPreferredCities();
+        // cityTitlePane = createTitledPane(userCities);
+        // cityVBox.getChildren().add(cityTitlePane);
 
         // Update preferred cities
         updateCitiesButton.setOnAction(event -> {
@@ -108,11 +108,11 @@ public class MyProfileController extends Controller {
         // Inizializza il ComboBox per il campo "Cities of Interest" (CoI)
         // Estrai il campo "Study Field" (SF) e "Cities of Interest" (CoI) dal documento dell'utente
         // selectedStudyField = userDocument.getString("SF");
-        selectedStudyField = utente.getStudyField();
+        selectedStudyField = utente.getStudyField()==null ? "" : utente.getStudyField();
         // selectedCityOfInterest = userDocument.getString("CoI");
 
         // Imposta i valori iniziali nei ComboBox
-        studyFieldComboBox.setValue(selectedStudyField);
+        // studyFieldComboBox.setValue(selectedStudyField);
         // citiesOfInterestComboBox.setValue(selectedCityOfInterest);
 
         // Assumi che "house" possa essere un Document o una List<Document>
@@ -136,7 +136,7 @@ public class MyProfileController extends Controller {
                     ImageView apartmentImage = new ImageView();
                     apartmentImage.setPreserveRatio(true);
 
-                    String imageUrl = apartment.getImageURL();
+                    String imageUrl = apartment.getImageURL().get(0);
                     String noImageAvaialblePath = "/media/no_photo_available.png";
                     if(imageUrl==null || imageUrl.isEmpty()){
                         apartmentImage.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvaialblePath))));
@@ -338,6 +338,7 @@ public class MyProfileController extends Controller {
     @FXML
     private void onStudyFieldSelectionChanged(ActionEvent event)
     {
+        /*
         String newStudyField = studyFieldComboBox.getValue();
         if (!newStudyField.equals(selectedStudyField))
         {
@@ -352,6 +353,7 @@ public class MyProfileController extends Controller {
                 showConfirmationMessageSF("Errore nell'aggiornamento di study field!");
             }
         }
+        */
     }
 
     @FXML
