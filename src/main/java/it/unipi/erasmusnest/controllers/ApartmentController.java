@@ -318,11 +318,8 @@ public class ApartmentController extends Controller{
     public void onGoBackButtonClick() {
         cleanAverageRatingInSession();
         System.out.println(getPreviousWindowName());
-        if(getSession().getCity()==null){
-            super.changeWindow("apartment", "myprofile");
-        }else{
-            super.changeWindow("apartment", "apartments");
-        }
+        super.changeWindow("apartment", "apartments");
+
     }
 
 
