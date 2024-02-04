@@ -70,16 +70,9 @@ public class WriteReviewController extends Controller{
     void submit() {
         System.out.println("submit action");
         System.out.println("MANCA IL REDIRECT AL PROFILE DELL'UTENTE");
-
-        //todo rimuovi
-        getSession().setApartmentId("65bd18bdab992650b589cc71");
-        getSession().setUser(new User("loricarr@gmail.com","Lorenzo","Carrera", new ArrayList<>(),"AIDE"));
-
         Review review = new Review(getSession().getApartmentId(),getSession().getUser().getEmail(),textArea.getText(), (int)ratingSlider.getValue());
         getNeo4jConnectionManager().addReview(review);
-        //super.changeWindow("writeReview","myProfile");
-        //todo rimuovi
-        super.changeWindow("writeReview","writeReview");
+        super.changeWindow("writeReview","myProfile");
 
     }
 }

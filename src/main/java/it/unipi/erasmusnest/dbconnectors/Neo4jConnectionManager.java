@@ -42,7 +42,6 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
 
     //CREATE
 
-    //TODO: POTENZIALMENTE NON FUNZIONA PERCHè NON AGGIUNGE AUTOMATICAMENTE GLI APICI AL PARAMETRO
     public void addUser( final String email, final int id )
     {
         try (Session session = driver.session())
@@ -58,8 +57,6 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         }
     }
 
-
-    //TODO: POTENZIALMENTE NON FUNZIONA PERCHè NON AGGIUNGE AUTOMATICAMENTE GLI APICI AL PARAMETRO
     public void addCity( final String name)
     {
         try (Session session = driver.session())
