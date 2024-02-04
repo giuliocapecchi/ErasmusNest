@@ -164,7 +164,8 @@ public class MongoConnectionManager extends ConnectionManager{
 
             // find one document with new Document that have the object id field equal to the apartmentId
             Document apartment = collection.find(eq("_id", new ObjectId(apartmentId))).first();
-            System.out.println("\n\n\nAPPARTAMENTO TROVATO GET APARTMENT:\n" + apartment.toJson());
+            if(apartment!=null)
+                System.out.println("\n\n\nAPPARTAMENTO TROVATO GET APARTMENT:\n" + apartment.toJson());
 
             String coordinates = apartment.getString("position");
             // remove space from coordinates
@@ -391,24 +392,39 @@ public class MongoConnectionManager extends ConnectionManager{
                     .append("email", updatedHouse.getHostEmail())
                     .append("position", updatedHouse.getLocation().getX() + ", " + updatedHouse.getLocation().getY())
                     .append("bathrooms", updatedHouse.getBathrooms());
-            /*
-            if(updatedHouse.getImageURL()!=null) {
-                if(updatedHouse.getImageURL().isEmpty() || updatedHouse.getDescription().equals(" "))
-                    updatedHouseDocument.remove("picture_url");
-                else
-                    updatedHouseDocument.append("picture_url", updatedHouse.getImageURL());
-            }
-            */
 
             System.out.println("\n\n\nDescription: " + updatedHouse.getDescription());
+            Document updateOperation = new Document();
+
             if (updatedHouse.getDescription() == null || updatedHouse.getDescription().isEmpty() || updatedHouse.getDescription().isBlank()) {
-                // Usa l'operatore $unset per rimuovere il campo "description"
-                collection.updateOne(Filters.eq("_id", new ObjectId(updatedHouse.getId())), new Document("$unset", new Document("description", "")));
+                // Aggiungi l'operazione $unset al documento di aggiornamento
+                updateOperation.append("$unset", new Document("description", ""));
             } else {
-                // Usa l'operatore $set per aggiornare il campo "description"
+                // Aggiungi o aggiorna la descrizione nel documento di aggiornamento
                 updatedHouseDocument.append("description", updatedHouse.getDescription());
-                collection.updateOne(Filters.eq("_id", new ObjectId(updatedHouse.getId())), new Document("$set", updatedHouseDocument));
             }
+
+
+            // Se ci sono altri campi da aggiornare, aggiungili con l'operatore $set
+            if (!updatedHouseDocument.isEmpty()) {
+                updateOperation.append("$set", updatedHouseDocument);
+            }
+
+            // Applica l'operazione di aggiornamento
+            collection.updateOne(Filters.eq("_id", new ObjectId(updatedHouse.getId())), updateOperation);
+
+            List<String> pictureUrls = updatedHouse.getImageURLs();
+            if (pictureUrls == null || pictureUrls.isEmpty()) {
+                // Se la lista è vuota o null, rimuovi il campo picture_url
+                updateOperation.append("$unset", new Document("picture_url", ""));
+            } else {
+                // Se la lista contiene almeno un URL, aggiorna il campo picture_url con la lista
+                updateOperation.append("$set", new Document("picture_url", pictureUrls));
+            }
+
+            // Applica l'operazione di aggiornamento
+            collection.updateOne(Filters.eq("_id", new ObjectId(updatedHouse.getId())), updateOperation);
+
             updated = true;
         }
         catch (Exception e)
@@ -448,7 +464,7 @@ public class MongoConnectionManager extends ConnectionManager{
             }
 
             // Ottieni l'array "houses" dal documento utente
-            ArrayList<Document> housesEmbeddedDocument = userDocument.get("houses", ArrayList.class);
+            ArrayList housesEmbeddedDocument = userDocument.get("houses", ArrayList.class);
 
             if (housesEmbeddedDocument == null) {
                 throw new RuntimeException("L'utente non ha un documento 'houses'.");
@@ -456,24 +472,15 @@ public class MongoConnectionManager extends ConnectionManager{
                 System.out.println("\n\nDocumento 'houses' trovato con successo.\n\n");
             }
 
-            // Ottieni l'array "houses" dall'embed document
-            ArrayList<Document> housesArray = userDocument.get("houses", ArrayList.class);
-
-            if (housesArray == null) {
-                throw new RuntimeException("L'array 'houses' è nullo.");
-            } else {
-                System.out.println("\n\nArray 'houses' trovato con successo.\n\n");
-            }
-
             // Rimuovi la casa con lo stesso ObjectID dall'array
             ObjectId apartmentToRemoveObjectId = new ObjectId(objectIdToRemove);
 
             // Se l'array ha un solo elemento, elimina tutto il documento "houses"
-            if ( housesArray.size() == 1) {
+            if ( housesEmbeddedDocument.size() == 1) {
                 usersCollection.updateOne(userFilter, new Document("$unset", new Document("houses", "")));
-            } else if(housesArray.size()>1){
+            } else if(housesEmbeddedDocument.size()>1){
                 // Altrimenti, aggiorna l'array "houses" nel documento utente
-                usersCollection.updateOne(userFilter, new Document("$pull", new Document("houses", new Document("_id", apartmentToRemoveObjectId))));
+                usersCollection.updateOne(userFilter, new Document("$pull", new Document("houses", new Document("object_id", apartmentToRemoveObjectId))));
             }
             else {
                 throw new RuntimeException("L'array 'houses' è vuoto.");

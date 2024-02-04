@@ -173,11 +173,18 @@ public class ApartmentController extends Controller{
             imageView.setSmooth(true);
             // make the image view always fit the height of the parent
             imageView.fitWidthProperty().bind(leftFirstVBox.widthProperty().multiply(0.8));
-            String information = apartment.getDescription() + "\n" +
-                    "Accommodates: " + apartment.getMaxAccommodates() + "\n" +
-                    "Price per month: " + apartment.getDollarPriceMonth() + "$\n";
+            String information = "";
+            if(apartment.getDescription()==null || apartment.getDescription().isEmpty()) {
+                information = "Accommodates: " + apartment.getMaxAccommodates() + "\n" +
+                        "Price per month: " + apartment.getDollarPriceMonth() + "$\n";
+            } else {
+                information = apartment.getDescription() + "\n" +
+                        "Accommodates: " + apartment.getMaxAccommodates() + "\n" +
+                        "Price per month: " + apartment.getDollarPriceMonth() + "$\n";
+            }
+
             infoText.setText(information);
-            if(apartment.getDescription().length() > 100){
+            if(apartment.getDescription()!=null && apartment.getDescription().length() > 100){
                 infoText.setTextAlignment(TextAlignment.JUSTIFY);
                 infoText.wrappingWidthProperty().bind(leftFirstVBox.widthProperty().multiply(0.8));
             }else{
@@ -229,6 +236,11 @@ public class ApartmentController extends Controller{
         System.out.println("SLIDE IMAGE "+ imageIndex);
         String noImageAvailablePath = "/media/no_photo_available.png";
         Image image;
+        if(apartment.getImageURLs().isEmpty()){
+            image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvailablePath)));
+            imageView.setImage(image);
+            return;
+        }
         try {
             image = new Image(apartment.getImageURLs().get(imageIndex), true);
         }catch (IllegalArgumentException e){

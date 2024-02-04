@@ -29,10 +29,11 @@
 
             </VBox>
 
-            <Label text="Picture URL:" />
-            <VBox fx:id="imageVBox">
-
-            </VBox>
+            <VBox fx:id="pictureUrlsVBox" />
+            <HBox spacing="5">
+                <Button fx:id="morePictureButton" onAction="#onMorePictureButtonClick" style="-fx-background-color: orange; -fx-text-fill: white; -fx-padding: 5px 10px;" text="Upload one more picture" />
+                <Button fx:id="lessPictureButton" onAction="#onLessPictureButtonClick" style="-fx-background-color: #ff2600; -fx-text-fill: white; -fx-padding: 5px 10px;" text="Upload less pictures" />
+            </HBox>
 
             <VBox fx:id="buttons">
                 <Button fx:id="updateHouse" onAction="#onUpdateHouseButtonClick" text="Update House" />

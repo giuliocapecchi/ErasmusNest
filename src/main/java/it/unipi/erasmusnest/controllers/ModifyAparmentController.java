@@ -13,6 +13,7 @@ import org.controlsfx.control.PopOver;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class ModifyAparmentController extends Controller{
 
@@ -27,14 +28,19 @@ public class ModifyAparmentController extends Controller{
     private Spinner<Integer> inputAccommodates;
     private Spinner<Integer> inputBathrooms;
     private Spinner<Integer> inputPrice;
-    @FXML
-    private VBox imageVBox;
     private TextField textField;
     private TextArea descriptionTextArea;
     @FXML
     private Button updateHouse;
     @FXML
     private Button removeHouse;
+    @FXML
+    VBox pictureUrlsVBox;
+    @FXML
+    Button morePictureButton;
+    @FXML
+    Button lessPictureButton;
+    private ArrayList<TextField> pictureUrlsTextField;
 
     public ModifyAparmentController()
     {
@@ -45,6 +51,7 @@ public class ModifyAparmentController extends Controller{
     private void initialize()
     {
         String apartmentId = getSession().getApartmentId();
+        System.out.println("\n\n\nL'ID dell'appartamento è: "+apartmentId);
         Apartment apartment = getMongoConnectionManager().getApartment(apartmentId);
         System.out.println("\n\n\n"+apartment.toString());
 
@@ -68,11 +75,13 @@ public class ModifyAparmentController extends Controller{
         descriptionTextArea.setWrapText(true); // Abilita il word wrapping per l'area di testo
         neighborhoodVBox.getChildren().add(descriptionTextArea);
         //Aggiunta foto:
-        // Creazione di un campo di input di testo
-        textField = new TextField();
-        // textField.setText(apartment.getImageURLs());
-        textField.setText("");
-        imageVBox.getChildren().add(textField);
+
+        TextField pictureUrlTextField = new TextField();
+        pictureUrlTextField.setPromptText("Insert picture URL");
+        // pictureUrlTextField.onKeyReleasedProperty().set(event -> checkFields());
+        pictureUrlsVBox.getChildren().add(pictureUrlTextField);
+        pictureUrlsTextField = new ArrayList<>();
+        pictureUrlsTextField.add(pictureUrlTextField);
     }
 
     public void onUpdateHouseButtonClick(ActionEvent actionEvent)
@@ -85,9 +94,12 @@ public class ModifyAparmentController extends Controller{
         apartment.setDollarPriceMonth(inputPrice.getValue());
         apartment.setDescription(descriptionTextArea.getText());
         // String imageUrl = textField.getText()==null || textField.getText().isBlank() || textField.getText().isEmpty() ? "" : textField.getText();
-        ArrayList<String> imageUrl = new ArrayList<>();
-        imageUrl.add(textField.getText());
-        apartment.setImageURL(imageUrl);
+        ArrayList<String> pictureUrls = new ArrayList<>();
+        for (TextField pictureUrlTextField : pictureUrlsTextField) {
+            if(pictureUrlTextField.getText() != null && !pictureUrlTextField.getText().isEmpty() && !pictureUrlTextField.getText().isBlank())
+                pictureUrls.add(pictureUrlTextField.getText());
+        }
+        apartment.setImageURL(pictureUrls);
         apartment.setId(getSession().getApartmentId());
 
         if(getMongoConnectionManager().updateApartment(apartment))
@@ -193,11 +205,48 @@ public class ModifyAparmentController extends Controller{
 
         alert.setOnCloseRequest(event -> {
             // Qui puoi aggiungere il codice per reindirizzare a un'altra pagina
-            super.refreshWindow();
+            //super.refreshWindow();
         });
 
         // Mostra la finestra di dialogo
         alert.showAndWait();
+    }
+
+    @FXML
+    protected void onMorePictureButtonClick() {
+        if(pictureUrlsTextField.size() <= 5) {
+            TextField pictureUrlTextField = new TextField();
+            //pictureUrlTextField.onKeyReleasedProperty().set(event -> checkFields());
+            pictureUrlTextField.setPromptText("Insert picture URL");
+            pictureUrlsVBox.getChildren().add(pictureUrlTextField);
+            pictureUrlsTextField.add(pictureUrlTextField);
+        }
+        if(pictureUrlsTextField.size() == 5) {
+            morePictureButton.setDisable(true);
+        }
+        if(!pictureUrlsTextField.isEmpty()) {
+            lessPictureButton.setDisable(false);
+        }
+    }
+
+    @FXML
+    protected void onLessPictureButtonClick(){
+        if(!pictureUrlsTextField.isEmpty()) {
+            pictureUrlsVBox.getChildren().remove(pictureUrlsTextField.get(pictureUrlsTextField.size() - 1));
+            pictureUrlsTextField.remove(pictureUrlsTextField.size() - 1);
+        }
+        if(pictureUrlsTextField.size() < 5) {
+            morePictureButton.setDisable(false);
+        }
+        if(pictureUrlsTextField.isEmpty()) {
+            lessPictureButton.setDisable(true);
+        }
+        //checkFields();
+    }
+
+    @FXML
+    private void checkFields() {
+        //uploadButton.setDisable(Objects.equals(houseNameTextField.getText(), "") || wrongPictureUrls() ||(mapGraphicManager.getLocation() == null));
     }
 
 }
