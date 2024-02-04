@@ -1,13 +1,9 @@
 package it.unipi.erasmusnest.controllers;
 
 import it.unipi.erasmusnest.model.User;
-import javafx.event.ActionEvent;
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
@@ -52,7 +48,7 @@ public class HomepageController extends Controller{
     @FXML
     VBox resultsBox;
 
-    private List<String> CITIES = new ArrayList<>();
+    private List<String> cities = new ArrayList<>();
 
     public HomepageController() {
         System.out.println("HomepageController constructor");
@@ -67,18 +63,22 @@ public class HomepageController extends Controller{
         resultsBox.maxWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.3));
         title.maxWidthProperty().bind(super.getRootPane().widthProperty());
         logoImageView.fitWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.2));
-        CITIES = getNeo4jConnectionManager().getAllCities();
-        if(CITIES == null){
-            getSession().reset();
-            getSession().setConnectionError(true);
-            super.changeWindow("homepage","login");
+        if(getSession().getCities() == null || getSession().getCities().isEmpty()) {
+            cities = getNeo4jConnectionManager().getAllCities();
+            if(cities == null){
+                getSession().reset();
+                getSession().setConnectionError(true);
+                super.changeWindow("homepage","login");
+            }
+        }else{
+            cities = getSession().getCities();
         }
 
         radioButtonLookForCities.setToggleGroup(toggleGroup);
         radioButtonLookForUsers.setToggleGroup(toggleGroup);
         radioButtonLookForCities.setSelected(true);
         searchUserButton.setVisible(false);
-        getSession().setCities(CITIES);
+        getSession().setCities(cities);
 
         if(getSession().isLogged()) {
             System.out.println("User logged");
@@ -113,7 +113,7 @@ public class HomepageController extends Controller{
     private void updateSearchResults(String searchText) {
         resultsBox.getChildren().clear();
 
-        for (String city : CITIES) {
+        for (String city : cities) {
             if (city.toLowerCase().contains(searchText)) {
                 Hyperlink cityLink = new Hyperlink(city);
                 cityLink.setOnAction(e -> handleCitySelection(city));

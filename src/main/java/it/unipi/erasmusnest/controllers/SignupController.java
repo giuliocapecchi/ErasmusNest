@@ -54,7 +54,9 @@ public class SignupController extends Controller{
 
     @FXML
     private void initialize() {
-
+        if(getSession().getCities()==null) {
+            getSession().setCities(getNeo4jConnectionManager().getAllCities());
+        }
         signupButton.setDisable(true);
         emailField.emailAddressProperty().addListener((observable, oldValue, newValue) -> checkFields());
         passwordField.textProperty().addListener((observable, oldValue, newValue) -> checkFields());
@@ -79,8 +81,8 @@ public class SignupController extends Controller{
         backButton.maxWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.3));
         errorTextFlow.maxWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.5));
         studiesComboBox.maxWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.3));
-        // cityComboBox.maxWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.3));
-
+        cityTidlePane.maxWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.3));
+        cityTidlePane.setPadding(new Insets(10, 10, 10, 10));
     }
 
     public TitledPane createTitledPane() {
