@@ -8,6 +8,7 @@ import org.neo4j.driver.types.Node;
 import org.neo4j.driver.types.Relationship;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static org.neo4j.driver.Values.NULL;
@@ -276,15 +277,17 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
                 parameters.put("elementsToSkip",elementsToSkip);
                 parameters.put("elementsPerPage", elementsPerPage);
 
+                System.out.println("email: " + email + " elementsToSkip: " + elementsToSkip + " elementsPerPage: " + elementsPerPage);
+
                 result = tx.run("MATCH (u:User {email: $email})-[r:REVIEW]->() RETURN r SKIP $elementsToSkip LIMIT $elementsPerPage;", parameters);
                 List<Review> reviewList = new ArrayList<>();
                 while (result.hasNext()) {
-                    System.out.println("sei qui");
                     Record record = result.next();
                     Relationship reviewRel = record.get("r").asRelationship();
                     String comment = reviewRel.get("comment").asString();
                     float rating = reviewRel.get("score").asFloat();
-                    Review review = new Review(null,email, comment,rating);
+                    String timestamp = reviewRel.get("date").asString();
+                    Review review = new Review(null,email, comment,rating, timestamp);
                     reviewList.add(review);
                 }
                 return reviewList;

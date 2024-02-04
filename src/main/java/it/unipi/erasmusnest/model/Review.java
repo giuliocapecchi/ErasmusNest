@@ -21,6 +21,16 @@ public class Review {
         this.timestamp = LocalDate.parse(LocalDate.now().toString(), formatter);
     }
 
+    public Review(String apartmentId, String userEmail, String text, float rating, String timestamp) throws DateTimeParseException{
+        this.apartmentId = apartmentId;
+        this.userEmail = userEmail;
+        this.comments = text;
+        this.rating = rating;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        this.timestamp = LocalDate.parse(timestamp, formatter);
+        System.out.println("Review created with timestamp: " + this.timestamp);
+    }
+
     public String getApartmentId() {
         return apartmentId;
     }
