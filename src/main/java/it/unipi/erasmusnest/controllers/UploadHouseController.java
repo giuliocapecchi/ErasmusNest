@@ -185,7 +185,7 @@ public class UploadHouseController extends Controller {
 
     @FXML
     private void checkFields() {
-        uploadButton.setDisable(Objects.equals(houseNameTextField.getText(), "") || wrongPictureUrls() || Objects.equals(houseDescriptionTextField.getText(),"")||(mapGraphicManager.getLocation() == null));
+        uploadButton.setDisable(Objects.equals(houseNameTextField.getText(), "") || wrongPictureUrls() ||(mapGraphicManager.getLocation() == null));
     }
 
     private boolean wrongPictureUrls() {
