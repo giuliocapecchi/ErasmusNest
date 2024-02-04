@@ -13,6 +13,8 @@
                     <items>
                         <MenuItem text="Review score: Descendent order" onAction="#handleOption1"/>
                         <MenuItem text="Review score: Ascendant order" onAction="#handleOption2"/>
+                        <MenuItem text="Review score: Newest first" onAction="#handleOption3"/>
+                        <MenuItem text="Review score: Oldest first" onAction="#handleOption4"/>
                         <MenuItem text="Default option" onAction="#handleDefaultOption"/>
                     </items>
                 </MenuButton>

@@ -243,6 +243,16 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
                                     "ORDER BY r.score ASC "+
                                     "SKIP $elementsToSkip LIMIT $elementsPerPage", parameters);
 
+                }else if(filter==3){ //ordino le recensioni per data (nuove per prime)
+                    result = tx.run("MATCH (u:User)-[r:REVIEW]->(a:Apartment {apartmentId: $apartmentId}) " +
+                                    "RETURN u,r " +
+                                    "ORDER BY r.date DESC "+
+                                    "SKIP $elementsToSkip LIMIT $elementsPerPage", parameters);
+                }else if(filter==4){ //ordino le recensioni per data (più vecchie per prime)
+                    result = tx.run("MATCH (u:User)-[r:REVIEW]->(a:Apartment {apartmentId: $apartmentId}) " +
+                                    "RETURN u,r " +
+                                    "ORDER BY r.date ASC "+
+                                    "SKIP $elementsToSkip LIMIT $elementsPerPage", parameters);
                 }
                 if(result == null)
                     return null;
@@ -254,7 +264,8 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
                     String userEmail = userNode.get("email").asString();
                     String comment = reviewRel.get("comment").asString();
                     float rating = reviewRel.get("score").asFloat();
-                    Review review = new Review(apartmentId,userEmail, comment,rating);
+                    String timestamp = reviewRel.get("date").asString();
+                    Review review = new Review(apartmentId,userEmail, comment,rating, timestamp);
                     reviewList.add(review);
                 }
                 return reviewList;

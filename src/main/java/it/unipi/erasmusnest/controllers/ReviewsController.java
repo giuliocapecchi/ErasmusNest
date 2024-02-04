@@ -67,7 +67,7 @@ public class ReviewsController extends Controller{
         int elementsPerPage = 10;
         List <Review> reviews;
         if(Objects.equals(getPreviousWindowName(), "profile")) {
-            reviews = getNeo4jConnectionManager().getReviewsForUser(getSession().getOtherProfileMail(),page, elementsPerPage);
+            reviews = getNeo4jConnectionManager().getReviewsForUser(getSession().getOtherProfileMail(),page, elementsPerPage); //TODO ; aggiungiamo un filtro anche qui o no?
         }else{
             reviews = getNeo4jConnectionManager().getReviewsForApartment(getSession().getApartmentId(),page, elementsPerPage,selectedFilter);
         }
@@ -173,17 +173,31 @@ public class ReviewsController extends Controller{
     }
 
 
-    public void handleOption1(ActionEvent actionEvent) {
+    public void handleOption1() {
         selectedFilter = 1;
         page = 1;
         System.out.println("Option 1");
         printReviews();
     }
 
-    public void handleOption2(ActionEvent actionEvent) {
+    public void handleOption2() {
         selectedFilter = 2;
         page = 1;
         System.out.println("Option 2");
+        printReviews();
+    }
+
+    public void handleOption3() {
+        selectedFilter = 3;
+        page = 1;
+        System.out.println("Option 3");
+        printReviews();
+    }
+
+    public void handleOption4() {
+        selectedFilter = 4;
+        page = 1;
+        System.out.println("Option 4");
         printReviews();
     }
 
@@ -219,5 +233,4 @@ public class ReviewsController extends Controller{
         }
         printReviews();
     }
-
 }
