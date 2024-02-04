@@ -1,7 +1,15 @@
 package it.unipi.erasmusnest.model;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+
 public class Review {
     private String apartmentId;
+    private String userEmail;
+    private String comments;
+    private float rating;
+    LocalDate timestamp;
 
     public String getUserEmail() {
         return userEmail;
@@ -11,17 +19,15 @@ public class Review {
         this.userEmail = userEmail;
     }
 
-    private String userEmail;
-    private String comments;
-    private float rating;
-
     public Review(String apartmentId, String userEmail, String text, float rating) {
         this.apartmentId = apartmentId;
         this.userEmail = userEmail;
         this.comments = text;
         this.rating = rating;
+        // quando viene creata una Review viene automaticamente aggiunta la data corrente
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        this.timestamp = LocalDate.parse(LocalDate.now().toString(), formatter);
     }
-
 
     public String getApartmentId() {
         return apartmentId;
@@ -46,5 +52,21 @@ public class Review {
 
     public void setRating(int rating) {
         this.rating = rating;
+    }
+
+    public LocalDate getTimestamp() {
+        return timestamp;
+    }
+
+
+    /**
+     * Imposta la data e l'ora del timestamp utilizzando una stringa nel formato "yyyy-MM-dd".
+     *
+     * @param timestamp La stringa che rappresenta il timestamp nel formato "yyyy-MM-dd".
+     * @throws DateTimeParseException Se la stringa timestamp non è nel formato corretto.
+     */
+    public void setTimestamp(String timestamp) throws DateTimeParseException {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        this.timestamp = LocalDate.parse(timestamp, formatter);
     }
 }

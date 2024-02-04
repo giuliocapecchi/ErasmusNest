@@ -110,7 +110,6 @@ public class UploadHouseController extends Controller {
         }
         Integer accommodates = inputAccommodates.getValue();
         Integer bathrooms = inputBathrooms.getValue();
-        // String bathrooms = String.valueOf(inputBathrooms.getValue()); //TODO: I BAGNI DOVREBBERO ESSERE INTERI, NON STRINGHE
         Double price = inputPrice.getValue();
         String houseDescription = houseDescriptionTextField.getText();
         double latitude = mapGraphicManager.getLatitude();
@@ -119,7 +118,6 @@ public class UploadHouseController extends Controller {
         String userEmail = getSession().getUser().getEmail();
         User user = getMongoConnectionManager().findUser(userEmail);
         if (user != null) {
-            //Create new apartment //todo : perchè a tutti assegna id 7L????
             Apartment apartment = new Apartment(houseName, houseDescription, location, price, accommodates, userEmail,
                     pictureUrls, 0.0, 0, bathrooms, user.getName(), user.getSurname());
 
@@ -198,7 +196,7 @@ public class UploadHouseController extends Controller {
 
     @FXML
     private void openLinkInBrowser() {
-        String url = "https://imgbb.com"; // Sostituisci con l'URL desiderato
+        String url = "https://imgbb.com";
         // Apri l'URL nel browser predefinito
         java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
         if (desktop.isSupported(java.awt.Desktop.Action.BROWSE)) {

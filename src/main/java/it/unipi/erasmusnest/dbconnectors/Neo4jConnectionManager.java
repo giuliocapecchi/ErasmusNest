@@ -7,6 +7,7 @@ import org.neo4j.driver.Record;
 import org.neo4j.driver.types.Node;
 import org.neo4j.driver.types.Relationship;
 
+import java.time.LocalDate;
 import java.util.*;
 
 import static org.neo4j.driver.Values.NULL;
@@ -41,13 +42,14 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
 
     //CREATE
 
+    //TODO: POTENZIALMENTE NON FUNZIONA PERCHè NON AGGIUNGE AUTOMATICAMENTE GLI APICI AL PARAMETRO
     public void addUser( final String email, final int id )
     {
         try (Session session = driver.session())
         {
             session.writeTransaction((TransactionWork<Void>) tx -> {
-                tx.run( "MERGE (p:Person {email: $email, userID: $id})",
-                        parameters( "email", email, "userID", id ) );
+                tx.run( "MERGE (p:Person {email: $email})",
+                        parameters( "email", email) );
                 return null;
             });
         }catch (Exception e){
@@ -56,6 +58,8 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         }
     }
 
+
+    //TODO: POTENZIALMENTE NON FUNZIONA PERCHè NON AGGIUNGE AUTOMATICAMENTE GLI APICI AL PARAMETRO
     public void addCity( final String name)
     {
         try (Session session = driver.session())
@@ -77,8 +81,13 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         try (Session session = driver.session())
         {
             session.writeTransaction((TransactionWork<Void>) tx -> {
-                tx.run( "MERGE (a:Apartment {apartmentId: $apartmentId, name: $name, pictureUrl: $pictureUrl, averageReviewScore: $averageReviewScore})",
-                        parameters( "apartmentId", apartmentId, "name", name, "pictureUrl", pictureUrl, "averageReviewScore", averageReviewScore ) );
+                Map<String, Object> parameters = new HashMap<>();
+                parameters.put("apartmentId", apartmentId);
+                parameters.put("name", name);
+                parameters.put("pictureUrl", pictureUrl);
+                parameters.put("averageReviewScore", averageReviewScore);
+
+                tx.run( "MERGE (a:Apartment {apartmentId: $apartmentId, name: $name, pictureUrl: $pictureUrl, averageReviewScore: $averageReviewScore})", parameters);
                 return null;
             });
         }catch (Exception e){
@@ -87,16 +96,29 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         }
     }
 
-    public void addReview(final String email, String apartmentId, String comment,Integer score) {
-        System.out.println("email:" + email + " apartmentId:" + apartmentId + " comment:" + comment + " score:" + score);
+    public void addReview(Review review) {
+        String email = review.getUserEmail();
+        String apartmentId = review.getApartmentId();
+        String comment = review.getComments();
+        float score = review.getRating();
+        LocalDate timestamp = review.getTimestamp();
+        System.out.println("email:" + email + " apartmentId:" + apartmentId + " comment:" + comment + " score:" + score + " timestamp:" + timestamp);
         try (Session session = driver.session()) {
             session.writeTransaction((TransactionWork<Void>) tx -> {
+
+                Map<String, Object> parameters = new HashMap<>();
+                parameters.put("email", email);
+                parameters.put("apartmentId", apartmentId);
+                parameters.put("comment", comment);
+                parameters.put("score", score);
+                parameters.put("timestamp", timestamp.toString());
+
                 tx.run("MATCH (u:User {email: $email}) " +
                                 "MATCH (a:Apartment {apartmentId: $apartmentId}) " +
                                 "CREATE (u)-[r:REVIEW]->(a) " +
-                                "SET r.comment = $comment, r.score = $score "+
-                                "RETURN r",
-                        parameters("email", email, "apartmentId", apartmentId, "comment", comment, "score", score));
+                                "SET r.comment = $comment, r.score = $score, r.timestamp = $timestamp " +
+                                "RETURN r", parameters);
+
                 System.out.println("Review added");
                 updateApartmentAverageReviewScore(apartmentId);
                 System.out.println("Average review score updated");
@@ -117,21 +139,25 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
             int elementsToSkip =  (page-1)*elementsPerPage;
             List<Apartment> apartments = session.readTransaction((TransactionWork<List<Apartment>>) tx -> {
                 Result result = null;
+
+                Map<String, Object> parameters = new HashMap<>();
+                parameters.put("cityName", cityName);
+                parameters.put("elementsToSkip",elementsToSkip);
+                parameters.put("elementsPerPage", elementsPerPage);
+
                 if(filter==0){ // default query without filter
                     result = tx.run("MATCH (a:Apartment)-[:LOCATED]->(c:City {name:$cityName}) " +
                                     "OPTIONAL MATCH (a)<-[r:REVIEW]-() " +
                                     "WITH a, COUNT(r) AS reviewCount " +
                                     "RETURN a, reviewCount " +
-                                    "SKIP $elementsToSkip LIMIT $elementsPerPage",
-                            parameters("cityName", cityName, "elementsToSkip", elementsToSkip, "elementsPerPage", elementsPerPage));
+                                    "SKIP $elementsToSkip LIMIT $elementsPerPage", parameters);
                 }else if(filter==1){ // query that orders the houses based on the positiveness of the reviews
                     result = tx.run("MATCH (a:Apartment)-[:LOCATED]->(c:City {name:$cityName}) " +
                                     "OPTIONAL MATCH (a)<-[r:REVIEW]-() " +
                                     "WITH a, COUNT(r) AS reviewCount " +
                                     "RETURN a, reviewCount " +
                                     "ORDER BY CASE WHEN a.averageReviewScore IS NULL THEN 1 ELSE 0 END, a.averageReviewScore DESC " +
-                                    "SKIP $elementsToSkip LIMIT $elementsPerPage",
-                            parameters("cityName", cityName, "elementsToSkip", elementsToSkip, "elementsPerPage", elementsPerPage));
+                                    "SKIP $elementsToSkip LIMIT $elementsPerPage", parameters);
                 }else if(filter==2){ // query that orders the houses based on the number of reviews
                     result = tx.run("MATCH (a:Apartment)-[:LOCATED]->(c:City {name:$cityName}) " +
                                         "OPTIONAL MATCH (a)<-[r:REVIEW]-() " +
@@ -139,8 +165,7 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
                                         "RETURN a, reviewCount " +
                                         "ORDER BY CASE WHEN a.averageReviewScore IS NULL THEN 1 ELSE 0 END, reviewCount DESC " +
                                         "SKIP $elementsToSkip " +
-                                        "LIMIT $elementsPerPage",
-                            parameters("cityName", cityName, "elementsToSkip", elementsToSkip, "elementsPerPage",elementsPerPage));
+                                        "LIMIT $elementsPerPage", parameters);
                 }
 
                 List<Apartment> apartmentList = new ArrayList<>();
@@ -198,23 +223,26 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
             int elementsToSkip =  (page-1)*elementsPerPage;
             List<Review> reviews = session.readTransaction((TransactionWork<List<Review>>) tx -> {
                 Result result = null;
+
+                Map<String, Object> parameters = new HashMap<>();
+                parameters.put("apartmentId", apartmentId);
+                parameters.put("elementsToSkip",elementsToSkip);
+                parameters.put("elementsPerPage", elementsPerPage);
+
                 if(filter==0){
                     result = tx.run("MATCH (u:User)-[r:REVIEW]->(a:Apartment {apartmentId: $apartmentId}) RETURN u,r "+
-                                    "SKIP $elementsToSkip LIMIT $elementsPerPage",
-                            parameters("apartmentId", apartmentId, "elementsToSkip", elementsToSkip, "elementsPerPage", elementsPerPage));
+                                    "SKIP $elementsToSkip LIMIT $elementsPerPage", parameters);
                 }else if(filter==1){
                     result = tx.run("MATCH (u:User)-[r:REVIEW]->(a:Apartment {apartmentId: $apartmentId}) " +
                                     "RETURN u,r " +
                                     "ORDER BY r.score DESC "+
-                                    "SKIP $elementsToSkip LIMIT $elementsPerPage",
-                            parameters("apartmentId", apartmentId, "elementsToSkip", elementsToSkip, "elementsPerPage", elementsPerPage));
+                                    "SKIP $elementsToSkip LIMIT $elementsPerPage", parameters);
 
                 }else if(filter==2){
                     result = tx.run("MATCH (u:User)-[r:REVIEW]->(a:Apartment {apartmentId: $apartmentId}) " +
                                     "RETURN u,r " +
                                     "ORDER BY r.score ASC "+
-                                    "SKIP $elementsToSkip LIMIT $elementsPerPage",
-                            parameters("apartmentId", apartmentId, "elementsToSkip", elementsToSkip, "elementsPerPage", elementsPerPage));
+                                    "SKIP $elementsToSkip LIMIT $elementsPerPage", parameters);
 
                 }
                 if(result == null)
@@ -245,10 +273,12 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
             int elementsToSkip =  (page-1)*elementsPerPage;
             List<Review> reviews = session.readTransaction((TransactionWork<List<Review>>) tx -> {
                 Result result;
-                //result = tx.run("MATCH (u:User {email:'"+email+"'}) return u");
-                result = tx.run("MATCH (u:User {email: '"+email+"'})-[r:REVIEW]->() RETURN r SKIP $elementsToSkip LIMIT $elementsPerPage;",
-                        parameters( "elementsToSkip", elementsToSkip, "elementsPerPage", elementsPerPage));
-                System.out.println("MATCH (u:User {email: '"+email+"'})-[r:REVIEW]->() RETURN r SKIP 0 LIMIT 10;");
+                Map<String, Object> parameters = new HashMap<>();
+                parameters.put("email", email);
+                parameters.put("elementsToSkip",elementsToSkip);
+                parameters.put("elementsPerPage", elementsPerPage);
+
+                result = tx.run("MATCH (u:User {email: $email})-[r:REVIEW]->() RETURN r SKIP $elementsToSkip LIMIT $elementsPerPage;", parameters);
                 List<Review> reviewList = new ArrayList<>();
                 while (result.hasNext()) {
                     System.out.println("sei qui");
@@ -292,6 +322,7 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         try (Session session = driver.session())
         {
             return session.readTransaction((TransactionWork<List<String>>) tx -> {
+
                 Result result = tx.run("MATCH (u:User {email: $email})-[f:FOLLOWS]->(u2:User) RETURN u2.email",
                         parameters("email", email));
                 while(result.hasNext())
