@@ -26,7 +26,7 @@
         </center>
         <bottom>
             <HBox alignment="CENTER">
-                <Button alignment="CENTER" onAction="#onBackButtonPressed" text="Go back">
+                <Button alignment="CENTER" onAction="#onGoBackButtonPressed" text="Go back">
                     <HBox.margin>
                         <Insets bottom="5.0" left="5.0" right="110.0" top="5.0" />
                     </HBox.margin></Button>
