@@ -76,12 +76,27 @@ public class ModifyAparmentController extends Controller{
         neighborhoodVBox.getChildren().add(descriptionTextArea);
         //Aggiunta foto:
 
-        TextField pictureUrlTextField = new TextField();
-        pictureUrlTextField.setPromptText("Insert picture URL");
+
         // pictureUrlTextField.onKeyReleasedProperty().set(event -> checkFields());
-        pictureUrlsVBox.getChildren().add(pictureUrlTextField);
+
         pictureUrlsTextField = new ArrayList<>();
-        pictureUrlsTextField.add(pictureUrlTextField);
+        pictureUrlsVBox.setSpacing(5);
+        if(apartment.getImageURLs() != null)
+        {
+            for (String url : apartment.getImageURLs()) {
+                TextField pictureUrlTextField = new TextField();
+                pictureUrlTextField.setText(url);
+                pictureUrlsVBox.getChildren().add(pictureUrlTextField);
+                pictureUrlsTextField.add(pictureUrlTextField);
+            }
+        }
+        else
+        {
+            TextField pictureUrlTextField = new TextField();
+            pictureUrlTextField.setPromptText("Insert picture URL");
+            pictureUrlsVBox.getChildren().add(pictureUrlTextField);
+            pictureUrlsTextField.add(pictureUrlTextField);
+        }
     }
 
     public void onUpdateHouseButtonClick(ActionEvent actionEvent)
