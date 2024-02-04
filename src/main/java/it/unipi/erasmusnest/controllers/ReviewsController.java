@@ -67,7 +67,7 @@ public class ReviewsController extends Controller{
         int elementsPerPage = 10;
         List <Review> reviews;
         if(Objects.equals(getPreviousWindowName(), "profile")) {
-            reviews = getNeo4jConnectionManager().getReviewsForUser(getSession().getOtherProfileMail(),page, elementsPerPage); //TODO ; aggiungiamo un filtro anche qui o no?
+            reviews = getNeo4jConnectionManager().getReviewsForUser(getSession().getOtherProfileMail(),page, elementsPerPage);
         }else{
             reviews = getNeo4jConnectionManager().getReviewsForApartment(getSession().getApartmentId(),page, elementsPerPage,selectedFilter);
         }
