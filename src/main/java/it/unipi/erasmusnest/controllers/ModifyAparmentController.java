@@ -70,7 +70,7 @@ public class ModifyAparmentController extends Controller{
         //Aggiunta foto:
         // Creazione di un campo di input di testo
         textField = new TextField();
-        // textField.setText(apartment.getImageURL());
+        // textField.setText(apartment.getImageURLs());
         textField.setText("");
         imageVBox.getChildren().add(textField);
     }

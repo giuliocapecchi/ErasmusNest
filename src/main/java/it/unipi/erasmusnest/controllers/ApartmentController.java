@@ -4,7 +4,6 @@ import it.unipi.erasmusnest.model.Apartment;
 import it.unipi.erasmusnest.graphicmanagers.MapGraphicManager;
 import it.unipi.erasmusnest.graphicmanagers.RatingGraphicManager;
 import it.unipi.erasmusnest.graphicmanagers.ReservationGraphicManager;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -51,6 +50,7 @@ public class ApartmentController extends Controller{
     @FXML
     private Label nameLabel;
     @FXML
+    private InfoOverlay imageOverlay;
     private ImageView imageView;
     @FXML
     private Text infoText;
@@ -148,35 +148,27 @@ public class ApartmentController extends Controller{
             rightVBox.prefWidthProperty().bind(secondHBox.widthProperty().multiply(ratio));
             leftVBox.prefWidthProperty().bind(secondHBox.widthProperty().multiply(ratio));
             nameLabel.setText(apartment.getName());
+
+            imageView = new ImageView();
+            imageView.setPreserveRatio(true);
             slideImage();
 
-            imageView.setOnMouseClicked(event -> {
-                slideImage();
-            });
-
-            imageView.hoverProperty().addListener((observable, oldValue, newValue) -> {
-                if(newValue){
-                    // TODO working here
-                    imageView.setStyle("-fx-cursor: hand;");
-                    // show a message with "click to slide images"
-                    /*PopOver popOver = new PopOver();
-                    Label label = new Label("Click to slide images");
-                    label.setStyle("-fx-padding: 10px;");
-                    popOver.setContentNode(label);
-                    popOver.setDetachable(false);
-                    popOver.setAutoHide(true);
-                    popOver.show(imageView);*/
-                    // show an information overlay over the image
-                    /*InfoOverlay infoOverlay = new InfoOverlay(imageView, "Click to slide images");
-                    // get the image view parent
-                    VBox parent = (VBox) imageView.getParent();
-                    parent.getChildren().clear();
-                    parent.getChildren().add(infoOverlay);*/
-
-                }else{
-                    imageView.setStyle("-fx-cursor: default;");
-                }
-            });
+            imageOverlay.setContent(imageView);
+            if(apartment.getImageURLs().size() > 1){
+                imageOverlay.setText("Click on the image\nto see more images");
+                imageView.setOnMouseClicked(event -> {
+                    slideImage();
+                });
+                imageView.hoverProperty().addListener((observable, oldValue, newValue) -> {
+                    if(newValue){
+                        imageView.setStyle("-fx-cursor: hand;");
+                    }else{
+                        imageView.setStyle("-fx-cursor: default;");
+                    }
+                });
+            }else{
+                imageOverlay.setText("Only image available.\n There are no other images for this apartment");
+            }
 
             imageView.setSmooth(true);
             // make the image view always fit the height of the parent
@@ -238,11 +230,11 @@ public class ApartmentController extends Controller{
         String noImageAvailablePath = "/media/no_photo_available.png";
         Image image;
         try {
-            image = new Image(apartment.getImageURL().get(imageIndex), true);
+            image = new Image(apartment.getImageURLs().get(imageIndex), true);
         }catch (IllegalArgumentException e){
             image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvailablePath)));
         }
-        imageIndex = (imageIndex + 1) % apartment.getImageURL().size();
+        imageIndex = (imageIndex + 1) % apartment.getImageURLs().size();
         imageView.setImage(image);
     }
 
@@ -304,7 +296,7 @@ public class ApartmentController extends Controller{
             String userEmail = getSession().getUser().getEmail();
             String houseId = String.valueOf(getSession().getApartmentId());
 
-            getRedisConnectionManager().addReservation(userEmail, houseId, String.valueOf(startYear), String.valueOf(startMonth), String.valueOf(numberOfMonths), getSession().getCity(), apartment.getImageURL().get(0));
+            getRedisConnectionManager().addReservation(userEmail, houseId, String.valueOf(startYear), String.valueOf(startMonth), String.valueOf(numberOfMonths), getSession().getCity(), apartment.getImageURLs().get(0));
 
             cleanAverageRatingInSession();
             super.changeWindow("apartment","myreservations");
