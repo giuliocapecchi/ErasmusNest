@@ -271,7 +271,7 @@ public class ApartmentController extends Controller{
 
     @FXML
     protected void onShowReviewsButtonClick() {
-        cleanAverageRatingInSession();
+        //cleanAverageRatingInSession();
         super.changeWindow("apartment","reviews");
     }
 
@@ -313,8 +313,13 @@ public class ApartmentController extends Controller{
 
     public void onGoBackButtonClick() {
         cleanAverageRatingInSession();
-        super.changeWindow("apartment","apartments");
+        if(getPreviousWindowName().equals("myProfile")){
+            backToPreviousWindow();
+        }else{
+            super.changeWindow("apartment", "apartments");
+        }
     }
+
 
     private void cleanAverageRatingInSession(){
         getSession().setApartmentAverageRating(null);
