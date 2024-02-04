@@ -29,19 +29,20 @@
                            <Insets top="5.0" />
                        </VBox.margin>
                   </Label>
-                  <InfoOverlay fx:id="imageOverlay" >
-                     <VBox.margin>
-                        <Insets bottom="5.0" top="5.0" />
-                     </VBox.margin>
-                  </InfoOverlay>
+                     <InfoOverlay fx:id="imageOverlay" >
+                        <VBox.margin>
+                           <Insets bottom="5.0" top="30.0" />
+                        </VBox.margin>
+                     </InfoOverlay>
                </VBox>
-               <VBox fx:id="rightFirstVBox" alignment="TOP_CENTER">
+               <VBox fx:id="rightFirstVBox" alignment="TOP_CENTER" >
                   <Label style="-fx-font-size: 20px; -fx-text-fill: #019fe1;" text="Location">
                      <VBox.margin>
+                        <Insets top="5.0" />
                         <Insets bottom="5.0" />
                      </VBox.margin>
                   </Label>
-                  <WebView fx:id="webView">
+                  <WebView fx:id="webView" minHeight="250">
                     <VBox.margin>
                          <Insets bottom="5.0" left="20.0" right="20.0" />
                     </VBox.margin>
