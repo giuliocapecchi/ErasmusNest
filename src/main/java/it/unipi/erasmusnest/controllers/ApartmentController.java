@@ -15,6 +15,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import javafx.scene.web.WebView;
+import org.controlsfx.control.InfoOverlay;
 import org.controlsfx.control.PopOver;
 
 import java.io.IOException;
@@ -75,6 +76,8 @@ public class ApartmentController extends Controller{
     private Apartment apartment;
     private ReservationGraphicManager reservationGraphicManager;
     private boolean reservationsLoaded;
+
+    private int imageIndex = 0;
 
     @FXML
     private void initialize() {
@@ -145,15 +148,36 @@ public class ApartmentController extends Controller{
             rightVBox.prefWidthProperty().bind(secondHBox.widthProperty().multiply(ratio));
             leftVBox.prefWidthProperty().bind(secondHBox.widthProperty().multiply(ratio));
             nameLabel.setText(apartment.getName());
-            String noImageAvailablePath = "/media/no_photo_available.png";
-            Image image;
-            try {
-                image = new Image(apartment.getImageURL().get(0), true);
-            }catch (IllegalArgumentException e){
-                image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvailablePath)));
-            }
+            slideImage();
 
-            imageView.setImage(image);
+            imageView.setOnMouseClicked(event -> {
+                slideImage();
+            });
+
+            imageView.hoverProperty().addListener((observable, oldValue, newValue) -> {
+                if(newValue){
+                    // TODO working here
+                    imageView.setStyle("-fx-cursor: hand;");
+                    // show a message with "click to slide images"
+                    /*PopOver popOver = new PopOver();
+                    Label label = new Label("Click to slide images");
+                    label.setStyle("-fx-padding: 10px;");
+                    popOver.setContentNode(label);
+                    popOver.setDetachable(false);
+                    popOver.setAutoHide(true);
+                    popOver.show(imageView);*/
+                    // show an information overlay over the image
+                    /*InfoOverlay infoOverlay = new InfoOverlay(imageView, "Click to slide images");
+                    // get the image view parent
+                    VBox parent = (VBox) imageView.getParent();
+                    parent.getChildren().clear();
+                    parent.getChildren().add(infoOverlay);*/
+
+                }else{
+                    imageView.setStyle("-fx-cursor: default;");
+                }
+            });
+
             imageView.setSmooth(true);
             // make the image view always fit the height of the parent
             imageView.fitWidthProperty().bind(leftFirstVBox.widthProperty().multiply(0.8));
@@ -207,6 +231,19 @@ public class ApartmentController extends Controller{
                 loginButton.setVisible(false);
             }
         }
+    }
+
+    private void slideImage() {
+        System.out.println("SLIDE IMAGE "+ imageIndex);
+        String noImageAvailablePath = "/media/no_photo_available.png";
+        Image image;
+        try {
+            image = new Image(apartment.getImageURL().get(imageIndex), true);
+        }catch (IllegalArgumentException e){
+            image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvailablePath)));
+        }
+        imageIndex = (imageIndex + 1) % apartment.getImageURL().size();
+        imageView.setImage(image);
     }
 
     private Button getLikeButton() {
