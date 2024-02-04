@@ -2,23 +2,57 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
 <StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.erasmusnest.controllers.ReviewsController">
     <BorderPane prefHeight="200.0" prefWidth="200.0">
         <top>
-            <HBox fx:id="hboxTitle" alignment="CENTER_LEFT">
-                <TextField fx:id="title" alignment="CENTER" editable="false" text="Apartments found in "  HBox.hgrow="ALWAYS" />
-                <MenuButton fx:id="changeFiltersButton" text="Change results order">
-                    <items>
-                        <MenuItem text="Review score: Descendent order" onAction="#handleOption1"/>
-                        <MenuItem text="Review score: Ascendant order" onAction="#handleOption2"/>
-                        <MenuItem text="Review score: Newest first" onAction="#handleOption3"/>
-                        <MenuItem text="Review score: Oldest first" onAction="#handleOption4"/>
-                        <MenuItem text="Default option" onAction="#handleDefaultOption"/>
-                    </items>
-                </MenuButton>
-            </HBox>
+            <VBox>
+                <HBox fx:id="hboxTitle" alignment="CENTER_LEFT">
+                    <TextField fx:id="title" alignment="CENTER" editable="false" text="Apartments found in " HBox.hgrow="ALWAYS" />
+                    <MenuButton fx:id="changeFiltersButton" text="Change results order">
+                        <items>
+                            <MenuItem onAction="#handleOption1" text="Review score: Descendent order" />
+                            <MenuItem onAction="#handleOption2" text="Review score: Ascendant order" />
+                            <MenuItem onAction="#handleOption3" text="Review score: Newest first" />
+                            <MenuItem onAction="#handleOption4" text="Review score: Oldest first" />
+                            <MenuItem onAction="#handleDefaultOption" text="Default option" />
+                        </items>
+                    </MenuButton>
+                </HBox>
+                <HBox alignment="CENTER" prefHeight="31.0" prefWidth="234.0">
+                    <Label alignment="CENTER" text="Average score:">
+                  <padding>
+                     <Insets bottom="5.0" left="5.0" right="10.0" top="5.0" />
+                  </padding></Label>
+                    <ImageView fx:id="ratingImage1" fitHeight="20" fitWidth="20" preserveRatio="true">
+                        <HBox.margin>
+                            <Insets bottom="5.0" />
+                        </HBox.margin>
+                    </ImageView>
+                    <ImageView fx:id="ratingImage2" fitHeight="20" fitWidth="20" preserveRatio="true">
+                        <HBox.margin>
+                            <Insets bottom="5.0" />
+                        </HBox.margin>
+                    </ImageView>
+                    <ImageView fx:id="ratingImage3" fitHeight="20" fitWidth="20" preserveRatio="true">
+                        <HBox.margin>
+                            <Insets bottom="5.0" />
+                        </HBox.margin>
+                    </ImageView>
+                    <ImageView fx:id="ratingImage4" fitHeight="20" fitWidth="20" preserveRatio="true">
+                        <HBox.margin>
+                            <Insets bottom="5.0" />
+                        </HBox.margin>
+                    </ImageView>
+                    <ImageView fx:id="ratingImage5" fitHeight="20" fitWidth="20" preserveRatio="true">
+                        <HBox.margin>
+                            <Insets bottom="5.0" />
+                        </HBox.margin>
+                    </ImageView>
+                </HBox>
+            </VBox>
         </top>
         <center>
             <ScrollPane fx:id="scrollPane" fitToWidth="true" prefHeight="178.0" prefWidth="387.0" BorderPane.alignment="CENTER">
@@ -49,4 +83,3 @@
     </BorderPane>
 
 </StackPane>
-

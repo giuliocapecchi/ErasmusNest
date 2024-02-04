@@ -28,7 +28,6 @@ public class Review {
         this.rating = rating;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         this.timestamp = LocalDate.parse(timestamp, formatter);
-        System.out.println("Review created with timestamp: " + this.timestamp);
     }
 
     public String getApartmentId() {

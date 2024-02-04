@@ -1,5 +1,6 @@
 package it.unipi.erasmusnest.controllers;
 
+import it.unipi.erasmusnest.graphicmanagers.RatingGraphicManager;
 import it.unipi.erasmusnest.model.Review;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -11,10 +12,26 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class ReviewsController extends Controller{
+
+    @FXML
+    ImageView ratingImage1;
+
+    @FXML
+    ImageView ratingImage2;
+
+    @FXML
+    ImageView ratingImage3;
+
+    @FXML
+    ImageView ratingImage4;
+
+    @FXML
+    ImageView ratingImage5;
 
     @FXML
     HBox hboxTitle;
@@ -66,10 +83,21 @@ public class ReviewsController extends Controller{
 
         int elementsPerPage = 10;
         List <Review> reviews;
-        if(Objects.equals(getPreviousWindowName(), "profile")) {
+        if(Objects.equals(getPreviousWindowName(), "profile")) { // prendo le recensioni che ha scritto un utente
             reviews = getNeo4jConnectionManager().getReviewsForUser(getSession().getOtherProfileMail(),page, elementsPerPage);
-        }else{
+        }else{ // prendo le recensioni di un appartamento
             reviews = getNeo4jConnectionManager().getReviewsForApartment(getSession().getApartmentId(),page, elementsPerPage,selectedFilter);
+            Double averageRating = getNeo4jConnectionManager().getAverageReviewScore(getSession().getApartmentId());
+            if(averageRating != null){
+                ArrayList<ImageView> ratingImages = new ArrayList<>();
+                ratingImages.add(ratingImage1);
+                ratingImages.add(ratingImage2);
+                ratingImages.add(ratingImage3);
+                ratingImages.add(ratingImage4);
+                ratingImages.add(ratingImage5);
+                RatingGraphicManager ratingGraphicManager = new RatingGraphicManager(ratingImages, ratingImages.size());
+                ratingGraphicManager.showRating(averageRating);
+            }
         }
 
         scrollPane.setVvalue(0.0);
@@ -125,7 +153,6 @@ public class ReviewsController extends Controller{
 
             // Timestamp
             Label timestampLabel = new Label(review.getTimestamp().toString());
-            System.out.println("Timestamp: "+review.getTimestamp().toString());
             timestampLabel.setStyle("-fx-font-size: 12px;");
             timestampLabel.setAlignment(Pos.CENTER);
             timestampLabel.setMaxWidth(Double.MAX_VALUE);
