@@ -46,7 +46,7 @@
                         <Insets bottom="5.0" />
                      </VBox.margin>
                   </Label>
-                  <WebView fx:id="webView" prefHeight="200.0" prefWidth="200.0">
+                  <WebView fx:id="webView">
                     <VBox.margin>
                          <Insets bottom="5.0" left="20.0" right="20.0" />
                     </VBox.margin>
