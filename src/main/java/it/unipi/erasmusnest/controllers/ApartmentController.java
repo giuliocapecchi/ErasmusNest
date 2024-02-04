@@ -243,12 +243,16 @@ public class ApartmentController extends Controller{
         System.out.println("SLIDE IMAGE "+ imageIndex);
         String noImageAvailablePath = "/media/no_photo_available.png";
         Image image;
-        try {
-            image = new Image(apartment.getImageURLs().get(imageIndex), true);
-        }catch (IllegalArgumentException e){
+        if(!apartment.getImageURLs().isEmpty()) {
+            try {
+                image = new Image(apartment.getImageURLs().get(imageIndex), true);
+                imageIndex = (imageIndex + 1) % apartment.getImageURLs().size();
+            }catch (IllegalArgumentException e){
+                image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvailablePath)));
+            }
+        } else {
             image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvailablePath)));
         }
-        imageIndex = (imageIndex + 1) % apartment.getImageURLs().size();
         imageView.setImage(image);
     }
 

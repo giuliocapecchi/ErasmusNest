@@ -417,15 +417,16 @@ public class MyProfileController extends Controller {
         System.out.println("Favourites button clicked");
         List<String> favourites = getNeo4jConnectionManager().getFavourites(getSession().getUser().getEmail());
         if(favourites==null || favourites.isEmpty()){
-            favouritesContainerVBox.getChildren().clear();
+            // favouritesContainerVBox.getChildren().clear();
+            System.out.println("\n\n\nNo favourites found\n\n\n");
             favouritesContainerVBox.getChildren().add(new Label("No favourites found"));
         }
         else {
             for(String favourite : favourites){
                 Button button = new Button("favourite");
                 System.out.println("\n\n\nfavourite: "+favourite);
-                String name = getMongoConnectionManager().getApartment(favourite).getName();
-                button.setText(name);
+                //String name = getMongoConnectionManager().getApartment(favourite).getName();
+                button.setText(favourite);
                 button.setOnAction(event -> {
                     getSession().setApartmentId(favourite);
                     super.changeWindow("myprofile","apartment");
