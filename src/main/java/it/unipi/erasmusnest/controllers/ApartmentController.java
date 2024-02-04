@@ -305,7 +305,7 @@ public class ApartmentController extends Controller{
 
     public void onGoBackButtonClick() {
         cleanAverageRatingInSession();
-        super.backToPreviousWindow();
+        super.changeWindow("apartment","apartments");
     }
 
     private void cleanAverageRatingInSession(){

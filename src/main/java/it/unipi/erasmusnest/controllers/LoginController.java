@@ -10,6 +10,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class LoginController extends Controller{
 
@@ -87,8 +88,8 @@ public class LoginController extends Controller{
     protected void onLoginButtonClick() {
         boolean logged = false;
         if(isEmailFieldValid(emailField) && isTextFieldValid(passwordField)) {
-            String password = super.getRedisConnectionManager().getPassword(emailField.getEmailAddress());
-            System.out.println("\n\n\nREDIS Password: " + password);
+            String password = getRedisConnectionManager().getPassword(emailField.getEmailAddress());
+            System.out.println("REDIS Password: " + password);
             if(password != null && password.equals(passwordField.getText())) {
                 getSession().setLogged(true);
                 getSession().getUser().setEmail(emailField.getEmailAddress());
@@ -102,8 +103,8 @@ public class LoginController extends Controller{
             else
             {
                 System.out.println("Credentials not found in Redis. Let's check in MongoDB");
-                String mongoPassword = super.getMongoConnectionManager().getPassword(emailField.getEmailAddress());
-                System.out.println("\n\n\nREDIS Password: " + mongoPassword);
+                String mongoPassword = getMongoConnectionManager().getPassword(emailField.getEmailAddress());
+                System.out.println("MongoDB Password: " + mongoPassword);
                 if(mongoPassword != null && mongoPassword.equals(passwordField.getText())) {
                     getSession().setLogged(true);
                     getSession().getUser().setEmail(emailField.getEmailAddress());
@@ -127,7 +128,7 @@ public class LoginController extends Controller{
     @FXML
     protected void onContinueButtonClick(){
         getSession().setLogged(false);
-        if(getPreviousWindowName() != null) {
+        if(Objects.equals(getPreviousWindowName(), "apartment")) {
             super.backToPreviousWindow();
         } else {
             super.changeWindow("login","homepage");
