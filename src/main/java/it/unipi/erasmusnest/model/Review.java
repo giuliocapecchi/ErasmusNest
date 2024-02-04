@@ -11,14 +11,6 @@ public class Review {
     private float rating;
     LocalDate timestamp;
 
-    public String getUserEmail() {
-        return userEmail;
-    }
-
-    public void setUserEmail(String userEmail) {
-        this.userEmail = userEmail;
-    }
-
     public Review(String apartmentId, String userEmail, String text, float rating) {
         this.apartmentId = apartmentId;
         this.userEmail = userEmail;
@@ -68,5 +60,13 @@ public class Review {
     public void setTimestamp(String timestamp) throws DateTimeParseException {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         this.timestamp = LocalDate.parse(timestamp, formatter);
+    }
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
     }
 }

@@ -83,6 +83,7 @@ public class MyProfileController extends Controller {
         String userEmail = getSession().getUser().getEmail();
 
         User utente = getMongoConnectionManager().findUser(userEmail);
+        System.out.println("\n\n\nUSER: "+utente.toString());
         passwordField.setText("******"); // Set password field to 6 asterisks
         // List<String> userCities = utente.getPreferredCities();
         // cityTitlePane = createTitledPane(userCities);
@@ -129,6 +130,7 @@ public class MyProfileController extends Controller {
                 // Recupera gli appartamenti dell'utente e li aggiunge al VBox apartmentsContainer
                 for (Apartment apartment : utente.getHouses())
                 {
+                    System.out.println("\n\n\nApartment: "+apartment.toString());
                     //QUI TUTTO CORRETTO
                     HBox apartmentBox = new HBox(10);
                     apartmentBox.setAlignment(Pos.CENTER_LEFT);
@@ -136,7 +138,10 @@ public class MyProfileController extends Controller {
                     ImageView apartmentImage = new ImageView();
                     apartmentImage.setPreserveRatio(true);
 
-                    String imageUrl = apartment.getImageURL().get(0);
+                    String imageUrl = null;
+                    if(apartment.getImageURL()!=null && !apartment.getImageURL().isEmpty()){
+                        imageUrl = apartment.getImageURL().get(0);
+                    }
                     String noImageAvaialblePath = "/media/no_photo_available.png";
                     if(imageUrl==null || imageUrl.isEmpty()){
                         apartmentImage.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvaialblePath))));
@@ -191,9 +196,11 @@ public class MyProfileController extends Controller {
             adminContainer.getChildren().add(analyticsButton);
         }
 
+        /*
         if(utente.getHouses().isEmpty()){
             reservationsContainerVBox.getChildren().clear();
         }
+        */
 
         getSession().setUser(utente);
     }

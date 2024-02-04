@@ -23,7 +23,7 @@
             <Label text="Bathrooms:" />
                 <Spinner fx:id="inputBathrooms" amountToStepBy="1" max="20" min="1" />
             <Label text="Price per Month:" />
-                <Spinner fx:id="inputPrice" amountToStepBy="1.0" initialValue="200.0" max="9999.0" min="1.0" />
+                <Spinner fx:id="inputPrice" amountToStepBy="1" initialValue="200" max="9999" min="1" />
          <Label text="House Description :" />
             <TextField fx:id="houseDescriptionTextField" alignment="TOP_LEFT" onKeyReleased="#checkFields" prefHeight="143.0" prefWidth="624.0" />
            <Label text="Please provide 'street, city' of the house:" />
