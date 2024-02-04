@@ -34,7 +34,6 @@ public class UploadHouseController extends Controller {
     Spinner<Integer> inputPrice;
     @FXML
     TextField houseDescriptionTextField;
-
     @FXML
     TextField addressTextField;
     @FXML

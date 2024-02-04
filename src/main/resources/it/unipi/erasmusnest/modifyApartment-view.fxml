@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-<?import javafx.scene.web.*?>
-
 <StackPane fx:id="rootPane" prefHeight="554.0" prefWidth="652.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.erasmusnest.controllers.ModifyAparmentController">
     <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="ALWAYS">
-        <VBox alignment="TOP_LEFT" spacing="10" style="-fx-border-color: orange; -fx-border-width: 2px; -fx-padding: 10px;">
+        <VBox spacing="10" style="-fx-border-color: orange; -fx-border-width: 2px; -fx-padding: 10px;">
             <Label text="Accommodates:" />
             <VBox fx:id="apartmentVBox">
 
@@ -29,10 +24,11 @@
 
             </VBox>
 
-            <Label text="Picture URL:" />
-            <VBox fx:id="imageVBox">
-
-            </VBox>
+            <VBox fx:id="pictureUrlsVBox" />
+            <HBox spacing="5">
+                <Button fx:id="morePictureButton" onAction="#onMorePictureButtonClick" style="-fx-background-color: orange; -fx-text-fill: white; -fx-padding: 5px 10px;" text="Upload one more picture" />
+                <Button fx:id="lessPictureButton" onAction="#onLessPictureButtonClick" style="-fx-background-color: #ff2600; -fx-text-fill: white; -fx-padding: 5px 10px;" text="Upload less pictures" />
+            </HBox>
 
             <VBox fx:id="buttons">
                 <Button fx:id="updateHouse" onAction="#onUpdateHouseButtonClick" text="Update House" />

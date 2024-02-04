@@ -142,8 +142,6 @@ public class ApartmentController extends Controller{
             firstHBox.prefHeightProperty().bind(centerVBox.heightProperty().multiply(ratio));
             secondHBox.prefHeightProperty().bind(centerVBox.heightProperty().multiply(ratio));
 
-
-
             rightFirstVBox.prefWidthProperty().bind(firstHBox.widthProperty().multiply(ratio));
             leftFirstVBox.prefWidthProperty().bind(firstHBox.widthProperty().multiply(ratio));
 
@@ -153,14 +151,18 @@ public class ApartmentController extends Controller{
 
             buildImage();
             imageView.fitWidthProperty().bind(leftFirstVBox.widthProperty().multiply(0.8));
+            String information = "";
+            if(apartment.getDescription()==null || apartment.getDescription().isEmpty()) {
+                information = "Accommodates: " + apartment.getMaxAccommodates() + "\n" +
+                        "Price per month: " + apartment.getDollarPriceMonth() + "$\n";
+            } else {
+                information = apartment.getDescription() + "\n" +
+                        "Accommodates: " + apartment.getMaxAccommodates() + "\n" +
+                        "Price per month: " + apartment.getDollarPriceMonth() + "$\n";
+            }
 
-
-
-            String information = apartment.getDescription() + "\n" +
-                    "Accommodates: " + apartment.getMaxAccommodates() + "\n" +
-                    "Price per month: " + apartment.getDollarPriceMonth() + "$\n";
             infoText.setText(information);
-            if(apartment.getDescription().length() > 100){
+            if(apartment.getDescription()!=null && apartment.getDescription().length() > 100){
                 infoText.setTextAlignment(TextAlignment.JUSTIFY);
                 infoText.wrappingWidthProperty().bind(leftFirstVBox.widthProperty().multiply(0.8));
             }else{
@@ -241,12 +243,16 @@ public class ApartmentController extends Controller{
         System.out.println("SLIDE IMAGE "+ imageIndex);
         String noImageAvailablePath = "/media/no_photo_available.png";
         Image image;
-        try {
-            image = new Image(apartment.getImageURLs().get(imageIndex), true);
-        }catch (IllegalArgumentException e){
+        if(!apartment.getImageURLs().isEmpty()) {
+            try {
+                image = new Image(apartment.getImageURLs().get(imageIndex), true);
+                imageIndex = (imageIndex + 1) % apartment.getImageURLs().size();
+            }catch (IllegalArgumentException e){
+                image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvailablePath)));
+            }
+        } else {
             image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvailablePath)));
         }
-        imageIndex = (imageIndex + 1) % apartment.getImageURLs().size();
         imageView.setImage(image);
     }
 
@@ -321,7 +327,6 @@ public class ApartmentController extends Controller{
         super.changeWindow("apartment", "apartments");
 
     }
-
 
     private void cleanAverageRatingInSession(){
         getSession().setApartmentAverageRating(null);

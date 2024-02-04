@@ -339,12 +339,12 @@ public class Apartment {
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", location=" + location +
+                ", position=" + location +
                 ", studyFields=" + studyFields +
                 ", dollarPriceMonth=" + dollarPriceMonth +
                 ", maxAccommodates=" + maxAccommodates +
                 ", bathrooms=" + bathrooms +
-                ", hostEmail='" + hostEmail + '\'' +
+                ", email='" + hostEmail + '\'' +
                 ", imageURL='" + imageUrls + '\'' +
                 ", averageRating=" + averageRating +
                 '}';
