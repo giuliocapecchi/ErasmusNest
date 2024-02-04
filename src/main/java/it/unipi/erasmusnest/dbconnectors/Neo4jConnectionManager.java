@@ -197,7 +197,13 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         try (Session session = driver.session()) {
             return session.readTransaction((TransactionWork<List<String>>) tx -> {
                 Result result = tx.run("MATCH (c:City) RETURN c.name");
-                return getStrings(result);
+                List<String> cityNamesList = new ArrayList<>();
+                while (result.hasNext()) {
+                    Record record = result.next();
+                    String cityNameFromDB = record.get("c.name").asString();
+                    cityNamesList.add(cityNameFromDB);
+                }
+                return cityNamesList;
             });
         }catch (Exception e){
             System.out.println("Exception: " + e);
@@ -206,14 +212,22 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         }
     }
 
-    private List<String> getStrings(Result result) {
-        List<String> cityNamesList = new ArrayList<>();
-        while (result.hasNext()) {
-            Record record = result.next();
-            String cityNameFromDB = record.get("c.name").asString();
-            cityNamesList.add(cityNameFromDB);
+    public Double getAverageReviewScore(String apartmentId) {
+        try (Session session = driver.session()) {
+            return session.readTransaction((TransactionWork<Double>) tx -> {
+                Result result = tx.run("MATCH (a:Apartment {apartmentId: $apartmentId}) RETURN a.averageReviewScore",
+                        parameters("apartmentId", apartmentId));
+                if (result.hasNext()) {
+                    return result.next().get("a.averageReviewScore").asDouble();
+                } else {
+                    return null;
+                }
+            });
+        }catch (Exception e){
+            System.out.println("Exception: " + e);
+            new AlertDialogGraphicManager("Neo4j connection failed").show();
+            return null;
         }
-        return cityNamesList;
     }
 
 
@@ -229,28 +243,28 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
                 parameters.put("elementsPerPage", elementsPerPage);
 
                 if(filter==0){
-                    result = tx.run("MATCH (u:User)-[r:REVIEW]->(a:Apartment {apartmentId: $apartmentId}) RETURN u,r "+
+                    result = tx.run("MATCH (u:User)-[r:REVIEW]->(a:Apartment {apartmentId: $apartmentId}) RETURN u.email,r "+
                                     "SKIP $elementsToSkip LIMIT $elementsPerPage", parameters);
                 }else if(filter==1){
                     result = tx.run("MATCH (u:User)-[r:REVIEW]->(a:Apartment {apartmentId: $apartmentId}) " +
-                                    "RETURN u,r " +
+                                    "RETURN u.email,r " +
                                     "ORDER BY r.score DESC "+
                                     "SKIP $elementsToSkip LIMIT $elementsPerPage", parameters);
 
                 }else if(filter==2){
                     result = tx.run("MATCH (u:User)-[r:REVIEW]->(a:Apartment {apartmentId: $apartmentId}) " +
-                                    "RETURN u,r " +
+                                    "RETURN u.email,r " +
                                     "ORDER BY r.score ASC "+
                                     "SKIP $elementsToSkip LIMIT $elementsPerPage", parameters);
 
                 }else if(filter==3){ //ordino le recensioni per data (nuove per prime)
                     result = tx.run("MATCH (u:User)-[r:REVIEW]->(a:Apartment {apartmentId: $apartmentId}) " +
-                                    "RETURN u,r " +
+                                    "RETURN u.email,r " +
                                     "ORDER BY r.date DESC "+
                                     "SKIP $elementsToSkip LIMIT $elementsPerPage", parameters);
                 }else if(filter==4){ //ordino le recensioni per data (più vecchie per prime)
                     result = tx.run("MATCH (u:User)-[r:REVIEW]->(a:Apartment {apartmentId: $apartmentId}) " +
-                                    "RETURN u,r " +
+                                    "RETURN u.email,r " +
                                     "ORDER BY r.date ASC "+
                                     "SKIP $elementsToSkip LIMIT $elementsPerPage", parameters);
                 }
@@ -259,9 +273,8 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
                 List<Review> reviewList = new ArrayList<>();
                 while (result.hasNext()) {
                     Record record = result.next();
-                    Node userNode = record.get("u").asNode();
+                    String userEmail = record.get("u.email").asString();
                     Relationship reviewRel = record.get("r").asRelationship();
-                    String userEmail = userNode.get("email").asString();
                     String comment = reviewRel.get("comment").asString();
                     float rating = reviewRel.get("score").asFloat();
                     String timestamp = reviewRel.get("date").asString();
