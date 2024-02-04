@@ -83,7 +83,7 @@ public class MyProfileController extends Controller {
         String userEmail = getSession().getUser().getEmail();
 
         User utente = getMongoConnectionManager().findUser(userEmail);
-        System.out.println("\n\n\nUSER: "+utente.toString());
+        System.out.println("\n\n\nUSER DELLA MYPROFILE: "+utente.toString());
         passwordField.setText("******"); // Set password field to 6 asterisks
         // List<String> userCities = utente.getPreferredCities();
         // cityTitlePane = createTitledPane(userCities);
@@ -108,12 +108,12 @@ public class MyProfileController extends Controller {
         studyFieldComboBox.getItems().addAll(getSession().getStudyFields());
         // Inizializza il ComboBox per il campo "Cities of Interest" (CoI)
         // Estrai il campo "Study Field" (SF) e "Cities of Interest" (CoI) dal documento dell'utente
-        // selectedStudyField = userDocument.getString("SF");
+        //selectedStudyField = userDocument.getString("SF");
         selectedStudyField = utente.getStudyField()==null ? "" : utente.getStudyField();
         // selectedCityOfInterest = userDocument.getString("CoI");
 
         // Imposta i valori iniziali nei ComboBox
-        // studyFieldComboBox.setValue(selectedStudyField);
+        studyFieldComboBox.setValue(selectedStudyField);
         // citiesOfInterestComboBox.setValue(selectedCityOfInterest);
 
         // Assumi che "house" possa essere un Document o una List<Document>
@@ -175,9 +175,7 @@ public class MyProfileController extends Controller {
                     apartmentBox.getChildren().addAll(apartmentImage, viewButton, apartmentButton);
                     apartmentsContainer.getChildren().add(apartmentBox); // This should add the apartment to the UI
                 }
-            }
-        else
-        {
+            } else {
             apartmentsContainer.getChildren().add(new Label("No apartments available."));
         }
         // Parte riservata all'ADMIN
@@ -345,7 +343,6 @@ public class MyProfileController extends Controller {
     @FXML
     private void onStudyFieldSelectionChanged(ActionEvent event)
     {
-        /*
         String newStudyField = studyFieldComboBox.getValue();
         if (!newStudyField.equals(selectedStudyField))
         {
@@ -360,7 +357,6 @@ public class MyProfileController extends Controller {
                 showConfirmationMessageSF("Errore nell'aggiornamento di study field!");
             }
         }
-        */
     }
 
     @FXML

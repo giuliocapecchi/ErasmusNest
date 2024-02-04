@@ -81,8 +81,7 @@ public class ModifyAparmentController extends Controller{
         String apartmentId = getSession().getApartmentId();
         Apartment apartment = getMongoConnectionManager().getApartment(apartmentId);
         apartment.setMaxAccommodates(inputAccommodates.getValue());
-        Integer bathrooms = inputBathrooms.getValue();
-        apartment.setBathrooms(bathrooms);
+        apartment.setBathrooms(inputBathrooms.getValue());
         apartment.setDollarPriceMonth(inputPrice.getValue());
         apartment.setDescription(descriptionTextArea.getText());
         // String imageUrl = textField.getText()==null || textField.getText().isBlank() || textField.getText().isEmpty() ? "" : textField.getText();
@@ -93,6 +92,7 @@ public class ModifyAparmentController extends Controller{
 
         if(getMongoConnectionManager().updateApartment(apartment))
         {
+            System.out.println("\n\n\nCasa modificata correttamente"+apartment.toString());
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Information Dialog");
             alert.setHeaderText(null);
@@ -158,10 +158,10 @@ public class ModifyAparmentController extends Controller{
                 "You will not be able to recover it","confirmation").showAndGetConfirmation();
         if(remove)
         {
-            if(getRedisConnectionManager().isApartmentReserved(apartmentId))
+            if(!getRedisConnectionManager().isApartmentReserved(apartmentId))
             {
-                // non ci sono prenotazioni per questo appartamento
-                if(getMongoConnectionManager().removeApartment(apartmentId))
+                // non ci sono prenotazioni attive, si puo eliminare la casa
+                if(getMongoConnectionManager().removeApartment(apartmentId, getSession().getUser().getEmail()))
                 {
                     // Apartment removed from MongoDB
                     // Apartment is still available on Neo4j, apartments view
@@ -186,7 +186,7 @@ public class ModifyAparmentController extends Controller{
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Information Dialog");
         alert.setHeaderText(null);
-        alert.setContentText("Impossible to correctly modify the house.");
+        alert.setContentText(s);
 
         ButtonType okButton = new ButtonType("OK");
         alert.getButtonTypes().setAll(okButton);

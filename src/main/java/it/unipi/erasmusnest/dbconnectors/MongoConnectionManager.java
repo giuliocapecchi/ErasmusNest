@@ -90,6 +90,7 @@ public class MongoConnectionManager extends ConnectionManager{
             e.printStackTrace();
             System.out.println("Error in findUser: " + e.getMessage());
         }
+        System.out.println("\n\n\nUSER DELLA FIND USER: " + user.toString());
         return user;
     }
 
@@ -165,7 +166,7 @@ public class MongoConnectionManager extends ConnectionManager{
 
             // find one document with new Document that have the object id field equal to the apartmentId
             Document apartment = collection.find(eq("_id", new ObjectId(apartmentId))).first();
-            System.out.println("Apartment: " + apartment.toJson());
+            System.out.println("\n\n\nAPPARTAMENTO TROVATO GET APARTMENT:\n" + apartment.toJson());
 
             String coordinates = apartment.getString("position");
             // remove space from coordinates
@@ -186,7 +187,7 @@ public class MongoConnectionManager extends ConnectionManager{
 
             // description += "Bathrooms: "+apartment.getString("bathrooms_text");
 
-            String id = apartment.get("_id").toString();
+            // String id = apartment.get("_id").toString();
             // if apartment.get("id") return an integer, it is necessary to cast it to Long
             /*
             if(apartment.get("id") instanceof Integer)
@@ -274,10 +275,10 @@ public class MongoConnectionManager extends ConnectionManager{
         // If new studyField != None, update the user's studyField
         // else remove the studyField from the user's document
         if(!newStudyField.equals("None")) {
-            collection.updateOne(Filters.eq("email", email), new Document("$set", new Document("SF", newStudyField)));
+            collection.updateOne(Filters.eq("email", email), new Document("$set", new Document("study_field", newStudyField)));
         }
         else {
-            collection.updateOne(Filters.eq("email", email),new Document("$unset", new Document("SF", ""))
+            collection.updateOne(Filters.eq("email", email),new Document("$unset", new Document("study_field", ""))
             );
         }
         mongoClient.close();
@@ -341,7 +342,7 @@ public class MongoConnectionManager extends ConnectionManager{
                         .append("first_name", utente.getName())
                         .append("last_name", utente.getSurname());
                 if(!utente.getStudyField().equals("None"))
-                    newUser.append("SF", utente.getStudyField());
+                    newUser.append("study_field", utente.getStudyField());
                 collection.insertOne(newUser);
             }
             catch (Exception e)
@@ -392,19 +393,24 @@ public class MongoConnectionManager extends ConnectionManager{
                     .append("email", updatedHouse.getHostEmail())
                     .append("position", updatedHouse.getLocation().getX() + ", " + updatedHouse.getLocation().getY())
                     .append("bathrooms", updatedHouse.getBathrooms());
+            /*
             if(updatedHouse.getImageURL()!=null) {
                 if(updatedHouse.getImageURL().isEmpty() || updatedHouse.getDescription().equals(" "))
                     updatedHouseDocument.remove("picture_url");
                 else
                     updatedHouseDocument.append("picture_url", updatedHouse.getImageURL());
             }
-            if(updatedHouse.getDescription()!=null) {
-                if(updatedHouse.getDescription().isEmpty() || updatedHouse.getDescription().isBlank() || updatedHouse.getDescription().equals(" "))
-                    updatedHouseDocument.remove("description");
-                else
-                    updatedHouseDocument.append("description", updatedHouse.getDescription());
+            */
+
+            System.out.println("\n\n\nDescription: " + updatedHouse.getDescription());
+            if (updatedHouse.getDescription() == null || updatedHouse.getDescription().isEmpty() || updatedHouse.getDescription().isBlank()) {
+                // Usa l'operatore $unset per rimuovere il campo "description"
+                collection.updateOne(Filters.eq("_id", new ObjectId(updatedHouse.getId())), new Document("$unset", new Document("description", "")));
+            } else {
+                // Usa l'operatore $set per aggiornare il campo "description"
+                updatedHouseDocument.append("description", updatedHouse.getDescription());
+                collection.updateOne(Filters.eq("_id", new ObjectId(updatedHouse.getId())), new Document("$set", updatedHouseDocument));
             }
-            collection.updateOne(Filters.eq("_id", updatedHouse.getId()), new Document("$set", updatedHouseDocument));
             updated = true;
         }
         catch (Exception e)
@@ -416,6 +422,74 @@ public class MongoConnectionManager extends ConnectionManager{
         return updated;
     }
 
+    public boolean removeApartment(String objectIdToRemove, String userEmail) {
+        boolean res = false;
+        try (MongoClient mongoClient = MongoClients.create("mongodb://" + super.getHost() + ":" + super.getPort())) {
+            MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
+            // Cerca e rimuovi l'appartamento dalla collezione "apartments" utilizzando l'ObjectID
+            MongoCollection<Document> apartmentsCollection = database.getCollection("apartments");
+            ObjectId apartmentObjectId = new ObjectId(objectIdToRemove);
+            Document apartmentFilter = new Document("_id", apartmentObjectId);
+            boolean apartmentRemoved = apartmentsCollection.deleteOne(apartmentFilter).getDeletedCount() > 0;
+
+            if (!apartmentRemoved) {
+                throw new RuntimeException("L'appartamento con l'ObjectID specificato non è stato trovato o non può essere rimosso.");
+            } else {
+                System.out.println("\n\nAppartamento rimosso con successo.\n\n");
+            }
+
+            // Cerca l'utente nella collezione "users" utilizzando l'email
+            MongoCollection<Document> usersCollection = database.getCollection("users");
+            Document userFilter = new Document("email", userEmail);
+            Document userDocument = usersCollection.find(userFilter).first();
+
+            if (userDocument == null) {
+                throw new RuntimeException("L'utente con l'email specificata non è stato trovato.");
+            } else {
+                System.out.println("\n\nUtente trovato con successo.\n\n"+userDocument.toJson());
+            }
+
+            // Ottieni l'array "houses" dal documento utente
+            ArrayList<Document> housesEmbeddedDocument = userDocument.get("houses", ArrayList.class);
+
+            if (housesEmbeddedDocument == null) {
+                throw new RuntimeException("L'utente non ha un documento 'houses'.");
+            } else {
+                System.out.println("\n\nDocumento 'houses' trovato con successo.\n\n");
+            }
+
+            // Ottieni l'array "houses" dall'embed document
+            ArrayList<Document> housesArray = userDocument.get("houses", ArrayList.class);
+
+            if (housesArray == null) {
+                throw new RuntimeException("L'array 'houses' è nullo.");
+            } else {
+                System.out.println("\n\nArray 'houses' trovato con successo.\n\n");
+            }
+
+            // Rimuovi la casa con lo stesso ObjectID dall'array
+            ObjectId apartmentToRemoveObjectId = new ObjectId(objectIdToRemove);
+
+            // Se l'array ha un solo elemento, elimina tutto il documento "houses"
+            if ( housesArray.size() == 1) {
+                usersCollection.updateOne(userFilter, new Document("$unset", new Document("houses", "")));
+            } else if(housesArray.size()>1){
+                // Altrimenti, aggiorna l'array "houses" nel documento utente
+                usersCollection.updateOne(userFilter, new Document("$pull", new Document("houses", new Document("_id", apartmentToRemoveObjectId))));
+            }
+            else {
+                throw new RuntimeException("L'array 'houses' è vuoto.");
+            }
+            System.out.println("Operazione completata con successo.");
+            res = true;
+        } catch (Exception e) {
+            System.err.println("Errore durante l'operazione: " + e.getMessage());
+            res = false;
+        }
+        return res;
+    }
+
+    /*
     public boolean removeApartment(String apartmentId)
     {
         boolean removed = false;
@@ -428,7 +502,7 @@ public class MongoConnectionManager extends ConnectionManager{
             // Verifica se la casa da eliminare è l'ultima associata all'utente
             MongoCollection<Document> userCollection = database.getCollection("users");
             long apartmentsCount = userCollection.countDocuments(Filters.eq("object_id", objectId));
-
+            System.out.println("\n\n\nApartments count: " + apartmentsCount+"\n\n\n");
             if (apartmentsCount > 1) {
                 collection.deleteOne(Filters.eq("object_id", objectId));
                 userCollection.updateOne(Filters.eq("object_id", objectId), Updates.pull("houses", new Document("_id", objectId)));
@@ -447,4 +521,5 @@ public class MongoConnectionManager extends ConnectionManager{
         }
         return removed;
     }
+    */
 }

@@ -91,4 +91,17 @@ public class User {
         String emailDomain = emailParts[1];
         return emailDomain.equals("erasmusnest.com");
     }
+
+    public String toString() {
+        return "User{" +
+                "email='" + email + '\'' +
+                ", name='" + name + '\'' +
+                ", surname='" + surname + '\'' +
+                ", preferredCities=" + preferredCities +
+                ", studyField='" + studyField + '\'' +
+                ", houses=" + houses +
+                ", password='" + password + '\'' +
+                '}';
+    }
+
 }
