@@ -62,7 +62,7 @@ public class ReviewsController extends Controller{
 
     }
 
-    public void printReviews() { //TODO : aggiungi il timestamp delle recensioni
+    public void printReviews() {
 
         int elementsPerPage = 10;
         List <Review> reviews;
