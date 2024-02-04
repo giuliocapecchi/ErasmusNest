@@ -69,7 +69,7 @@
         <bottom>
             <VBox alignment="CENTER_RIGHT" />
             <ToolBar fx:id="toolBar" nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: orange;" BorderPane.alignment="CENTER">
-                <Button fx:id="backToSearch" onAction="#backToBrowse" text="Back to search" />
+                <Button fx:id="backToSearch" onAction="#backToBrowse" text="Go back" />
                 <Button onAction="#backToHomepage" text="Homepage" />
             </ToolBar>
         </bottom>

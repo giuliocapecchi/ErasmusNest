@@ -149,29 +149,7 @@ public class ApartmentController extends Controller{
             leftVBox.prefWidthProperty().bind(secondHBox.widthProperty().multiply(ratio));
             nameLabel.setText(apartment.getName());
 
-            imageView = new ImageView();
-            imageView.setPreserveRatio(true);
-            slideImage();
-
-            imageOverlay.setContent(imageView);
-            if(apartment.getImageURLs().size() > 1){
-                imageOverlay.setText("Click on the image\nto see more images");
-                imageView.setOnMouseClicked(event -> {
-                    slideImage();
-                });
-                imageView.hoverProperty().addListener((observable, oldValue, newValue) -> {
-                    if(newValue){
-                        imageView.setStyle("-fx-cursor: hand;");
-                    }else{
-                        imageView.setStyle("-fx-cursor: default;");
-                    }
-                });
-            }else{
-                imageOverlay.setText("Only image available.\n There are no other images for this apartment");
-            }
-
-            imageView.setSmooth(true);
-            // make the image view always fit the height of the parent
+            buildImage();
             imageView.fitWidthProperty().bind(leftFirstVBox.widthProperty().multiply(0.8));
             String information = "";
             if(apartment.getDescription()==null || apartment.getDescription().isEmpty()) {
@@ -232,15 +210,39 @@ public class ApartmentController extends Controller{
         }
     }
 
+    private void buildImage(){
+        imageView = new ImageView();
+        imageView.setPreserveRatio(true);
+        slideImage();
+
+        imageOverlay.setContent(imageView);
+        if(apartment.getImageURLs().size() > 1){
+            imageOverlay.setText("Click on the image\nto see more images");
+            imageView.setOnMouseClicked(event -> {
+                slideImage();
+            });
+            imageView.hoverProperty().addListener((observable, oldValue, newValue) -> {
+                if(newValue){
+                    imageView.setStyle("-fx-cursor: hand;");
+                }else{
+                    imageView.setStyle("-fx-cursor: default;");
+                }
+            });
+        }else if(apartment.getImageURLs().size() == 1){
+            imageOverlay.setText("Only image available.\n There are no other images for this apartment");
+        }else {
+            imageOverlay.setText("No images available.\n There are no images for this apartment");
+        }
+
+        imageView.setCache(true);
+        imageView.setSmooth(true);
+
+    }
+
     private void slideImage() {
         System.out.println("SLIDE IMAGE "+ imageIndex);
         String noImageAvailablePath = "/media/no_photo_available.png";
         Image image;
-        if(apartment.getImageURLs().isEmpty()){
-            image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvailablePath)));
-            imageView.setImage(image);
-            return;
-        }
         try {
             image = new Image(apartment.getImageURLs().get(imageIndex), true);
         }catch (IllegalArgumentException e){
@@ -275,7 +277,7 @@ public class ApartmentController extends Controller{
 
     @FXML
     protected void onShowReviewsButtonClick() {
-        cleanAverageRatingInSession();
+        //cleanAverageRatingInSession();
         super.changeWindow("apartment","reviews");
     }
 
@@ -317,7 +319,12 @@ public class ApartmentController extends Controller{
 
     public void onGoBackButtonClick() {
         cleanAverageRatingInSession();
-        super.changeWindow("apartment","apartments");
+        System.out.println(getPreviousWindowName());
+        if(getSession().getCity()==null){
+            super.changeWindow("apartment", "myprofile");
+        }else{
+            super.changeWindow("apartment", "apartments");
+        }
     }
 
     private void cleanAverageRatingInSession(){

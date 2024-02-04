@@ -141,7 +141,7 @@ public class ProfileController extends Controller{
 
     @FXML
     protected void backToBrowse() {
-        super.changeWindow("profile","apartments");
+        super.changeWindow("profile","apartment");
     }
 
     @FXML
