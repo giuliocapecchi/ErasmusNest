@@ -10,9 +10,7 @@ import javafx.geometry.Point2D;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.mongodb.client.model.Filters.*;
@@ -114,8 +112,8 @@ public class MongoConnectionManager extends ConnectionManager{
             if(description!=null && !description.isEmpty() && !description.isBlank()) {
                 newApartment.append("description", apartment.getDescription());
             }
-            if(apartment.getImageURL()!=null && !apartment.getImageURL().isEmpty()) {
-                newApartment.append("picture_url", apartment.getImageURL());
+            if(apartment.getImageURLs()!=null && !apartment.getImageURLs().isEmpty()) {
+                newApartment.append("picture_url", apartment.getImageURLs());
             }
             collection.insertOne(newApartment);
             ObjectId objectId = newApartment.getObjectId("_id");
@@ -128,9 +126,9 @@ public class MongoConnectionManager extends ConnectionManager{
                 Document houseDocument = new Document()
                         .append("object_id", objectId)
                         .append("house_name", apartment.getName());
-                if(apartment.getImageURL()!=null && !apartment.getImageURL().isEmpty()) {
+                if(apartment.getImageURLs()!=null && !apartment.getImageURLs().isEmpty()) {
                     // Taking only the first image of the list
-                    houseDocument.append("picture_url", apartment.getImageURL().get(0));
+                    houseDocument.append("picture_url", apartment.getImageURLs().get(0));
                 }
                 ArrayList<Document> houseArray = new ArrayList<>();
                 // Controlla se il campo "house" non esiste o è vuoto
@@ -502,7 +500,7 @@ public class MongoConnectionManager extends ConnectionManager{
             // Verifica se la casa da eliminare è l'ultima associata all'utente
             MongoCollection<Document> userCollection = database.getCollection("users");
             long apartmentsCount = userCollection.countDocuments(Filters.eq("object_id", objectId));
-            System.out.println("\n\n\nApartments count: " + apartmentsCount+"\n\n\n");
+
             if (apartmentsCount > 1) {
                 collection.deleteOne(Filters.eq("object_id", objectId));
                 userCollection.updateOne(Filters.eq("object_id", objectId), Updates.pull("houses", new Document("_id", objectId)));

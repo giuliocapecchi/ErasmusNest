@@ -139,8 +139,8 @@ public class MyProfileController extends Controller {
                     apartmentImage.setPreserveRatio(true);
 
                     String imageUrl = null;
-                    if(apartment.getImageURL()!=null && !apartment.getImageURL().isEmpty()){
-                        imageUrl = apartment.getImageURL().get(0);
+                    if(apartment.getImageURLs()!=null && !apartment.getImageURLs().isEmpty()){
+                        imageUrl = apartment.getImageURLs().get(0);
                     }
                     String noImageAvaialblePath = "/media/no_photo_available.png";
                     if(imageUrl==null || imageUrl.isEmpty()){

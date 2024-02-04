@@ -97,13 +97,12 @@ public class UploadHouseController extends Controller {
         if(pictureUrlsTextField.isEmpty()) {
             lessPictureButton.setDisable(true);
         }
+        checkFields();
     }
 
     @FXML
     void onUploadButtonClick() {
         String houseName = houseNameTextField.getText();
-        // String [] pictureUrlArray = pictureUrlTextField.getText().split(";");
-        //ArrayList<String> arrayList = new ArrayList<>(Arrays.asList(pictureUrlTextField.getText().split(";")));
         ArrayList<String> pictureUrls = new ArrayList<>();
         for (TextField pictureUrlTextField : pictureUrlsTextField) {
             if(pictureUrlTextField.getText() != null && !pictureUrlTextField.getText().isEmpty() && !pictureUrlTextField.getText().isBlank())
@@ -111,7 +110,6 @@ public class UploadHouseController extends Controller {
         }
         Integer accommodates = inputAccommodates.getValue();
         Integer bathrooms = inputBathrooms.getValue();
-        // String bathrooms = String.valueOf(inputBathrooms.getValue()); //TODO: I BAGNI DOVREBBERO ESSERE INTERI, NON STRINGHE
         Integer price = inputPrice.getValue();
         String houseDescription = houseDescriptionTextField.getText();
         double latitude = mapGraphicManager.getLatitude();
@@ -120,7 +118,6 @@ public class UploadHouseController extends Controller {
         String userEmail = getSession().getUser().getEmail();
         User user = getMongoConnectionManager().findUser(userEmail);
         if (user != null) {
-            //Create new apartment //todo : perchè a tutti assegna id 7L????
             Apartment apartment = new Apartment(houseName, houseDescription, location, price, accommodates, userEmail,
                     pictureUrls, 0.0, 0, bathrooms, user.getName(), user.getSurname());
 
@@ -147,20 +144,46 @@ public class UploadHouseController extends Controller {
 
     @FXML
     void onGeocodeButtonClick() {
+
+        if(!cityIsValid(addressTextField.getText())){
+            mapVBox.getChildren().clear();
+            mapGraphicManager.setLocation(null);
+            geocodeResultLabel.setText("Our service is not available in this city right now.");
+            checkFields();
+            return;
+        }
+
         String address = URLEncoder.encode(addressTextField.getText(), StandardCharsets.UTF_8);
         WebView mapWebView = new WebView();
         mapVBox.getChildren().clear();
         mapVBox.getChildren().add(mapWebView);
         mapWebView.maxWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.5));
         mapWebView.maxHeightProperty().bind(super.getRootPane().heightProperty().multiply(0.5));
-        if (mapGraphicManager.geocodeAddress(address, mapWebView, geocodeResultLabel)) {
-            uploadButton.setDisable(false);
+        if (!mapGraphicManager.geocodeAddress(address, mapWebView, geocodeResultLabel)) {
+            mapVBox.getChildren().clear();
+            mapGraphicManager.setLocation(null);
         }
+        checkFields();
+    }
+
+    private boolean cityIsValid(String address) {
+        // verifico se la città è nell'elenco di città che serviamo, altrimenti la scarto
+        String[] splittedStrings = address.split(",");
+        for (String str : splittedStrings) {
+            str = str.trim().toLowerCase();
+            for(String city : getSession().getCities()){
+                if (str.equals(city.toLowerCase())) {
+                    return true;
+                }
+            }
+        }
+        System.out.println("City not valid");
+        return false;
     }
 
     @FXML
     private void checkFields() {
-        uploadButton.setDisable(Objects.equals(houseNameTextField.getText(), "") || wrongPictureUrls() || Objects.equals(houseDescriptionTextField.getText(),"")||(mapGraphicManager.getLocation() == null));
+        uploadButton.setDisable(Objects.equals(houseNameTextField.getText(), "") || wrongPictureUrls() ||(mapGraphicManager.getLocation() == null));
     }
 
     private boolean wrongPictureUrls() {
@@ -173,7 +196,7 @@ public class UploadHouseController extends Controller {
 
     @FXML
     private void openLinkInBrowser() {
-        String url = "https://imgbb.com"; // Sostituisci con l'URL desiderato
+        String url = "https://imgbb.com";
         // Apri l'URL nel browser predefinito
         java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
         if (desktop.isSupported(java.awt.Desktop.Action.BROWSE)) {

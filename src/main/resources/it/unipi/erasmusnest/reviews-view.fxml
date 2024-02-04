@@ -13,6 +13,8 @@
                     <items>
                         <MenuItem text="Review score: Descendent order" onAction="#handleOption1"/>
                         <MenuItem text="Review score: Ascendant order" onAction="#handleOption2"/>
+                        <MenuItem text="Review score: Newest first" onAction="#handleOption3"/>
+                        <MenuItem text="Review score: Oldest first" onAction="#handleOption4"/>
                         <MenuItem text="Default option" onAction="#handleDefaultOption"/>
                     </items>
                 </MenuButton>
@@ -26,7 +28,7 @@
         </center>
         <bottom>
             <HBox alignment="CENTER">
-                <Button alignment="CENTER" onAction="#onBackButtonPressed" text="Go back">
+                <Button alignment="CENTER" onAction="#onGoBackButtonPressed" text="Go back">
                     <HBox.margin>
                         <Insets bottom="5.0" left="5.0" right="110.0" top="5.0" />
                     </HBox.margin></Button>

@@ -97,7 +97,8 @@ public class ReviewsController extends Controller{
             // Calculate width proportions for each cell
             double emailWidthRatio = 0.2; // 20% of the width
             double ratingWidthRatio = 0.2; // 20% of the width
-            double commentsWidthRatio = 0.8; // 60% of the width
+            double commentsWidthRatio = 0.6; // 60% of the width
+            double timestampWidthRatio = 0.2; // 20% of the width
 
             // Apartment name
             Label emailLabel = new Label(review.getUserEmail());
@@ -122,12 +123,22 @@ public class ReviewsController extends Controller{
             commentsLabel.prefWidthProperty().bind(reviewHBox.widthProperty().multiply(commentsWidthRatio));
             commentsLabel.setWrapText(true);
 
+            // Timestamp
+            Label timestampLabel = new Label(review.getTimestamp().toString());
+            System.out.println("Timestamp: "+review.getTimestamp().toString());
+            timestampLabel.setStyle("-fx-font-size: 12px;");
+            timestampLabel.setAlignment(Pos.CENTER);
+            timestampLabel.setMaxWidth(Double.MAX_VALUE);
+            timestampLabel.prefWidthProperty().bind(reviewHBox.widthProperty().multiply(timestampWidthRatio));
+            timestampLabel.setWrapText(true);
+
             // Adding elements to the horizontal box
-            reviewHBox.getChildren().addAll(emailLabel, ratingLabel, commentsLabel);
+            reviewHBox.getChildren().addAll(emailLabel, ratingLabel, commentsLabel, timestampLabel);
             reviewHBox.setAlignment(Pos.CENTER);
             HBox.setMargin(emailLabel, new Insets(5.0, 5.0, 5.0, 5.0));
             HBox.setMargin(ratingLabel, new Insets(5.0, 5.0, 5.0, 5.0));
             HBox.setMargin(commentsLabel, new Insets(5.0, 5.0, 5.0, 5.0));
+            HBox.setMargin(timestampLabel, new Insets(2.0, 2.0, 2.0, 2.0));
 
             // Adding the apartment entry to the main VBox
             reviewsVBox.getChildren().add(reviewHBox);
@@ -162,17 +173,31 @@ public class ReviewsController extends Controller{
     }
 
 
-    public void handleOption1(ActionEvent actionEvent) {
+    public void handleOption1() {
         selectedFilter = 1;
         page = 1;
         System.out.println("Option 1");
         printReviews();
     }
 
-    public void handleOption2(ActionEvent actionEvent) {
+    public void handleOption2() {
         selectedFilter = 2;
         page = 1;
         System.out.println("Option 2");
+        printReviews();
+    }
+
+    public void handleOption3() {
+        selectedFilter = 3;
+        page = 1;
+        System.out.println("Option 3");
+        printReviews();
+    }
+
+    public void handleOption4() {
+        selectedFilter = 4;
+        page = 1;
+        System.out.println("Option 4");
         printReviews();
     }
 
@@ -183,7 +208,7 @@ public class ReviewsController extends Controller{
         printReviews();
     }
 
-    public void onBackButtonPressed() {
+    public void onGoBackButtonPressed() {
         super.backToPreviousWindow();
     }
 
@@ -208,5 +233,4 @@ public class ReviewsController extends Controller{
         }
         printReviews();
     }
-
 }

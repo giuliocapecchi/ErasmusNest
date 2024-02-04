@@ -4,7 +4,6 @@ import it.unipi.erasmusnest.model.Apartment;
 import it.unipi.erasmusnest.graphicmanagers.MapGraphicManager;
 import it.unipi.erasmusnest.graphicmanagers.RatingGraphicManager;
 import it.unipi.erasmusnest.graphicmanagers.ReservationGraphicManager;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -15,6 +14,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import javafx.scene.web.WebView;
+import org.controlsfx.control.InfoOverlay;
 import org.controlsfx.control.PopOver;
 
 import java.io.IOException;
@@ -50,6 +50,7 @@ public class ApartmentController extends Controller{
     @FXML
     private Label nameLabel;
     @FXML
+    private InfoOverlay imageOverlay;
     private ImageView imageView;
     @FXML
     private Text infoText;
@@ -75,6 +76,8 @@ public class ApartmentController extends Controller{
     private Apartment apartment;
     private ReservationGraphicManager reservationGraphicManager;
     private boolean reservationsLoaded;
+
+    private int imageIndex = 0;
 
     @FXML
     private void initialize() {
@@ -145,15 +148,28 @@ public class ApartmentController extends Controller{
             rightVBox.prefWidthProperty().bind(secondHBox.widthProperty().multiply(ratio));
             leftVBox.prefWidthProperty().bind(secondHBox.widthProperty().multiply(ratio));
             nameLabel.setText(apartment.getName());
-            String noImageAvailablePath = "/media/no_photo_available.png";
-            Image image;
-            try {
-                image = new Image(apartment.getImageURL().get(0), true);
-            }catch (IllegalArgumentException e){
-                image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvailablePath)));
+
+            imageView = new ImageView();
+            imageView.setPreserveRatio(true);
+            slideImage();
+
+            imageOverlay.setContent(imageView);
+            if(apartment.getImageURLs().size() > 1){
+                imageOverlay.setText("Click on the image\nto see more images");
+                imageView.setOnMouseClicked(event -> {
+                    slideImage();
+                });
+                imageView.hoverProperty().addListener((observable, oldValue, newValue) -> {
+                    if(newValue){
+                        imageView.setStyle("-fx-cursor: hand;");
+                    }else{
+                        imageView.setStyle("-fx-cursor: default;");
+                    }
+                });
+            }else{
+                imageOverlay.setText("Only image available.\n There are no other images for this apartment");
             }
 
-            imageView.setImage(image);
             imageView.setSmooth(true);
             // make the image view always fit the height of the parent
             imageView.fitWidthProperty().bind(leftFirstVBox.widthProperty().multiply(0.8));
@@ -207,6 +223,19 @@ public class ApartmentController extends Controller{
                 loginButton.setVisible(false);
             }
         }
+    }
+
+    private void slideImage() {
+        System.out.println("SLIDE IMAGE "+ imageIndex);
+        String noImageAvailablePath = "/media/no_photo_available.png";
+        Image image;
+        try {
+            image = new Image(apartment.getImageURLs().get(imageIndex), true);
+        }catch (IllegalArgumentException e){
+            image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvailablePath)));
+        }
+        imageIndex = (imageIndex + 1) % apartment.getImageURLs().size();
+        imageView.setImage(image);
     }
 
     private Button getLikeButton() {
@@ -267,7 +296,7 @@ public class ApartmentController extends Controller{
             String userEmail = getSession().getUser().getEmail();
             String houseId = String.valueOf(getSession().getApartmentId());
 
-            getRedisConnectionManager().addReservation(userEmail, houseId, String.valueOf(startYear), String.valueOf(startMonth), String.valueOf(numberOfMonths), getSession().getCity(), apartment.getImageURL().get(0));
+            getRedisConnectionManager().addReservation(userEmail, houseId, String.valueOf(startYear), String.valueOf(startMonth), String.valueOf(numberOfMonths), getSession().getCity(), apartment.getImageURLs().get(0));
 
             cleanAverageRatingInSession();
             super.changeWindow("apartment","myreservations");
@@ -276,7 +305,7 @@ public class ApartmentController extends Controller{
 
     public void onGoBackButtonClick() {
         cleanAverageRatingInSession();
-        super.backToPreviousWindow();
+        super.changeWindow("apartment","apartments");
     }
 
     private void cleanAverageRatingInSession(){

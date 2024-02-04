@@ -5,7 +5,6 @@ import it.unipi.erasmusnest.model.Session;
 import it.unipi.erasmusnest.model.User;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToolBar;
@@ -15,7 +14,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.controlsfx.control.PopOver;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -104,9 +102,9 @@ public class ProfileController extends Controller{
                     apartmentImage.setFitWidth(100);
                     apartmentImage.setPreserveRatio(true);
                     // apartmentImage.setPreserveRatio(false);
-                    //String imageUrl = apartment.getImageURL() != null && !apartment.getImageURL().isEmpty() ? apartment.getImageURL() : "https://hips.hearstapps.com/hmg-prod/images/lago-di-montagna-cervinia-1628008263.jpg";
+                    //String imageUrl = apartment.getImageURLs() != null && !apartment.getImageURLs().isEmpty() ? apartment.getImageURLs() : "https://hips.hearstapps.com/hmg-prod/images/lago-di-montagna-cervinia-1628008263.jpg";
 
-                    String imageUrl = apartment.getImageURL().get(0);
+                    String imageUrl = apartment.getImageURLs().get(0);
                     if (imageUrl == null || imageUrl.isEmpty()) {
                         imageUrl = "https://hips.hearstapps.com/hmg-prod/images/lago-di-montagna-cervinia-1628008263.jpg";
                     }

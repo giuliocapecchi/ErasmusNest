@@ -1,9 +1,13 @@
 package it.unipi.erasmusnest.controllers;
 
+import it.unipi.erasmusnest.model.Review;
+import it.unipi.erasmusnest.model.User;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.text.TextFlow;
+
+import java.util.ArrayList;
 
 public class WriteReviewController extends Controller{
     @FXML
@@ -66,8 +70,9 @@ public class WriteReviewController extends Controller{
     void submit() {
         System.out.println("submit action");
         System.out.println("MANCA IL REDIRECT AL PROFILE DELL'UTENTE");
-        //super.changeWindow("profile");
-        getNeo4jConnectionManager().addReview(getSession().getUser().getEmail(), getSession().getApartmentId(),textArea.getText(), (int)ratingSlider.getValue());
-        super.changeWindow("writeReview","homepage");
+        Review review = new Review(getSession().getApartmentId(),getSession().getUser().getEmail(),textArea.getText(), (int)ratingSlider.getValue());
+        getNeo4jConnectionManager().addReview(review);
+        super.changeWindow("writeReview","myProfile");
+
     }
 }
