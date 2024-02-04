@@ -54,7 +54,7 @@ public class SignupController extends Controller{
 
     @FXML
     private void initialize() {
-        if(getSession().getCities()==null) {
+        if(getSession().getCities()==null || getSession().getCities().isEmpty()){
             getSession().setCities(getNeo4jConnectionManager().getAllCities());
         }
         signupButton.setDisable(true);
@@ -88,10 +88,7 @@ public class SignupController extends Controller{
     public TitledPane createTitledPane() {
         GridPane gridPane = new GridPane();
         List<String> cities = getSession().getCities();
-        for(String city : cities)
-        {
-            System.out.println("\n"+city);
-        }
+
         for(String city : cities)
         {
             CheckBox mainCheckBox = new CheckBox(city);
