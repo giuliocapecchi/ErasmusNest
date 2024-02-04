@@ -7,6 +7,7 @@
 <?import javafx.scene.text.*?>
 <?import javafx.scene.web.*?>
 
+<?import org.controlsfx.control.InfoOverlay?>
 <StackPane fx:id="rootPane" prefHeight="554.0" prefWidth="652.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.erasmusnest.controllers.ApartmentController">
    <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="ALWAYS">
    <BorderPane prefHeight="200.0" prefWidth="200.0">
@@ -28,16 +29,11 @@
                            <Insets top="5.0" />
                        </VBox.margin>
                   </Label>
-                  <!--<InfoOverlay>
+                  <InfoOverlay fx:id="imageOverlay" >
                      <VBox.margin>
                         <Insets bottom="5.0" top="5.0" />
                      </VBox.margin>
-                  </InfoOverlay>-->
-                  <ImageView fx:id="imageView" preserveRatio="true">
-                       <VBox.margin>
-                           <Insets bottom="5.0" top="5.0" />
-                       </VBox.margin>
-                  </ImageView>
+                  </InfoOverlay>
                </VBox>
                <VBox fx:id="rightFirstVBox" alignment="TOP_CENTER">
                   <Label style="-fx-font-size: 20px; -fx-text-fill: #019fe1;" text="Location">

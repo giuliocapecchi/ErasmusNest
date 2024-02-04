@@ -10,9 +10,7 @@ import javafx.geometry.Point2D;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.mongodb.client.model.Filters.*;
@@ -113,8 +111,8 @@ public class MongoConnectionManager extends ConnectionManager{
             if(description!=null && !description.isEmpty() && !description.isBlank()) {
                 newApartment.append("description", apartment.getDescription());
             }
-            if(apartment.getImageURL()!=null && !apartment.getImageURL().isEmpty()) {
-                newApartment.append("picture_url", apartment.getImageURL());
+            if(apartment.getImageURLs()!=null && !apartment.getImageURLs().isEmpty()) {
+                newApartment.append("picture_url", apartment.getImageURLs());
             }
             collection.insertOne(newApartment);
             ObjectId objectId = newApartment.getObjectId("_id");
@@ -127,9 +125,9 @@ public class MongoConnectionManager extends ConnectionManager{
                 Document houseDocument = new Document()
                         .append("object_id", objectId)
                         .append("house_name", apartment.getName());
-                if(apartment.getImageURL()!=null && !apartment.getImageURL().isEmpty()) {
+                if(apartment.getImageURLs()!=null && !apartment.getImageURLs().isEmpty()) {
                     // Taking only the first image of the list
-                    houseDocument.append("picture_url", apartment.getImageURL().get(0));
+                    houseDocument.append("picture_url", apartment.getImageURLs().get(0));
                 }
                 ArrayList<Document> houseArray = new ArrayList<>();
                 // Controlla se il campo "house" non esiste o è vuoto
@@ -392,11 +390,11 @@ public class MongoConnectionManager extends ConnectionManager{
                     .append("email", updatedHouse.getHostEmail())
                     .append("position", updatedHouse.getLocation().getX() + ", " + updatedHouse.getLocation().getY())
                     .append("bathrooms", updatedHouse.getBathrooms());
-            if(updatedHouse.getImageURL()!=null) {
-                if(updatedHouse.getImageURL().isEmpty() || updatedHouse.getDescription().equals(" "))
+            if(updatedHouse.getImageURLs()!=null) {
+                if(updatedHouse.getImageURLs().isEmpty() || updatedHouse.getDescription().equals(" "))
                     updatedHouseDocument.remove("picture_url");
                 else
-                    updatedHouseDocument.append("picture_url", updatedHouse.getImageURL());
+                    updatedHouseDocument.append("picture_url", updatedHouse.getImageURLs());
             }
             if(updatedHouse.getDescription()!=null) {
                 if(updatedHouse.getDescription().isEmpty() || updatedHouse.getDescription().isBlank() || updatedHouse.getDescription().equals(" "))

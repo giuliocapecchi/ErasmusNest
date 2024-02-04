@@ -3,7 +3,6 @@ package it.unipi.erasmusnest.model;
 import javafx.geometry.Point2D;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Apartment {
 
@@ -294,7 +293,7 @@ public class Apartment {
         this.studyFields = studyFields;
     }
 
-    public ArrayList<String> getImageURL() {
+    public ArrayList<String> getImageURLs() {
         return imageUrls;
     }
 
