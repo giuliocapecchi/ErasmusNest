@@ -7,7 +7,6 @@
 <?import javafx.scene.text.*?>
 <?import javafx.scene.web.*?>
 
-<?import org.controlsfx.control.InfoOverlay?>
 <StackPane fx:id="rootPane" prefHeight="554.0" prefWidth="652.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.erasmusnest.controllers.ApartmentController">
    <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="ALWAYS">
    <BorderPane prefHeight="200.0" prefWidth="200.0">

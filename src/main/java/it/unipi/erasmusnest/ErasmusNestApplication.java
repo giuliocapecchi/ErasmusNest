@@ -1,6 +1,5 @@
 package it.unipi.erasmusnest;
 
-import it.unipi.erasmusnest.graphicmanagers.AlertDialogGraphicManager;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
