@@ -61,10 +61,17 @@
                             <Label minWidth="75" style="-fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Study Field:" />
                             <ComboBox fx:id="studyFieldComboBox" minWidth="200" onAction="#onStudyFieldSelectionChanged"/>
                         </HBox>
-                        <HBox alignment="CENTER_LEFT" spacing="10">
-                            <Label minWidth="75" style="-fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Cities of Interest:" />
-                            <VBox fx:id="cityVBox" />
-                            <Button fx:id="updateCitiesButton" onAction="#onUpdateButtonClick" style="-fx-background-color: orange; -fx-border-color: red; -fx-border-width: 1px;" text="Update Cities of Interest" />
+                        <HBox spacing="10">
+                            <Label minWidth="75" style="-fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Cities of Interest:">
+                            <HBox.margin>
+                                <Insets top="5.0" />
+                            </HBox.margin>
+                            </Label>
+                            <VBox fx:id="citiesVBox" alignment="CENTER" >
+                                <!-- Qui verranno inserite le checkbox -->
+                                <TitledPane fx:id="cityTitlePane" text="Update cities of interest" onMouseClicked="#getCitiesOfInterest"/>
+                            </VBox>
+                            <Button fx:id="updateCitiesOfInterestButton" onAction="#onUpdateCitiesOfInterestButtonClick" style="-fx-background-color: orange; -fx-border-color: red; -fx-border-width: 1px;" text="Update" />
                         </HBox>
                      <HBox.margin>
                         <Insets left="10.0" top="50.0" />
