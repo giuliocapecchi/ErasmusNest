@@ -206,7 +206,7 @@ public class ModifyAparmentController extends Controller{
                     // Apartment is still available on Neo4j, apartments view
                     // While someone try to find out more information on apartment view, this'll be removed
                     alertDialog("House correctly removed");
-                    super.changeWindow("modifyApartment","myProfile");
+                    super.changeWindow("myProfile");
                 }
                 else
                 {
