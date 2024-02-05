@@ -5,13 +5,9 @@ import it.unipi.erasmusnest.model.Apartment;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
 import org.controlsfx.control.PopOver;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -41,6 +37,7 @@ public class ModifyAparmentController extends Controller{
     @FXML
     Button lessPictureButton;
     private ArrayList<TextField> pictureUrlsTextField;
+    private Apartment apartment;
 
     public ModifyAparmentController()
     {
@@ -52,9 +49,8 @@ public class ModifyAparmentController extends Controller{
     {
         String apartmentId = getSession().getApartmentId();
         System.out.println("\n\n\nL'ID dell'appartamento è: "+apartmentId);
-        Apartment apartment = getMongoConnectionManager().getApartment(apartmentId);
+        apartment = getMongoConnectionManager().getApartment(apartmentId);
         System.out.println("\n\n\n"+apartment.toString());
-
         inputAccommodates = new Spinner<>();
         inputBathrooms = new Spinner<>();
         inputPrice = new Spinner<>();
@@ -66,6 +62,9 @@ public class ModifyAparmentController extends Controller{
         inputAccommodates.setValueFactory(valoriAccommodates);
         inputBathrooms.setValueFactory(valoriBathrooms);
         inputPrice.setValueFactory(valoriPrice);
+        inputPrice.valueProperty().addListener((obs, oldValue, newValue) -> checkFields());
+        inputBathrooms.valueProperty().addListener((obs, oldValue, newValue) -> checkFields());
+        inputAccommodates.valueProperty().addListener((obs, oldValue, newValue) -> checkFields());
         priceVBox.getChildren().add(inputPrice);
         apartmentVBox.getChildren().add(inputAccommodates);
         bathroomsVBox.getChildren().add(inputBathrooms);
@@ -73,6 +72,7 @@ public class ModifyAparmentController extends Controller{
         descriptionTextArea = new TextArea();
         descriptionTextArea.setText(apartment.getDescription());
         descriptionTextArea.setWrapText(true); // Abilita il word wrapping per l'area di testo
+        descriptionTextArea.onKeyReleasedProperty().set(event -> checkFields());
         neighborhoodVBox.getChildren().add(descriptionTextArea);
         //Aggiunta foto:
 
@@ -97,6 +97,7 @@ public class ModifyAparmentController extends Controller{
             pictureUrlsVBox.getChildren().add(pictureUrlTextField);
             pictureUrlsTextField.add(pictureUrlTextField);
         }
+
     }
 
     public void onUpdateHouseButtonClick(ActionEvent actionEvent)
@@ -114,12 +115,23 @@ public class ModifyAparmentController extends Controller{
             if(pictureUrlTextField.getText() != null && !pictureUrlTextField.getText().isEmpty() && !pictureUrlTextField.getText().isBlank())
                 pictureUrls.add(pictureUrlTextField.getText());
         }
+        boolean change = false;
+        //if(!pictureUrls.get(0).equals(apartment.getImageURLs().get(0)) || apartment.getImageURLs()==null || apartment.getImageURLs().isEmpty())
+            change = true;
         apartment.setImageURL(pictureUrls);
+        System.out.println("\n\n\nIMMAGINI DENTRO ALL'APPARTAMENTO:");
+        for (String s : apartment.getImageURLs()) {
+            System.out.println(s);
+        }
         apartment.setId(getSession().getApartmentId());
 
         if(getMongoConnectionManager().updateApartment(apartment))
         {
-            System.out.println("\n\n\nCasa modificata correttamente"+apartment.toString());
+            //if(change)
+                if(getNeo4jConnectionManager().updateApartment(apartment.getId(), apartment.getImageURLs().get(0)))
+                    System.out.println("\n\n\nCasa modificata correttamente"+apartment.toString());
+                else
+                    System.out.println("\n\n\nCasa non modificata correttamente"+apartment.toString());
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Information Dialog");
             alert.setHeaderText(null);
@@ -194,6 +206,7 @@ public class ModifyAparmentController extends Controller{
                     // Apartment is still available on Neo4j, apartments view
                     // While someone try to find out more information on apartment view, this'll be removed
                     alertDialog("House correctly removed");
+                    super.changeWindow("myProfile");
                 }
                 else
                 {
@@ -233,6 +246,7 @@ public class ModifyAparmentController extends Controller{
             TextField pictureUrlTextField = new TextField();
             //pictureUrlTextField.onKeyReleasedProperty().set(event -> checkFields());
             pictureUrlTextField.setPromptText("Insert picture URL");
+            pictureUrlTextField.onKeyReleasedProperty().set(event -> checkFields());
             pictureUrlsVBox.getChildren().add(pictureUrlTextField);
             pictureUrlsTextField.add(pictureUrlTextField);
         }
@@ -261,7 +275,34 @@ public class ModifyAparmentController extends Controller{
 
     @FXML
     private void checkFields() {
-        //uploadButton.setDisable(Objects.equals(houseNameTextField.getText(), "") || wrongPictureUrls() ||(mapGraphicManager.getLocation() == null));
+        Integer accommodates = apartment.getMaxAccommodates();
+        Integer bathrooms = apartment.getBathrooms();
+        Integer price = apartment.getDollarPriceMonth();
+        String description = apartment.getDescription();
+        ArrayList<String> pictureUrls = apartment.getImageURLs();
+        boolean res = Objects.equals(inputAccommodates.getValue(), accommodates) && Objects.equals(inputBathrooms.getValue(), bathrooms) && Objects.equals(inputPrice.getValue(), price) && Objects.equals(descriptionTextArea.getText(), description);
+        //res = accommodates != null && bathrooms != null && price != null && description != null && pictureUrls != null && res;
+        System.out.println("\n\n\naccommodates: "+accommodates+" inputAccommodates: "+inputAccommodates.getValue());
+        System.out.println("bathrooms: "+bathrooms+" inputBathrooms: "+inputBathrooms.getValue());
+        System.out.println("price: "+price+" inputPrice: "+inputPrice.getValue());
+        System.out.println("description: "+description+" inputDescription: "+descriptionTextArea.getText());
+        System.out.println("pictureUrls: "+pictureUrls+" pictureUrlsTextField: "+pictureUrlsTextField);
+        System.out.println("picture url size: "+pictureUrls.size()+" picture url text field size: "+pictureUrlsTextField.size());
+        for (int i = 0; i < pictureUrlsTextField.size(); i++) {
+            if(pictureUrlsTextField.get(i).getText().isBlank() || pictureUrlsTextField.get(i).getText().isEmpty())
+            {
+                res = false;
+            } else {
+                if(pictureUrls.get(i)!=null) {
+                    if(!Objects.equals(pictureUrls.get(i), pictureUrlsTextField.get(i).getText()))
+                    {
+                        res = false;
+                        break;
+                    }
+                }
+            }
+        }
+        updateHouse.setDisable(res);
     }
 
 }

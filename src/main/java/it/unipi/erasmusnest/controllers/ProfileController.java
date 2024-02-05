@@ -151,24 +151,30 @@ public class ProfileController extends Controller{
     {
         String otherEmail = getSession().getOtherProfileMail();
         String email = getSession().getUser().getEmail();
-        getNeo4jConnectionManager().addFollow(email, otherEmail);
-        List<String> suggestedUsers =  getNeo4jConnectionManager().seeSuggestedUsers(email, otherEmail);
-        // Show pop up with suggested users
-        suggestedVBox.setVisible(true);
-        suggestedOuterBox.setVisible(true);
-        if (suggestedUsers != null && !suggestedUsers.isEmpty()) {
-            for (String suggestedUser : suggestedUsers) {
-                Button suggestedUserButton = new Button(suggestedUser);
-                suggestedVBox.getChildren().add(suggestedUserButton);
-                suggestedUserButton.setOnAction(event -> {
-                    getSession().setOtherProfileMail(suggestedUser);
-                    super.refreshWindow();
-                });
+        if(!email.equals(otherEmail) ) {
+            getNeo4jConnectionManager().addFollow(email, otherEmail);
+            List<String> suggestedUsers =  getNeo4jConnectionManager().seeSuggestedUsers(email, otherEmail);
+            // Show pop up with suggested users
+            suggestedVBox.setVisible(true);
+            suggestedOuterBox.setVisible(true);
+            if (suggestedUsers != null && !suggestedUsers.isEmpty()) {
+                for (String suggestedUser : suggestedUsers) {
+                    Button suggestedUserButton = new Button(suggestedUser);
+                    suggestedVBox.getChildren().add(suggestedUserButton);
+                    suggestedUserButton.setOnAction(event -> {
+                        getSession().setOtherProfileMail(suggestedUser);
+                        super.refreshWindow();
+                    });
+                }
+                showConfirmationMessage("Started follow", followButton);
+                followButton.setDisable(true);
+            } else {
+                suggestedOuterBox.getChildren().addAll(new Label("No suggested users"));
+                followButton.setDisable(true);
             }
-            showConfirmationMessage("Started follow", followButton);
-            followButton.setDisable(true);
-        } else {
-            suggestedOuterBox.getChildren().addAll(new Label("No suggested users"));
+        }
+        else {
+            showConfirmationMessage("You can't follow yourself", followButton);
             followButton.setDisable(true);
         }
     }
