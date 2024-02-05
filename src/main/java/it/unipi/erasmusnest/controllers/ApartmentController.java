@@ -246,10 +246,10 @@ public class ApartmentController extends Controller{
         if(!apartment.getImageURLs().isEmpty()) {
             try {
                 image = new Image(apartment.getImageURLs().get(imageIndex), true);
-                imageIndex = (imageIndex + 1) % apartment.getImageURLs().size();
             }catch (IllegalArgumentException e){
                 image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvailablePath)));
             }
+            imageIndex = (imageIndex + 1) % apartment.getImageURLs().size();
         } else {
             image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvailablePath)));
         }
