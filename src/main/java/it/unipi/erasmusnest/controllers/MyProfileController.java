@@ -272,6 +272,7 @@ public class MyProfileController extends Controller {
                 passwordChangeOuterBox.setVisible(false);
                 passwordField.setText("*".repeat(newPassword.length()));
                 showConfirmationMessage("Password aggiornata con successo!", modifyPasswordButton);
+                onModifyPasswordButtonClick();
             }else{ // aggiorno su Mongo e basta / TODO : eventual consistency da gestire qui! La password rimane solo su Redis per ora
                 System.out.println("Password non aggiornata su Redis perchè non trovata la chiave. La aggiorno su MongoDB");
                 // per come è ora il codice, su mongo la password viene aggiornata a priori (errore???)
@@ -304,36 +305,6 @@ public class MyProfileController extends Controller {
         popOver.show(node);
     }
 
-    private void showConfirmationMessagePassword(String message, Node node) {
-        PopOver popOver = new PopOver();
-        Label label = new Label(message);
-        label.setStyle("-fx-padding: 10px;");
-        popOver.setContentNode(label);
-        popOver.setDetachable(false);
-        popOver.setAutoHide(true);
-        popOver.show(node);
-    }
-
-    private void showConfirmationMessageCities(String message) {
-        PopOver popOver = new PopOver();
-        Label label = new Label(message);
-        label.setStyle("-fx-padding: 10px;");
-        popOver.setContentNode(label);
-        popOver.setDetachable(false);
-        popOver.setAutoHide(true);
-        popOver.show(updateCitiesOfInterestButton);
-    }
-
-    private void showConfirmationMessageSF(String message) {
-        PopOver popOver = new PopOver();
-        Label label = new Label(message);
-        label.setStyle("-fx-padding: 10px;");
-        popOver.setContentNode(label);
-        popOver.setDetachable(false);
-        popOver.setAutoHide(true);
-        popOver.show(studyFieldComboBox);
-    }
-
     @FXML
     private void onStudyFieldSelectionChanged() {
         String newStudyField = studyFieldComboBox.getValue();
@@ -343,11 +314,13 @@ public class MyProfileController extends Controller {
             {
                 // Aggiorna la variabile con il nuovo valore
                 selectedStudyField = newStudyField;
-                showConfirmationMessageSF("Study Field aggiornato con successo!");
+                //showConfirmationMessageSF("Study Field aggiornato con successo!");
+                showConfirmationMessage("Study Field aggiornato con successo!", studyFieldComboBox);
             }
             else
             {
-                showConfirmationMessageSF("Errore nell'aggiornamento di study field!");
+                //showConfirmationMessageSF("Errore nell'aggiornamento di study field!");
+                showConfirmationMessage("Errore nell'aggiornamento di study field!", studyFieldComboBox);
             }
         }
     }
@@ -434,9 +407,11 @@ public class MyProfileController extends Controller {
             citiesOfInterestInNeo4j.clear();
             citiesOfInterestInNeo4j.addAll(selectedCitiesOfInterest);
             cityTitlePane.setExpanded(false);
-            showConfirmationMessageCities("Città di interesse aggiornate con successo!");
+            //showConfirmationMessageCities("Città di interesse aggiornate con successo!");
+            showConfirmationMessage("Città di interesse aggiornate con successo!", updateCitiesOfInterestButton);
         }else{
-            showConfirmationMessageCities("Errore nell'aggiornamento delle città di interesse!");
+            //showConfirmationMessageCities("Errore nell'aggiornamento delle città di interesse!");
+            showConfirmationMessage("Errore nell'aggiornamento delle città di interesse!", updateCitiesOfInterestButton);
         }
     }
 }
