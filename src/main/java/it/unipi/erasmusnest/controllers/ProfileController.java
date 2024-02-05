@@ -108,9 +108,6 @@ public class ProfileController extends Controller{
                     if (imageUrl == null || imageUrl.isEmpty()) {
                         imageUrl = "https://hips.hearstapps.com/hmg-prod/images/lago-di-montagna-cervinia-1628008263.jpg";
                     }
-
-                    System.out.println("houseName: " + apartment.getName());
-                    System.out.println("immmagine: " + imageUrl);
                     Image image = new Image(imageUrl, true);
                     apartmentImage.setImage(image);
 
