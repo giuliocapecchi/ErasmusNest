@@ -432,7 +432,7 @@ public class MyProfileController extends Controller {
                 Button dislike = new Button("dislike");
                 dislike.setOnAction(event -> {
                     getNeo4jConnectionManager().removeFavourite(getSession().getUser().getEmail(),favourite);
-                    super.changeWindow("myprofile","myprofile");
+                    super.changeWindow("myprofile");
                 });
                 favouritesContainerVBox.getChildren().addAll(button,dislike);
             }
