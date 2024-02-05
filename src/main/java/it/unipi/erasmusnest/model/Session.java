@@ -23,7 +23,7 @@ public class Session {
 
     private List<String> studyFields;
 
-    private List<String> cities;
+    private List<String> cities; // sono tutte le città presenti nel db, non quelle di interesse!
 
     private List<String> apartmentsId;
 

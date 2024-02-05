@@ -18,19 +18,19 @@ import java.util.*;
 public class MyProfileController extends Controller {
 
     @FXML
-    VBox personalInfoVbox;
-    public VBox cityVBox;
-    public  TitledPane cityTitlePane;
+    Button updateCitiesOfInterestButton;
+    @FXML
+    private VBox personalInfoVbox;
+    @FXML
+    private VBox citiesVBox;
+    @FXML
+    private TitledPane cityTitlePane;
     @FXML
     VBox apartmentsContainerVBox;
     @FXML
-    Button updateCitiesButton;
-    @FXML
     VBox apartmentsContainer;
-
     @FXML
     VBox adminContainer;
-
     @FXML
     Label emailLabel;
     @FXML
@@ -51,16 +51,17 @@ public class MyProfileController extends Controller {
     PasswordField newPasswordField; // Campo per la nuova password
     @FXML
     PasswordField confirmNewPasswordField; // Campo per la conferma della nuova password
-    boolean isEditingPassword = false; // Aggiunto per gestire la modifica della password
     @FXML
     Label passwordErrorLabel; // Etichetta per visualizzare gli errori
     @FXML
     private ComboBox<String> studyFieldComboBox;
     @FXML
     private VBox favouritesContainerVBox;
-
+    boolean isEditingPassword = false; // Aggiunto per gestire la modifica della password
     private String selectedStudyField;
-    private final List<String> selectedCities = new ArrayList<>();
+    private ArrayList<String> citiesOfInterestInNeo4j = new ArrayList<>();
+    private ArrayList<String> selectedCitiesOfInterest = new ArrayList<>();
+
 
 
     // Metodo per impostare il testo dell'etichetta dell'errore
@@ -72,29 +73,23 @@ public class MyProfileController extends Controller {
 
     @FXML
     private void initialize() {
+        //todo rimuovi
+        getSession().setLogged(true);
+        getSession().setUser(getMongoConnectionManager().findUser("adriana33@gmail.com"));
+        // todo fine todo
 
         getSession().setCity(null); // serve per la change window
         personalInfoVbox.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.4));
         apartmentsContainerVBox.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.4));
         passwordChangeOuterBox.prefWidthProperty().bind(super.getRootPane().widthProperty());
+        //todo qui sotto
+        updateCitiesOfInterestButton.setDisable(true); // viene abilitato solo se l'utente effettivamente modifica le città di interesse
+
 
         String userEmail = getSession().getUser().getEmail();
 
         User utente = getMongoConnectionManager().findUser(userEmail);
-        System.out.println("\n\n\nUSER DELLA MYPROFILE: "+utente.toString());
         passwordField.setText("******"); // Set password field to 6 asterisks
-        // List<String> userCities = utente.getPreferredCities();
-        // cityTitlePane = createTitledPane(userCities);
-        // cityVBox.getChildren().add(cityTitlePane);
-
-        // Update preferred cities
-        updateCitiesButton.setOnAction(event -> {
-            if (updateCitiesInDatabase(selectedCities)) {
-                showConfirmationMessageCities("Preferred cities updated successfully!");
-            } else {
-                showConfirmationMessageCities("Error while updating preferred cities!");
-            }
-        });
 
         // Nascondi il banner/pop-up per la modifica della password all'inizio
         passwordChangeBox.setVisible(false);
@@ -106,80 +101,70 @@ public class MyProfileController extends Controller {
         studyFieldComboBox.getItems().addAll(getSession().getStudyFields());
         // Inizializza il ComboBox per il campo "Cities of Interest" (CoI)
         // Estrai il campo "Study Field" (SF) e "Cities of Interest" (CoI) dal documento dell'utente
-        //selectedStudyField = userDocument.getString("SF");
         selectedStudyField = utente.getStudyField()==null ? "" : utente.getStudyField();
-        // selectedCityOfInterest = userDocument.getString("CoI");
 
         // Imposta i valori iniziali nei ComboBox
         studyFieldComboBox.setValue(selectedStudyField);
-        // citiesOfInterestComboBox.setValue(selectedCityOfInterest);
-
-        // Assumi che "house" possa essere un Document o una List<Document>
-        //Object houseObject = userDocument.get("house");
 
         nameLabel.setText(utente.getName());
         lastNameLabel.setText(utente.getSurname());
         emailLabel.setText(utente.getEmail());
 
-        //apartmentsContainer = new VBox(10); // Assicurati che questo VBox sia definito nel FXML con fx:id="apartmentsContainer"
-
-            if(utente.getHouses() != null  && !utente.getHouses().isEmpty())
+        if(utente.getHouses() != null  && !utente.getHouses().isEmpty()){
+            // Recupera gli appartamenti dell'utente e li aggiunge al VBox apartmentsContainer
+            for (Apartment apartment : utente.getHouses())
             {
-                // Recupera gli appartamenti dell'utente e li aggiunge al VBox apartmentsContainer
-                for (Apartment apartment : utente.getHouses())
-                {
-                    System.out.println("\n\n\nApartment: "+apartment.toString());
-                    //QUI TUTTO CORRETTO
-                    HBox apartmentBox = new HBox(10);
-                    apartmentBox.setAlignment(Pos.CENTER_LEFT);
+                System.out.println("\n\n\nApartment: "+apartment.toString());
+                //QUI TUTTO CORRETTO
+                HBox apartmentBox = new HBox(10);
+                apartmentBox.setAlignment(Pos.CENTER_LEFT);
 
-                    ImageView apartmentImage = new ImageView();
-                    apartmentImage.setPreserveRatio(true);
+                ImageView apartmentImage = new ImageView();
+                apartmentImage.setPreserveRatio(true);
 
-                    String imageUrl = null;
-                    if(apartment.getImageURLs()!=null && !apartment.getImageURLs().isEmpty()){
-                        imageUrl = apartment.getImageURLs().get(0);
-                    }
-                    String noImageAvaialblePath = "/media/no_photo_available.png";
-                    if(imageUrl==null || imageUrl.isEmpty()){
-                        apartmentImage.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvaialblePath))));
-                    }else{
-                        Image image;
-                        try{
-                            image = new Image(imageUrl,true); // this can fail if the link is not valid
-                        }catch (Exception e) {
-                            System.out.println("not valid URL for the image");
-                            image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvaialblePath)));
-                        }
-                        apartmentImage.setImage(image);
-                    }
-
-                    apartmentImage.setSmooth(true);
-                    apartmentImage.fitWidthProperty().bind(apartmentBox.widthProperty().multiply(0.4));
-                    Button apartmentButton = new Button();
-                    apartmentButton.setText("Modify");
-
-                    apartmentButton.setId(apartment.getId());
-                    //Now add the apartment image and button to the HBox
-                    apartmentButton.setOnAction(event -> {
-                        // Chiamare il metodo desiderato quando il bottone viene premuto
-                        onApartmentView(apartmentButton.getId());
-                    });
-                    Button viewButton = new Button(apartment.getName());
-                    viewButton.setOnAction(event -> {
-                        onChangeView(apartmentButton.getId());
-                    });
-
-                    apartmentBox.getChildren().addAll(apartmentImage, viewButton, apartmentButton);
-                    apartmentsContainer.getChildren().add(apartmentBox); // This should add the apartment to the UI
+                String imageUrl = null;
+                if(apartment.getImageURLs()!=null && !apartment.getImageURLs().isEmpty()){
+                    imageUrl = apartment.getImageURLs().get(0);
                 }
-            } else {
+                String noImageAvaialblePath = "/media/no_photo_available.png";
+                if(imageUrl==null || imageUrl.isEmpty()){
+                    apartmentImage.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvaialblePath))));
+                }else{
+                    Image image;
+                    try{
+                        image = new Image(imageUrl,true); // può fallire se il link è non valido
+                    }catch (Exception e) {
+                        System.out.println("not valid URL for the image");
+                        image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvaialblePath)));
+                    }
+                    apartmentImage.setImage(image);
+                }
+
+                apartmentImage.setSmooth(true);
+                apartmentImage.fitWidthProperty().bind(apartmentBox.widthProperty().multiply(0.4));
+                Button apartmentButton = new Button();
+                apartmentButton.setText("Modify");
+
+                apartmentButton.setId(apartment.getId());
+                //Now add the apartment image and button to the HBox
+                apartmentButton.setOnAction(event -> {
+                    // Chiamare il metodo desiderato quando il bottone viene premuto
+                    onApartmentView(apartmentButton.getId());
+                });
+                Button viewButton = new Button(apartment.getName());
+                viewButton.setOnAction(event -> {
+                    onChangeView(apartmentButton.getId());
+                });
+
+                apartmentBox.getChildren().addAll(apartmentImage, viewButton, apartmentButton);
+                apartmentsContainer.getChildren().add(apartmentBox); // This should add the apartment to the UI
+            }
+        }else{
             apartmentsContainer.getChildren().add(new Label("No apartments available."));
         }
         // Parte riservata all'ADMIN
-        // Se sono admin, allora mi appare un bottone per accedere alla vista analitiche
-        if (utente.isAdmin(utente.getEmail()))
-        {
+        // Se sono admin, allora appare un bottone per accedere alla vista analitiche
+        if (utente.isAdmin(utente.getEmail())){
             Button analyticsButton = new Button();
             analyticsButton.setText("Analytics");
             analyticsButton.setStyle("-fx-background-color: orange; -fx-border-color: red; -fx-border-width: 1px;");
@@ -191,49 +176,47 @@ public class MyProfileController extends Controller {
 
             adminContainer.getChildren().add(analyticsButton);
         }
-
-        /*
-        if(utente.getHouses().isEmpty()){
-            reservationsContainerVBox.getChildren().clear();
-        }
-        */
-
         getSession().setUser(utente);
     }
 
-    private void onChangeView(String apartmentId)
-    {
+    private void onChangeView(String apartmentId){
         getSession().setApartmentId(apartmentId);
         super.changeWindow("apartment");
     }
 
-    public TitledPane createTitledPane(List<String> userCities) {
+    public TitledPane createTitledPane(List<String> userCities){
         GridPane gridPane = new GridPane();
-        List<String> cities = getNeo4jConnectionManager().getAllCities();
-        for(String city : cities)
-        {
+        if(getSession().getCities() == null || getSession().getCities().isEmpty()){
+            getSession().setCities(getNeo4jConnectionManager().getAllCities());
+        }
+        selectedCitiesOfInterest.addAll(citiesOfInterestInNeo4j); // selected cities of interest lo uso per gestire quando abilitare il tasto di upload
+
+        System.out.println("cities of interest in neo4j: "+citiesOfInterestInNeo4j);
+        System.out.println("selected cities of interest: "+selectedCitiesOfInterest);
+
+        for(String city : getSession().getCities()){
             CheckBox mainCheckBox = new CheckBox(city);
             mainCheckBox.setText(city);
             mainCheckBox.setOnAction(e -> {
                 if (mainCheckBox.isSelected()) {
-                    selectedCities.add(mainCheckBox.getText());
-                } else {
-                    selectedCities.remove(mainCheckBox.getText());
+                    selectedCitiesOfInterest.add(mainCheckBox.getText());
+                    updateCitiesOfInterestButton.setDisable(selectedCitiesOfInterest.equals(citiesOfInterestInNeo4j));
+                }else{
+                    selectedCitiesOfInterest.remove(mainCheckBox.getText());
+                    updateCitiesOfInterestButton.setDisable(selectedCitiesOfInterest.equals(citiesOfInterestInNeo4j));
                 }
+
+                System.out.println("cities of interest in neo4j: "+citiesOfInterestInNeo4j);
+                System.out.println("selected cities of interest: "+selectedCitiesOfInterest);
             });
             if(userCities!=null && userCities.contains(city)){
                 mainCheckBox.setSelected(true);
-                selectedCities.add(city);
             }
-            gridPane.add(mainCheckBox, 0, cities.indexOf(city));
+            gridPane.add(mainCheckBox, 0, getSession().getCities().indexOf(city));
         }
-
-        TitledPane titledPane = new TitledPane("Cities interested in", gridPane);
-        // titledPane.setStyle("-fx-pref-width: 10px;"); // Imposta la larghezza preferita inline
-        // titledPane.setPadding(new Insets(2, 2, 2, 2));
-
-        titledPane.setExpanded(false);
-
+        TitledPane titledPane = new TitledPane("Update cities of interest", gridPane);
+        titledPane.setAnimated(false);
+        titledPane.setExpanded(true);
         return titledPane;
     }
 
@@ -325,7 +308,7 @@ public class MyProfileController extends Controller {
         popOver.setContentNode(label);
         popOver.setDetachable(false);
         popOver.setAutoHide(true);
-        popOver.show(updateCitiesButton);
+        popOver.show(updateCitiesOfInterestButton);
     }
 
     private void showConfirmationMessageSF(String message) {
@@ -357,24 +340,12 @@ public class MyProfileController extends Controller {
         }
     }
 
-    @FXML
-    private void onUpdateButtonClick() {
-        // Aggiorna le città di interesse dell'utente nel database con selectedCities
-        if(updateCitiesInDatabase(selectedCities))
-        {
-            showConfirmationMessageCities("Città di interesse aggiornate con successo!");
-        } else {
-            showConfirmationMessageCities("Errore nell'aggiornamento delle città di interesse!");
-        }
+    public void getCitiesOfInterest() {
+        citiesOfInterestInNeo4j = getNeo4jConnectionManager().getCitiesOfInterest(getSession().getUser().getEmail());
+        cityTitlePane = createTitledPane(citiesOfInterestInNeo4j);
+        citiesVBox.getChildren().clear();
+        citiesVBox.getChildren().add(cityTitlePane);
     }
-
-    private boolean updateCitiesInDatabase(List<String> cities) {
-        // Ottieni l'ID dell'utente corrente
-        String mail = getSession().getUser().getEmail();
-        User user = getMongoConnectionManager().findUser(mail);
-        return getMongoConnectionManager().updatePreferredCities(user.getEmail(), cities);
-    }
-
 
     public void onUploadHouseButtonClick(ActionEvent actionEvent) {
         super.changeWindow("uploadHouse");
@@ -414,7 +385,6 @@ public class MyProfileController extends Controller {
         System.out.println("Favourites button clicked");
         Map<String,String> favourites = getNeo4jConnectionManager().getFavourites(getSession().getUser().getEmail());
         if(favourites==null || favourites.isEmpty()){
-            // favouritesContainerVBox.getChildren().clear();
             System.out.println("\n\n\nNo favourites found\n\n\n");
             favouritesContainerVBox.getChildren().add(new Label("No favourites found"));
         }
@@ -434,6 +404,18 @@ public class MyProfileController extends Controller {
                 });
                 favouritesContainerVBox.getChildren().addAll(button,dislike);
             }
+        }
+    }
+
+    public void onUpdateCitiesOfInterestButtonClick() {
+        if(getNeo4jConnectionManager().updateCitiesOfInterest(getSession().getUser().getEmail(), citiesOfInterestInNeo4j)){
+            updateCitiesOfInterestButton.setDisable(true);
+            citiesOfInterestInNeo4j.clear();
+            citiesOfInterestInNeo4j.addAll(selectedCitiesOfInterest);
+            cityTitlePane.setExpanded(false);
+            showConfirmationMessageCities("Città di interesse aggiornate con successo!");
+        }else{
+            showConfirmationMessageCities("Errore nell'aggiornamento delle città di interesse!");
         }
     }
 }
