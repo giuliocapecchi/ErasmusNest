@@ -92,37 +92,37 @@ public class MongoConnectionManager extends ConnectionManager{
         return user;
     }
 
-    public boolean uploadApartment(Apartment apartment)
+    public Apartment uploadApartment(Apartment apartment)
     {
-        boolean result = false;
+        Apartment insertedApartment = null;
         try(MongoClient mongoClient = MongoClients.create("mongodb://"+super.getHost()+":"+super.getPort()))
         {
             MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
-            MongoCollection<Document> collection = database.getCollection("apartments");
-            Document newApartment = new Document("house_name", apartment.getName())
-                    .append("host_name",apartment.getHostName())
-                    .append("host_surname",apartment.getHostSurname())
-                    .append("email", apartment.getHostEmail())
-                    .append("accommodates", apartment.getMaxAccommodates())
-                    .append("bathrooms", apartment.getBathrooms())
-                    .append("price", apartment.getDollarPriceMonth())
-                    .append("position", apartment.getLocation().getX() + ", " + apartment.getLocation().getY());
-            // OPTIONAL: DESCRIPTION E PICTUREURL
-            String description = apartment.getDescription();
-            if(description!=null && !description.isEmpty() && !description.isBlank()) {
-                newApartment.append("description", apartment.getDescription());
-            }
-            if(apartment.getImageURLs()!=null && !apartment.getImageURLs().isEmpty()) {
-                newApartment.append("picture_url", apartment.getImageURLs());
-            }
-            collection.insertOne(newApartment);
-            ObjectId objectId = newApartment.getObjectId("_id");
-            System.out.println("\n\n\nObjectId: " + objectId);
-            String insertedObjectId = newApartment.getObjectId("_id").toHexString();
-            // Update the user's house list
             MongoCollection<Document> userCollection = database.getCollection("users");
             Document userDocument = userCollection.find(Filters.eq("email", apartment.getHostEmail())).first();
-            if (userDocument != null) {
+            if (userDocument != null) { // procedo solo se l'utente che tenta il caricamento viene trovato
+                MongoCollection<Document> collection = database.getCollection("apartments");
+                Document newApartment = new Document("house_name", apartment.getName())
+                        .append("host_name",apartment.getHostName())
+                        .append("host_surname",apartment.getHostSurname())
+                        .append("email", apartment.getHostEmail())
+                        .append("accommodates", apartment.getMaxAccommodates())
+                        .append("bathrooms", apartment.getBathrooms())
+                        .append("price", apartment.getDollarPriceMonth())
+                        .append("position", apartment.getLocation().getX() + ", " + apartment.getLocation().getY());
+                // OPTIONAL: DESCRIPTION E PICTUREURL
+                String description = apartment.getDescription();
+                if(description!=null && !description.isEmpty() && !description.isBlank()) {
+                    newApartment.append("description", apartment.getDescription());
+                }
+                if(apartment.getImageURLs()!=null && !apartment.getImageURLs().isEmpty()) {
+                    newApartment.append("picture_url", apartment.getImageURLs());
+                }
+                collection.insertOne(newApartment);
+                ObjectId objectId = newApartment.getObjectId("_id");
+                System.out.println("\n\n\nObjectId: " + objectId);
+                String insertedObjectId = newApartment.getObjectId("_id").toHexString();
+                // Update the user's house list
                 Document houseDocument = new Document()
                         .append("object_id", objectId)
                         .append("house_name", apartment.getName());
@@ -137,21 +137,19 @@ public class MongoConnectionManager extends ConnectionManager{
                 houseArray.add(houseDocument);
                 userDocument.put("houses", houseArray);
                 userCollection.replaceOne(Filters.eq("email", apartment.getHostEmail()), userDocument);
-
                 System.out.println("Casa aggiunta o creata con successo.");
+                insertedApartment = apartment;
+                insertedApartment.setId(insertedObjectId);
             } else {
                 System.out.println("Documento utente non trovato.");
             }
-            result = true;
-        }
-        catch (Exception e)
-        {
+
+        }catch (Exception e){
             e.printStackTrace();
             new AlertDialogGraphicManager("MongoDB UPLOAD failed").show();
             System.out.println("Error in uploadApartment: " + e.getMessage());
-            result = false;
         }
-        return result;
+        return insertedApartment;
     }
 
     public Apartment getApartment(String apartmentId){

@@ -8,7 +8,6 @@ import org.neo4j.driver.types.Node;
 import org.neo4j.driver.types.Relationship;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static org.neo4j.driver.Values.NULL;
@@ -74,24 +73,29 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
     }
 
 
-    public void addApartment( final Integer apartmentId, final String name, final String pictureUrl, final Double averageReviewScore )
-    {
-        try (Session session = driver.session())
-        {
+    public boolean addApartment(Apartment apartment){
+        try (Session session = driver.session()){
             session.writeTransaction((TransactionWork<Void>) tx -> {
                 Map<String, Object> parameters = new HashMap<>();
-                parameters.put("apartmentId", apartmentId);
-                parameters.put("name", name);
-                parameters.put("pictureUrl", pictureUrl);
-                parameters.put("averageReviewScore", averageReviewScore);
+                parameters.put("apartmentId", apartment.getId());
+                parameters.put("name", apartment.getName());
+                parameters.put("pictureUrl", apartment.getImageURLs().get(0));
+                parameters.put("averageReviewScore", apartment.getAverageRating());
+                parameters.put("city", apartment.getCity());
+                tx.run("MERGE (a:Apartment {apartmentId: $apartmentId, name: $name, pictureUrl: $pictureUrl, averageReviewScore: $averageReviewScore}) " +
+                                "MERGE (c:City {name: $city}) " +
+                                "MERGE (a)-[:LOCATED]->(c)",
+                        parameters
+                );
 
-                tx.run( "MERGE (a:Apartment {apartmentId: $apartmentId, name: $name, pictureUrl: $pictureUrl, averageReviewScore: $averageReviewScore})", parameters);
                 return null;
             });
+            return true;
         }catch (Exception e){
             System.out.println("Exception: " + e);
             new AlertDialogGraphicManager("Neo4j connection failed").show();
         }
+        return false;
     }
 
     public void addReview(Review review) {

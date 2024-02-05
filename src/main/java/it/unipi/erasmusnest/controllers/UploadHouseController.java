@@ -12,7 +12,6 @@ import javafx.scene.web.WebView;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Objects;
 
 public class UploadHouseController extends Controller {
@@ -113,27 +112,33 @@ public class UploadHouseController extends Controller {
         String houseDescription = houseDescriptionTextField.getText();
         double latitude = mapGraphicManager.getLatitude();
         double longitude = mapGraphicManager.getLongitude();
+        String city = mapGraphicManager.getCity();
         Point2D location = new Point2D(latitude, longitude);
         String userEmail = getSession().getUser().getEmail();
         User user = getMongoConnectionManager().findUser(userEmail);
         if (user != null) {
-            Apartment apartment = new Apartment(houseName, houseDescription, location, price, accommodates, userEmail,
+            Apartment apartment = new Apartment(houseName, houseDescription, location, city, price, accommodates, userEmail,
                     pictureUrls, 0.0, 0, bathrooms, user.getName(), user.getSurname());
 
             // Call Mongo to insert apartment
-            if (getMongoConnectionManager().uploadApartment(apartment)) {
-                System.out.println("sei qui");
-                new AlertDialogGraphicManager("House uploaded correctly","House correctly uploaded.","You will be redirected to your profile","information").show();
-                super.changeWindow("uploadHouse","myProfile");
-                return;
-            } else {
-                System.out.println("impossibile caricare casa");}
-        } else {
+            apartment = getMongoConnectionManager().uploadApartment(apartment);
+            if (apartment.getId() != null) { // se è andato a buon fine, dentro l'ID ci sarà l'object id assegnato da MongoDB
+                //TODO : è corretta sta roba? Caricamento "atomico" su MongoDB poi su Neo4J se tutto è andato a buon fine
+                if(getNeo4jConnectionManager().addApartment(apartment)){ // tutto è andato a buon fine
+                    new AlertDialogGraphicManager("House uploaded correctly","House correctly uploaded.","You will be redirected to your profile","information").show();
+                    super.changeWindow("uploadHouse","myProfile");
+                    return;
+                }else{ // necessario rollback dell'upload su MongoDB
+                    System.out.println("Caricamento casa su Neo4j FALLITO");
+                    getMongoConnectionManager().removeApartment(apartment.getId(), apartment.getHostEmail());
+                }
+            }else{
+                System.out.println("Caricamento casa su MongoDB FALLITO");}
+        }else{
             System.out.println("impossibile caricare casa: l'utente non esiste su Mongo.");
         }
         // in tutti i casi negativi mostro un alert di errore all'utente
         new AlertDialogGraphicManager("House NOT uploaded correctly").show();
-
     }
 
     @FXML
@@ -165,6 +170,13 @@ public class UploadHouseController extends Controller {
         checkFields();
     }
 
+
+    /**
+    * Verifica se la città è valida, ovvero se è presente nell'elenco di città che serviamo.
+     * @param address indirizzo da verificare
+     * @return true se la città è valida, false altrimenti
+     *  Inoltre, setta dentro "mapGraphicManager" la città, se trovata
+     */
     private boolean cityIsValid(String address) {
         // verifico se la città è nell'elenco di città che serviamo, altrimenti la scarto
         String[] splittedStrings = address.split(",");
@@ -172,6 +184,7 @@ public class UploadHouseController extends Controller {
             str = str.trim().toLowerCase();
             for(String city : getSession().getCities()){
                 if (str.equals(city.toLowerCase())) {
+                    mapGraphicManager.setCity(city);
                     return true;
                 }
             }
