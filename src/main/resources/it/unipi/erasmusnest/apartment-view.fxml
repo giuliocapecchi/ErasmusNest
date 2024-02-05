@@ -14,11 +14,17 @@
       <top>
          <HBox alignment="CENTER_LEFT" style="-fx-background-color: #ff8000">
             <Label style="-fx-font-size: 25px; -fx-text-fill: white; -fx-font-style: italic;" text="Apartment view">
-                <HBox.margin>
-                    <Insets bottom="5.0" left="20.0" right="20.0" top="5.0" />
-                </HBox.margin>
+               <HBox.margin>
+                  <Insets bottom="5.0" left="20.0" right="20.0" top="5.0" />
+               </HBox.margin>
             </Label>
+            <Button fx:id="likeButton" text="Save this house" onAction="#onLikeButtonClicked">
+               <BorderPane.margin>
+                  <Insets top="5.0" bottom="5.0" left="5.0" right="5.0"/>
+               </BorderPane.margin>
+            </Button>
          </HBox>
+
       </top>
       <center>
          <VBox fx:id="centerVBox" alignment="CENTER">
@@ -38,14 +44,6 @@
                         </BorderPane.margin>
                      </InfoOverlay>
                     </center>
-                  <bottom>
-                     <!-- like button -->
-                     <Button fx:id="likeButton" text="like">
-                        <BorderPane.margin>
-                           <Insets  top="5.0" bottom="5.0"/>
-                        </BorderPane.margin>
-                     </Button>
-                  </bottom>
                </BorderPane>
                <VBox fx:id="rightFirstVBox" alignment="TOP_CENTER" >
                   <Label style="-fx-font-size: 20px; -fx-text-fill: #019fe1;" text="Location">
@@ -73,7 +71,7 @@
                      </VBox.margin>
                   </Text>
 
-                  <HBox alignment="CENTER">
+                  <HBox fx:id="reviewHBox" alignment="CENTER">
                      <ImageView fx:id="ratingImage1" fitHeight="20" fitWidth="20" preserveRatio="true">
                         <HBox.margin>
                            <Insets bottom="5.0" />

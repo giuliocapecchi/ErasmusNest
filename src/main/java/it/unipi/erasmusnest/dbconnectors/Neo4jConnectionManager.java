@@ -494,25 +494,27 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         }
     }
 
-    public boolean likeApartment(String id, String email) {
-        boolean queryExecuted = false;
+    public boolean likeApartment(String id, String email){
+        boolean result = false;
         if (!getFavourites(email).contains(id)) {
             try (Session session = driver.session()) {
                 session.writeTransaction((TransactionWork<Void>) tx -> {
-                    tx.run(
-                            "MATCH (u:User {email: $email}) " +
-                                    "MATCH (a:Apartment {apartmentId: $id}) " +
-                                    "MERGE (u)-[:LIKES]->(a)",
-                            parameters("email", email, "id", id));
+                    Map<String, Object> parameters = new HashMap<>();
+                    parameters.put("id", id);
+                    parameters.put("email", email);
+                    tx.run("MERGE (a:Apartment {apartmentId: $id}) " +
+                                    "MERGE (u:User {email: $email}) " +
+                                    "MERGE (u)-[:LIKES]->(a) ",
+                            parameters);
                     return null;
                 });
-                queryExecuted = true;
+                result = true;
             } catch (Exception e) {
                 e.printStackTrace();
                 new AlertDialogGraphicManager("Neo4j connection failed").show();
             }
         }
-        return queryExecuted;
+        return result;
     }
 
     public List<String> getFavourites(String email) {
