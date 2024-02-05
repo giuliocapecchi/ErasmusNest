@@ -23,23 +23,34 @@
       <center>
          <VBox fx:id="centerVBox" alignment="CENTER">
             <HBox fx:id="firstHBox" alignment="CENTER">
-               <VBox fx:id="leftFirstVBox" alignment="TOP_CENTER">
-                  <Label fx:id="nameLabel" style="-fx-font-size: 20px; -fx-text-fill: #019fe1;" text="Apartment name">
-                       <VBox.margin>
+               <BorderPane fx:id="leftFirstBorderPane" >
+                  <top>
+                     <Label fx:id="nameLabel" style="-fx-font-size: 20px; -fx-text-fill: #019fe1;" text="Apartment name" BorderPane.alignment="CENTER">
+                        <BorderPane.margin>
                            <Insets top="5.0" />
-                       </VBox.margin>
-                  </Label>
-                     <InfoOverlay fx:id="imageOverlay" >
-                        <VBox.margin>
-                           <Insets bottom="5.0" top="30.0" />
-                        </VBox.margin>
+                        </BorderPane.margin>
+                     </Label>
+                  </top>
+                  <center>
+                     <InfoOverlay fx:id="imageOverlay" prefWidth="100" prefHeight="100" >
+                        <BorderPane.margin>
+                           <Insets  top="5.0" bottom="5.0"/>
+                        </BorderPane.margin>
                      </InfoOverlay>
-               </VBox>
+                    </center>
+                  <bottom>
+                     <!-- like button -->
+                     <Button fx:id="likeButton" text="like">
+                        <BorderPane.margin>
+                           <Insets  top="5.0" bottom="5.0"/>
+                        </BorderPane.margin>
+                     </Button>
+                  </bottom>
+               </BorderPane>
                <VBox fx:id="rightFirstVBox" alignment="TOP_CENTER" >
                   <Label style="-fx-font-size: 20px; -fx-text-fill: #019fe1;" text="Location">
                      <VBox.margin>
-                        <Insets top="5.0" />
-                        <Insets bottom="5.0" />
+                        <Insets top="5.0" bottom="5.0" />
                      </VBox.margin>
                   </Label>
                   <WebView fx:id="webView" minHeight="250">
