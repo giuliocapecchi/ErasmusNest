@@ -57,8 +57,6 @@ public class MyProfileController extends Controller {
     @FXML
     private ComboBox<String> studyFieldComboBox;
     @FXML
-    private VBox reservationsContainerVBox;
-    @FXML
     private VBox favouritesContainerVBox;
 
     private String selectedStudyField;
@@ -432,7 +430,7 @@ public class MyProfileController extends Controller {
                 Button dislike = new Button("dislike");
                 dislike.setOnAction(event -> {
                     getNeo4jConnectionManager().removeFavourite(getSession().getUser().getEmail(),favourite);
-                    super.changeWindow("myprofile","myprofile");
+                    super.changeWindow("apartment");
                 });
                 favouritesContainerVBox.getChildren().addAll(button,dislike);
             }
