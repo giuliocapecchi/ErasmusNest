@@ -5,6 +5,7 @@ import it.unipi.erasmusnest.model.User;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -58,6 +59,8 @@ public class MyProfileController extends Controller {
     private ComboBox<String> studyFieldComboBox;
     @FXML
     private VBox favouritesContainerVBox;
+    @FXML
+    private Button buttonPwdUpdate;
 
     private String selectedStudyField;
     private final List<String> selectedCities = new ArrayList<>();
@@ -81,8 +84,9 @@ public class MyProfileController extends Controller {
         String userEmail = getSession().getUser().getEmail();
 
         User utente = getMongoConnectionManager().findUser(userEmail);
-        System.out.println("\n\n\nUSER DELLA MYPROFILE: "+utente.toString());
-        passwordField.setText("******"); // Set password field to 6 asterisks
+        System.out.println("USER DELLA MYPROFILE: "+utente.toString());
+        // Set the password field with asterisks, one for each character
+        passwordField.setText("*".repeat(utente.getPassword().length()));
         // List<String> userCities = utente.getPreferredCities();
         // cityTitlePane = createTitledPane(userCities);
         // cityVBox.getChildren().add(cityTitlePane);
@@ -285,7 +289,8 @@ public class MyProfileController extends Controller {
             if(getRedisConnectionManager().updateUserPassword(getSession().getUser().getEmail(), newPassword)){
                 System.out.println("Password aggiornata su Redis");
                 passwordChangeOuterBox.setVisible(false);
-                showConfirmationMessagePassword("Password aggiornata con successo!", modifyPasswordButton);
+                passwordField.setText("*".repeat(newPassword.length()));
+                showConfirmationMessage("Password aggiornata con successo!", modifyPasswordButton);
             }else{ // aggiorno su Mongo e basta / TODO : eventual consistency da gestire qui! La password rimane solo su Redis per ora
                 System.out.println("Password non aggiornata su Redis perchè non trovata la chiave. La aggiorno su MongoDB");
                 // per come è ora il codice, su mongo la password viene aggiornata a priori (errore???)
@@ -293,7 +298,7 @@ public class MyProfileController extends Controller {
                     // Nascondi il banner/pop-up e mostra un messaggio di conferma
                     //passwordChangeBox.setVisible(false);
                     passwordChangeOuterBox.setVisible(false);
-                    showConfirmationMessagePassword("Password aggiornata con successo!", modifyPasswordButton);
+                    showConfirmationMessage("Password aggiornata con successo!", modifyPasswordButton);
                 }else{
                     // Mostra un messaggio di errore se la nuova password non è valida o la vecchia password non coincide
                     setPasswordErrorText();
@@ -308,14 +313,24 @@ public class MyProfileController extends Controller {
     }
 
     // Metodo per mostrare un messaggio di conferma
-    private void showConfirmationMessagePassword(String message, Button modifyPasswordButton) {
+    private void showConfirmationMessage(String message, Node node) {
         PopOver popOver = new PopOver();
         Label label = new Label(message);
         label.setStyle("-fx-padding: 10px;");
         popOver.setContentNode(label);
         popOver.setDetachable(false);
         popOver.setAutoHide(true);
-        popOver.show(modifyPasswordButton);
+        popOver.show(node);
+    }
+
+    private void showConfirmationMessagePassword(String message, Node node) {
+        PopOver popOver = new PopOver();
+        Label label = new Label(message);
+        label.setStyle("-fx-padding: 10px;");
+        popOver.setContentNode(label);
+        popOver.setDetachable(false);
+        popOver.setAutoHide(true);
+        popOver.show(node);
     }
 
     private void showConfirmationMessageCities(String message) {
@@ -339,8 +354,7 @@ public class MyProfileController extends Controller {
     }
 
     @FXML
-    private void onStudyFieldSelectionChanged(ActionEvent event)
-    {
+    private void onStudyFieldSelectionChanged() {
         String newStudyField = studyFieldComboBox.getValue();
         if (!newStudyField.equals(selectedStudyField))
         {
@@ -376,7 +390,7 @@ public class MyProfileController extends Controller {
     }
 
 
-    public void onUploadHouseButtonClick(ActionEvent actionEvent) {
+    public void onUploadHouseButtonClick() {
         super.changeWindow("uploadHouse");
     }
 
@@ -434,6 +448,15 @@ public class MyProfileController extends Controller {
                 });
                 favouritesContainerVBox.getChildren().addAll(button,dislike);
             }
+        }
+    }
+
+    @FXML
+    protected void checkNewPassword() {
+        if (isTextFieldValid(newPasswordField) && isTextFieldValid(confirmNewPasswordField)) {
+            buttonPwdUpdate.setDisable(!newPasswordField.getText().equals(confirmNewPasswordField.getText()));
+        } else {
+            buttonPwdUpdate.setDisable(true);
         }
     }
 }

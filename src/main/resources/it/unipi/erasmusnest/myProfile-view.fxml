@@ -45,15 +45,15 @@
                             <VBox fx:id="passwordChangeBox" style="-fx-border-color: red; -fx-border-width: 5px; -fx-padding: 10px; -fx-background-color: white; -fx-background-radius: 5px; -fx-border-radius: 5px;">
                                 <HBox alignment="CENTER_LEFT" spacing="10">
                                     <Label minWidth="75" text="New password:" />
-                                    <PasswordField fx:id="newPasswordField" minWidth="200" />
+                                    <PasswordField fx:id="newPasswordField" minWidth="200" onKeyReleased="#checkNewPassword"/>
                                 </HBox>
                                 <HBox alignment="CENTER_LEFT" spacing="10">
                                     <Label minWidth="75" text="Confirm password:" />
-                                    <PasswordField fx:id="confirmNewPasswordField" minWidth="200" />
+                                    <PasswordField fx:id="confirmNewPasswordField" minWidth="200" onKeyReleased="#checkNewPassword" />
                                 </HBox>
                                 <HBox>
-                                    <Button onAction="#onUpdatePasswordClick" text="Update" />
-                                    <Button onAction="#onBackButtonClick" text="Back" />
+                                    <Button fx:id="buttonPwdUpdate" onAction="#onUpdatePasswordClick" text="Update" disable="true" />
+                                    <Button onAction="#onBackButtonClick" text="Back"/>
                                 </HBox>
                             </VBox>
                         </VBox>
@@ -94,7 +94,7 @@
                             <Insets right="60.0" top="50.0" />
                          </HBox.margin>
                     </VBox>
-                    <VBox fx:id="reservationsContainerVBox" spacing="10">
+                    <VBox spacing="10">
                         <padding>
                             <Insets bottom="20" left="20" right="20" top="20" />
                         </padding>
