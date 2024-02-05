@@ -406,11 +406,11 @@ public class MyProfileController extends Controller {
         super.changeWindow("myreservations");
     }
 
-    public void onFollowersButtonClick(ActionEvent actionEvent) {
+    public void onFollowersButtonClick() {
         super.changeWindow("followers");
     }
 
-    public void onFavouritesButtonClick(ActionEvent actionEvent) {
+    public void onFavouritesButtonClick() {
         System.out.println("Favourites button clicked");
         Map<String,String> favourites = getNeo4jConnectionManager().getFavourites(getSession().getUser().getEmail());
         if(favourites==null || favourites.isEmpty()){
@@ -430,7 +430,7 @@ public class MyProfileController extends Controller {
                 Button dislike = new Button("dislike");
                 dislike.setOnAction(event -> {
                     getNeo4jConnectionManager().removeFavourite(getSession().getUser().getEmail(),favourite);
-                    super.changeWindow("apartment");
+                    super.changeWindow("myprofile");
                 });
                 favouritesContainerVBox.getChildren().addAll(button,dislike);
             }
