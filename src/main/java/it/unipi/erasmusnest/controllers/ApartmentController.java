@@ -5,9 +5,11 @@ import it.unipi.erasmusnest.graphicmanagers.MapGraphicManager;
 import it.unipi.erasmusnest.graphicmanagers.RatingGraphicManager;
 import it.unipi.erasmusnest.graphicmanagers.ReservationGraphicManager;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -44,7 +46,7 @@ public class ApartmentController extends Controller{
     @FXML
     private VBox rightFirstVBox;
     @FXML
-    private VBox leftFirstVBox;
+    private BorderPane leftFirstBorderPane;
     @FXML
     private VBox centerVBox;
     @FXML
@@ -72,6 +74,8 @@ public class ApartmentController extends Controller{
     private Button loginButton;
     @FXML
     private TextFlow loginMessage;
+    @FXML
+    private Button likeButton;
 
     private Apartment apartment;
     private ReservationGraphicManager reservationGraphicManager;
@@ -103,7 +107,7 @@ public class ApartmentController extends Controller{
                 alert.setOnCloseRequest(event -> {
                     // Qui puoi aggiungere il codice per reindirizzare a un'altra pagina
                     cleanAverageRatingInSession();
-                    super.changeWindow("apartment","apartments");
+                    super.changeWindow("apartments");
                 });
 
                 // Mostra la finestra di dialogo
@@ -124,7 +128,7 @@ public class ApartmentController extends Controller{
                 alert.setOnCloseRequest(event -> {
                     // Qui puoi aggiungere il codice per reindirizzare a un'altra pagina
                     cleanAverageRatingInSession();
-                    super.changeWindow("apartment","apartments");
+                    super.changeWindow("apartments");
                 });
 
                 // Mostra la finestra di dialogo
@@ -143,15 +147,15 @@ public class ApartmentController extends Controller{
             secondHBox.prefHeightProperty().bind(centerVBox.heightProperty().multiply(ratio));
 
             rightFirstVBox.prefWidthProperty().bind(firstHBox.widthProperty().multiply(ratio));
-            leftFirstVBox.prefWidthProperty().bind(firstHBox.widthProperty().multiply(ratio));
-
+            leftFirstBorderPane.prefWidthProperty().bind(firstHBox.widthProperty().multiply(ratio));
+            leftFirstBorderPane.minHeightProperty().bind(super.getRootPane().heightProperty().multiply(ratio));
+            leftFirstBorderPane.maxHeightProperty().bind(super.getRootPane().heightProperty().multiply(ratio));
             rightVBox.prefWidthProperty().bind(secondHBox.widthProperty().multiply(ratio));
             leftVBox.prefWidthProperty().bind(secondHBox.widthProperty().multiply(ratio));
             nameLabel.setText(apartment.getName());
-
             buildImage();
-            imageView.fitWidthProperty().bind(leftFirstVBox.widthProperty().multiply(0.8));
-            String information = "";
+            imageView.fitWidthProperty().bind(leftFirstBorderPane.widthProperty().multiply(0.8));
+            String information;
             if(apartment.getDescription()==null || apartment.getDescription().isEmpty()) {
                 information = "Accommodates: " + apartment.getMaxAccommodates() + "\n" +
                         "Price per month: " + apartment.getDollarPriceMonth() + "$\n";
@@ -164,7 +168,7 @@ public class ApartmentController extends Controller{
             infoText.setText(information);
             if(apartment.getDescription()!=null && apartment.getDescription().length() > 100){
                 infoText.setTextAlignment(TextAlignment.JUSTIFY);
-                infoText.wrappingWidthProperty().bind(leftFirstVBox.widthProperty().multiply(0.8));
+                infoText.wrappingWidthProperty().bind(leftFirstBorderPane.widthProperty().multiply(0.8));
             }else{
                 infoText.setTextAlignment(TextAlignment.CENTER);
             }
@@ -173,15 +177,16 @@ public class ApartmentController extends Controller{
 
             Button likeButton = getLikeButton();
 
-            // button.setGraphic(view);
-            leftFirstVBox.getChildren().add(likeButton);
+            leftFirstBorderPane.setBottom(likeButton);
+            BorderPane.setAlignment(likeButton, Pos.CENTER);
+
 
             if(apartment.getAverageRating() != null) {
-                ratingImage1.fitHeightProperty().bind(leftFirstVBox.heightProperty());
-                ratingImage2.fitHeightProperty().bind(leftFirstVBox.heightProperty());
-                ratingImage3.fitHeightProperty().bind(leftFirstVBox.heightProperty());
-                ratingImage4.fitHeightProperty().bind(leftFirstVBox.heightProperty());
-                ratingImage5.fitHeightProperty().bind(leftFirstVBox.heightProperty());
+                ratingImage1.fitHeightProperty().bind(leftFirstBorderPane.heightProperty());
+                ratingImage2.fitHeightProperty().bind(leftFirstBorderPane.heightProperty());
+                ratingImage3.fitHeightProperty().bind(leftFirstBorderPane.heightProperty());
+                ratingImage4.fitHeightProperty().bind(leftFirstBorderPane.heightProperty());
+                ratingImage5.fitHeightProperty().bind(leftFirstBorderPane.heightProperty());
 
                 ArrayList<ImageView> ratingImages = new ArrayList<>();
                 ratingImages.add(ratingImage1);
@@ -215,6 +220,9 @@ public class ApartmentController extends Controller{
         imageView.setPreserveRatio(true);
         slideImage();
 
+        imageView.fitHeightProperty().bind(leftFirstBorderPane.heightProperty().multiply(0.8));
+        imageView.fitHeightProperty().bind(leftFirstBorderPane.heightProperty().multiply(0.8));
+
         imageOverlay.setContent(imageView);
         if(apartment.getImageURLs().size() > 1){
             imageOverlay.setText("Click on the image\nto see more images");
@@ -246,10 +254,10 @@ public class ApartmentController extends Controller{
         if(!apartment.getImageURLs().isEmpty()) {
             try {
                 image = new Image(apartment.getImageURLs().get(imageIndex), true);
-                imageIndex = (imageIndex + 1) % apartment.getImageURLs().size();
             }catch (IllegalArgumentException e){
                 image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvailablePath)));
             }
+            imageIndex = (imageIndex + 1) % apartment.getImageURLs().size();
         } else {
             image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvailablePath)));
         }
@@ -257,7 +265,6 @@ public class ApartmentController extends Controller{
     }
 
     private Button getLikeButton() {
-        Button likeButton = new Button();
         likeButton.setText("Like");
         likeButton.setDisable(!getSession().isLogged());
         likeButton.setOnAction(event -> {
@@ -282,20 +289,20 @@ public class ApartmentController extends Controller{
     @FXML
     protected void onShowReviewsButtonClick() {
         //cleanAverageRatingInSession();
-        super.changeWindow("apartment","reviews");
+        super.changeWindow("reviews");
     }
 
     @FXML
     protected void onContactHostButtonClick() {
         getSession().setOtherProfileMail(hostEmail.getText());
         cleanAverageRatingInSession();
-        super.changeWindow("apartment","profile");
+        super.changeWindow("profile");
     }
 
     @FXML
     protected void onLoginButtonClick() throws IOException {
         cleanAverageRatingInSession();
-        super.changeWindow("apartment","login");
+        super.changeWindow("login");
     }
 
     @FXML
@@ -317,18 +324,16 @@ public class ApartmentController extends Controller{
             getRedisConnectionManager().addReservation(userEmail, houseId, String.valueOf(startYear), String.valueOf(startMonth), String.valueOf(numberOfMonths), getSession().getCity(), apartment.getImageURLs().get(0));
 
             cleanAverageRatingInSession();
-            super.changeWindow("apartment","myreservations");
+            super.changeWindow("myreservations");
         }
     }
 
     public void onGoBackButtonClick() {
         cleanAverageRatingInSession();
         System.out.println(getPreviousWindowName());
-        if(getSession().getCity()==null){
-            super.changeWindow("apartment", "myprofile");
-        }else{
-            super.changeWindow("apartment", "apartments");
-        }
+        super.backToPreviousWindow();
+        //super.changeWindow("apartment", "apartments");
+
     }
 
     private void cleanAverageRatingInSession(){

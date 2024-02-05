@@ -68,7 +68,7 @@ public class ProfileController extends Controller{
             suggestedOuterBox.prefWidthProperty().bind(super.getRootPane().widthProperty());
             suggestedOuterBox.setVisible(false);
 
-            if(utente.getStudyField()==null || utente.getStudyField().isEmpty() || utente.getStudyField().isBlank())
+            if(utente.getStudyField() == null ||utente.getStudyField().isEmpty() || utente.getStudyField().isBlank())
                 studyFieldLabel.setText("not specified");
             else
                 studyFieldLabel.setText(utente.getStudyField());
@@ -108,9 +108,6 @@ public class ProfileController extends Controller{
                     if (imageUrl == null || imageUrl.isEmpty()) {
                         imageUrl = "https://hips.hearstapps.com/hmg-prod/images/lago-di-montagna-cervinia-1628008263.jpg";
                     }
-
-                    System.out.println("houseName: " + apartment.getName());
-                    System.out.println("immmagine: " + imageUrl);
                     Image image = new Image(imageUrl, true);
                     apartmentImage.setImage(image);
 
@@ -121,7 +118,7 @@ public class ProfileController extends Controller{
                         System.out.println("Apartment button clicked");
                         // Setto l'id dell'appartamento nella sessione
                         getSession().setApartmentId(apartment.getId());
-                        super.changeWindow("profile","apartment");
+                        super.changeWindow("apartment");
                     });
 
                     //Now add the apartment image and button to the HBox
@@ -141,12 +138,12 @@ public class ProfileController extends Controller{
 
     @FXML
     protected void backToBrowse() {
-        super.changeWindow("profile","apartment");
+        super.backToPreviousWindow();
     }
 
     @FXML
     protected void backToHomepage() {
-        super.changeWindow("profile","homepage");
+        super.changeWindow("homepage");
     }
 
     @FXML
@@ -193,6 +190,6 @@ public class ProfileController extends Controller{
     }
 
     public void showReviews() {
-        super.changeWindow("profile","reviews");
+        super.changeWindow("reviews");
     }
 }

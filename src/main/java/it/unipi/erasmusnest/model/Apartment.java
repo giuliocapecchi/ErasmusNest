@@ -10,148 +10,26 @@ public class Apartment {
     private String name;            // embedded in User (host)
     private String description;
     private Point2D location;
+    private String city;
     private ArrayList<String> studyFields;
     private Integer dollarPriceMonth;
     private Integer maxAccommodates;
     private String hostEmail;
     private ArrayList<String> imageUrls;        // embedded in User (host)
     private Double averageRating;    // embedded in User (host)
-
     private int numberOfReviews = 0; // in neo4j
     private Integer bathrooms; // in MONGO
     private String hostName;
     private String hostSurname;
 
 
-
-    //Complete constructor
-    /*
-    public Apartment(Long id, String name, String description, Point2D location, Double dollarPriceMonth,
-                     Integer maxAccomodates, String hostEmail, String imageURL, Double averageRating,
-                     int numberOfReviews, String bathrooms, String hostName, String hostSurname)
-    {
+    public Apartment(String id, String houseName, String imageURL, Double averageReviewScores, Integer numberOfReviews) {
         this.id = id;
-        this.name = name;
-        this.description = description;
-        this.location = location;
-        this.dollarPriceMonth = dollarPriceMonth;
-        this.maxAccommodates = maxAccomodates;
-        this.hostEmail = hostEmail;
-        this.imageUrls = new ArrayList<>();
-        this.imageUrls.add(imageURL);
-        this.averageRating = averageRating;
-        this.numberOfReviews = numberOfReviews;
-        this.bathrooms = bathrooms;
-        this.hostName = hostName;
-        this.hostSurname = hostSurname;
-    }
-    */
-
-    // COSTRUTTORE COMPLETO CORRETTO CON BAGNI IN INTEGER
-
-    // TODO: DELETE THIS ONE
-    /*
-    public Apartment(Long id, String name, String description, Point2D location, ArrayList<String> studyFields, String hostEmail, String imageURL, Double averageRating) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.location = location;
-        this.studyFields = studyFields;
-        this.hostEmail = hostEmail;
-        this.imageUrls = new ArrayList<>();
-        this.imageUrls.add(imageURL);
-        this.averageRating = averageRating;
-    }
-    */
-
-    // TODO: DELETE THIS ONE
-    /*
-    public Apartment(Long id, String name, String description, Point2D location, String studyField, String hostEmail, String imageURL, Double averageRating) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.location = location;
-        this.studyFields = new ArrayList<>();
-        this.studyFields.add(studyField);
-        this.hostEmail = hostEmail;
-        this.imageUrls = new ArrayList<>();
-        this.imageUrls.add(imageURL);
-        this.averageRating = averageRating;
-    }
-    */
-
-    public Apartment(String apartmentId, String apartmentName, String imageURL, Double averageReviewScores, Integer numberOfReviews) {
-        this.id = apartmentId;
-        this.name = apartmentName;
+        this.name = houseName;
         this.imageUrls = new ArrayList<>();
         this.imageUrls.add(imageURL);
         this.averageRating = averageReviewScores;
         this.numberOfReviews = numberOfReviews;
-    }
-
-    // TODO: DELETE THIS ONE
-    /*
-    public Apartment(Long id, String name, String description, Point2D point2D, Double price, Integer accommodates, String hostEmail, String imageURL, Double reviewScoresRating) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.location = point2D;
-        this.dollarPriceMonth = price;
-        this.maxAccommodates = accommodates;
-        this.hostEmail = hostEmail;
-        this.imageUrls = new ArrayList<>();
-        this.imageUrls.add(imageURL);
-        this.averageRating = reviewScoresRating;
-    }
-    */
-
-    public Apartment(String id, String houseName, String imageURL, Double reviewScoresRating)
-    {
-        this.id = id;
-        this.name = houseName;
-        this.imageUrls = new ArrayList<>();
-        this.imageUrls.add(imageURL);
-        this.averageRating = reviewScoresRating;
-    }
-
-    // TODO: DELETE THIS ONE
-    /*
-    public Apartment(Long id, String houseName, String description, Point2D point2D, double v, Integer accommodates, String hostEmail, String imageURL) {
-        this.id = id;
-        this.name = houseName;
-        this.description = description;
-        this.location = point2D;
-        this.dollarPriceMonth = v;
-        this.maxAccommodates = accommodates;
-        this.hostEmail = hostEmail;
-        this.imageUrls = new ArrayList<>();
-        this.imageUrls.add(imageURL);
-    }
-    */
-
-    // TODO: DELETE THIS ONE
-    /*
-    public Apartment(Long id, String name, String imageURL) {
-        this.id=id;
-        this.name=name;
-        this.imageUrls = new ArrayList<>();
-        this.imageUrls.add(imageURL);
-    }
-    */
-
-
-    public Apartment(String id, String houseName, String description, Point2D point2D, Integer price, Integer accommodates, String hostEmail, String imageURL, Integer bathroomsNumber)
-    {
-        this.id = id;
-        this.name = houseName;
-        this.description = description;
-        this.location = point2D;
-        this.dollarPriceMonth = price;
-        this.maxAccommodates = accommodates;
-        this.hostEmail = hostEmail;
-        this.imageUrls = new ArrayList<>();
-        this.imageUrls.add(imageURL);
-        this.bathrooms = bathroomsNumber;
     }
 
     public Apartment(String id, String houseName, String description, Point2D point2D, Integer price, Integer accommodates, String hostEmail, ArrayList<String> imageUrls, Integer bathroomsNumber)
@@ -167,48 +45,6 @@ public class Apartment {
         this.bathrooms = bathroomsNumber;
     }
 
-
-
-    //TODO : costruttore di Cape dove usiamo un'arrayList di stringhe per gli url invece che una stringa singola
-    /*
-    public Apartment(long id, String houseName, String neighborhood, Point2D location, Double price, Integer accommodates, String userEmail, String[] imageURLArray, double averageRating, int numberOfReviews, String bathrooms, String name, String surname) {
-        this.id = id;
-        this.name = houseName;
-        this.description = neighborhood;
-        this.location = location;
-        this.dollarPriceMonth = price;
-        this.maxAccommodates = accommodates;
-        this.hostEmail = userEmail;
-        this.imageUrls = new ArrayList<>();
-        this.imageUrls.addAll(Arrays.asList(imageURLArray));
-        this.averageRating = averageRating;
-        this.numberOfReviews = numberOfReviews;
-        this.bathrooms = bathrooms;
-        this.hostName = name;
-        this.hostSurname = surname;
-    }
-    */
-
-    // TODO COSTRUTTORE DI CAPE MODIFICATO METTENDO BATHROOMS A INTEGER E USANDO ARRAYLIST DI STRINGHE PER GLI URL
-    public Apartment(String id, String houseName, String neighborhood, Point2D location, Integer price, Integer accommodates, String userEmail, ArrayList<String> imagesURL, double averageRating, int numberOfReviews, Integer bathrooms, String name, String surname) {
-        this.id = id;
-        this.name = houseName;
-        this.description = neighborhood;
-        this.location = location;
-        this.dollarPriceMonth = price;
-        this.maxAccommodates = accommodates;
-        this.hostEmail = userEmail;
-        this.imageUrls = new ArrayList<>();
-        // this.imageUrls.addAll(Arrays.asList(imageURLArray));
-        this.imageUrls = imagesURL;
-        this.averageRating = averageRating;
-        this.numberOfReviews = numberOfReviews;
-        this.bathrooms = bathrooms;
-        this.hostName = name;
-        this.hostSurname = surname;
-    }
-
-    // TODO NUOVO COSTRUTTORE SENZA ID
     public Apartment(String houseName, String houseDescription, Point2D location, Integer price, Integer accommodates, String userEmail, ArrayList<String> arrayList, double v, int i, Integer bathrooms, String name, String surname) {
         this.name = houseName;
         this.description = houseDescription;
@@ -219,6 +55,23 @@ public class Apartment {
         this.imageUrls = arrayList;
         this.averageRating = v;
         this.numberOfReviews = i;
+        this.bathrooms = bathrooms;
+        this.hostName = name;
+        this.hostSurname = surname;
+    }
+
+    // NUOVO costruttore di Cape in cui metto anche la città dell'appartamento per il caricamento su Neo4j
+    public Apartment(String houseName, String houseDescription, Point2D location, String city, Integer price, Integer accommodates, String userEmail, ArrayList<String> pictureUrls, double averageRating, int numberOfReviews, Integer bathrooms, String name, String surname) {
+        this.name = houseName;
+        this.description = houseDescription;
+        this.location = location;
+        this.city = city;
+        this.dollarPriceMonth = price;
+        this.maxAccommodates = accommodates;
+        this.hostEmail = userEmail;
+        this.imageUrls = pictureUrls;
+        this.averageRating = averageRating;
+        this.numberOfReviews = numberOfReviews;
         this.bathrooms = bathrooms;
         this.hostName = name;
         this.hostSurname = surname;
@@ -357,5 +210,13 @@ public class Apartment {
 
     public void setNumberOfReviews(int numberOfReviews) {
         this.numberOfReviews = numberOfReviews;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 }

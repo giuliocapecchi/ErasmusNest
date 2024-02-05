@@ -54,7 +54,9 @@ public class SignupController extends Controller{
 
     @FXML
     private void initialize() {
-
+        if(getSession().getCities()==null || getSession().getCities().isEmpty()){
+            getSession().setCities(getNeo4jConnectionManager().getAllCities());
+        }
         signupButton.setDisable(true);
         emailField.emailAddressProperty().addListener((observable, oldValue, newValue) -> checkFields());
         passwordField.textProperty().addListener((observable, oldValue, newValue) -> checkFields());
@@ -79,17 +81,14 @@ public class SignupController extends Controller{
         backButton.maxWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.3));
         errorTextFlow.maxWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.5));
         studiesComboBox.maxWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.3));
-        // cityComboBox.maxWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.3));
-
+        cityTidlePane.maxWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.3));
+        cityTidlePane.setPadding(new Insets(10, 10, 10, 10));
     }
 
     public TitledPane createTitledPane() {
         GridPane gridPane = new GridPane();
         List<String> cities = getSession().getCities();
-        for(String city : cities)
-        {
-            System.out.println("\n"+city);
-        }
+
         for(String city : cities)
         {
             CheckBox mainCheckBox = new CheckBox(city);
@@ -142,7 +141,7 @@ public class SignupController extends Controller{
 
     @FXML
     protected void onBackButtonClick(){
-        super.changeWindow("signup","login");
+        super.changeWindow("login");
     }
 
     @FXML
@@ -158,7 +157,7 @@ public class SignupController extends Controller{
         utente.setPreferredCities(cities);
         boolean emailAvailable = super.getMongoConnectionManager().addUser(utente);
         if(emailAvailable) {
-            super.changeWindow("signup","login");
+            super.changeWindow("login");
         } else {
             signupButton.setDisable(true);
             showErrorMessage("Email not available", errorTextFlow);

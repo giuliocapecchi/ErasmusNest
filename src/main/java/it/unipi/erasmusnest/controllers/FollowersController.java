@@ -90,7 +90,7 @@ public class FollowersController extends Controller{
     private void onUserPageButtonClick(ActionEvent actionEvent)
     {
         getSession().setOtherProfileMail(((Button)actionEvent.getSource()).getText());
-        super.changeWindow("followers","profile");
+        super.changeWindow("profile");
     }
 
     private void onFollowerButtonClick(Button followButton, String otherEmail)
@@ -113,6 +113,6 @@ public class FollowersController extends Controller{
 
     public void onGoBackButtonClick(ActionEvent actionEvent)
     {
-        super.changeWindow("followers","myProfile");
+        super.changeWindow("myProfile");
     }
 }

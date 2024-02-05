@@ -242,16 +242,16 @@ public class MyReservationsController extends Controller {
     @FXML
     protected void logoutButtonClick(){
         getSession().reset();
-        super.changeWindow("myreservations","login");
+        super.changeWindow("login");
     }
 
     @FXML
     protected void homepageButtonClick(){
-        super.changeWindow("myreservations","homepage");
+        super.changeWindow("homepage");
     }
 
     @FXML
     protected void profileButtonClick(){
-        super.changeWindow("myreservations","myProfile");
+        super.changeWindow("myProfile");
     }
 }

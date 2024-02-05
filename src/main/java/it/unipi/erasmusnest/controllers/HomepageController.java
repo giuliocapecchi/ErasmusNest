@@ -1,13 +1,9 @@
 package it.unipi.erasmusnest.controllers;
 
 import it.unipi.erasmusnest.model.User;
-import javafx.event.ActionEvent;
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
@@ -52,12 +48,13 @@ public class HomepageController extends Controller{
     @FXML
     VBox resultsBox;
 
-    private List<String> CITIES = new ArrayList<>();
+    private List<String> cities = new ArrayList<>();
 
     public HomepageController() {
         System.out.println("HomepageController constructor");
         getSession().setCurrent_filter(0);
         getSession().setCurrent_page(1);
+        setFirstWindow("homepage");
     }
 
     @FXML
@@ -67,18 +64,22 @@ public class HomepageController extends Controller{
         resultsBox.maxWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.3));
         title.maxWidthProperty().bind(super.getRootPane().widthProperty());
         logoImageView.fitWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.2));
-        CITIES = getNeo4jConnectionManager().getAllCities();
-        if(CITIES == null){
-            getSession().reset();
-            getSession().setConnectionError(true);
-            super.changeWindow("homepage","login");
+        if(getSession().getCities() == null || getSession().getCities().isEmpty()) {
+            cities = getNeo4jConnectionManager().getAllCities();
+            if(cities == null){
+                getSession().reset();
+                getSession().setConnectionError(true);
+                super.changeWindow("login");
+            }
+        }else{
+            cities = getSession().getCities();
         }
 
         radioButtonLookForCities.setToggleGroup(toggleGroup);
         radioButtonLookForUsers.setToggleGroup(toggleGroup);
         radioButtonLookForCities.setSelected(true);
         searchUserButton.setVisible(false);
-        getSession().setCities(CITIES);
+        getSession().setCities(cities);
 
         if(getSession().isLogged()) {
             System.out.println("User logged");
@@ -113,7 +114,7 @@ public class HomepageController extends Controller{
     private void updateSearchResults(String searchText) {
         resultsBox.getChildren().clear();
 
-        for (String city : CITIES) {
+        for (String city : cities) {
             if (city.toLowerCase().contains(searchText)) {
                 Hyperlink cityLink = new Hyperlink(city);
                 cityLink.setOnAction(e -> handleCitySelection(city));
@@ -124,24 +125,24 @@ public class HomepageController extends Controller{
 
     private void handleCitySelection(String city) {
         getSession().setCity(city);
-        super.changeWindow("homepage","apartments");
+        super.changeWindow("apartments");
     }
 
     @FXML void handleLogoutAction() {
         getSession().reset();
-        super.changeWindow("homepage","login");
+        super.changeWindow("login");
     }
 
     @FXML void handleSignupAction() {
-        super.changeWindow("homepage","signup");
+        super.changeWindow("signup");
     }
 
     @FXML void handleLoginAction() {
-        super.changeWindow("homepage","login");
+        super.changeWindow("login");
     }
 
     @FXML void handleProfileAction() {
-        super.changeWindow("homepage","myProfile");
+        super.changeWindow("myProfile");
     }
 
     @FXML void lookForCities() {
@@ -164,25 +165,24 @@ public class HomepageController extends Controller{
     }
 
     public void handleSearchUserAction() {
-        System.out.println("searching user...");
+        System.out.println("searching for user : "+cityTextField.getText());
         User user = getMongoConnectionManager().findUser(cityTextField.getText());
         if(user == null) {
+            System.out.println("User not found in MongoDB");
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText("User "+cityTextField.getText()+" not found");
             alert.setContentText("The user you are looking for does not exist.");
             alert.showAndWait();
-        }else{
-            if(Objects.equals(getSession().getUser().getEmail(), user.getEmail())){
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error");
-                alert.setHeaderText("You can't search yourself");
-                alert.setContentText("Use the \"Profile\" button below.");
-                alert.showAndWait();
-                return;
-            }
+        }else if(Objects.equals(getSession().getUser().getEmail(), user.getEmail())){
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("You can't search yourself");
+            alert.setContentText("Use the \"Profile\" button below.");
+            alert.showAndWait();
+        }else{ // user was found
             getSession().setOtherProfileMail(user.getEmail());
-            super.changeWindow("homepage","profile");
+            super.changeWindow("profile");
         }
     }
 

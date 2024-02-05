@@ -24,6 +24,7 @@ import java.util.List;
 public class MapGraphicManager {
 
     private Point2D location;
+    private String city;
     private WebView webView;
 
     public MapGraphicManager(WebView webView, Point2D location){
@@ -131,5 +132,13 @@ public class MapGraphicManager {
 
     public void setLocation(Point2D location) {
         this.location = location;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getCity() {
+        return city;
     }
 }

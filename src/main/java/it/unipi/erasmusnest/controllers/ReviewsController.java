@@ -19,6 +19,8 @@ import java.util.Objects;
 public class ReviewsController extends Controller{
 
     @FXML
+    HBox averageReviewScoreHBox;
+    @FXML
     ImageView ratingImage1;
 
     @FXML
@@ -85,6 +87,7 @@ public class ReviewsController extends Controller{
         List <Review> reviews;
         if(Objects.equals(getPreviousWindowName(), "profile")) { // prendo le recensioni che ha scritto un utente
             reviews = getNeo4jConnectionManager().getReviewsForUser(getSession().getOtherProfileMail(),page, elementsPerPage);
+            averageReviewScoreHBox.getChildren().clear();
         }else{ // prendo le recensioni di un appartamento
             reviews = getNeo4jConnectionManager().getReviewsForApartment(getSession().getApartmentId(),page, elementsPerPage,selectedFilter);
             Double averageRating = getNeo4jConnectionManager().getAverageReviewScore(getSession().getApartmentId());

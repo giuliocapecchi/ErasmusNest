@@ -15,6 +15,7 @@ import javafx.scene.text.TextFlow;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.Stack;
 
 public class Controller implements Validator{
 
@@ -23,22 +24,26 @@ public class Controller implements Validator{
     @FXML
     private StackPane rootPane;
     private static final Session session = new Session();
-    private static String actualWindowName;
-    private static String previousWindowName;
     private static final RedisConnectionManager redisConnectionManager = new RedisConnectionManager();
     private static final MongoConnectionManager mongoConnectionManager = new MongoConnectionManager();
     private static final Neo4jConnectionManager neo4jConnectionManager = new Neo4jConnectionManager();
+
+    private static final Stack<String> windowsStack = new Stack<>();
 
     public Controller() {
     }
 
     protected void backToPreviousWindow() {
-        System.out.println("GOING BACK TO PREVIOUS WINDOW");
-        changeWindow(actualWindowName, previousWindowName);
+
+        windowsStack.pop();
+        refreshWindow();
+
+        printWindowsStack();
     }
 
     protected void refreshWindow() {
         try {
+            String actualWindowName = windowsStack.peek();
             StackPane pane = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/it/unipi/erasmusnest/" + actualWindowName + "-view.fxml")));
             rootPane.getChildren().setAll(pane);
         } catch (IOException e) {
@@ -46,28 +51,31 @@ public class Controller implements Validator{
         }
     }
 
-    protected void changeWindow(String actualWindowName, String nextWindowName) {
+    protected void changeWindow(String nextWindowName) {
 
         try {
-            Controller.previousWindowName = actualWindowName;
-            Controller.actualWindowName = nextWindowName;
+            windowsStack.push(nextWindowName);
             StackPane pane = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/it/unipi/erasmusnest/" + nextWindowName + "-view.fxml")));
             rootPane.getChildren().setAll(pane);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
+        printWindowsStack();
     }
 
-    protected void setActualWindowName(String actualWindowName) {
-        Controller.actualWindowName = actualWindowName;
+    protected void setFirstWindow(String firstWindowName){
+        Controller.windowsStack.clear();
+        Controller.windowsStack.push(firstWindowName);
     }
 
     protected String getActualWindowName() {
-        return actualWindowName;
+        return windowsStack.empty() ? null : windowsStack.peek();
     }
 
-    protected String getPreviousWindowName() { return previousWindowName; }
+    protected String getPreviousWindowName() {
+        return windowsStack.size() > 1 ? windowsStack.get(windowsStack.size() - 2) : null;
+    }
 
     RedisConnectionManager getRedisConnectionManager() {
         return redisConnectionManager;
@@ -124,4 +132,11 @@ public class Controller implements Validator{
         errorTextFlow.getChildren().add(text);
     }
 
+    private void printWindowsStack() {
+        System.out.print(">> printWindowsStack: ");
+        for (String s : windowsStack) {
+            System.out.print(s+" ");
+        }
+        System.out.println();
+    }
 }

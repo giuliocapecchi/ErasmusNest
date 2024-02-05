@@ -63,7 +63,7 @@ public class WriteReviewController extends Controller{
     @FXML
     void goToTheHomePage() {
         System.out.println("go to the home page action");
-        super.changeWindow("writeReview","homepage");
+        super.changeWindow("homepage");
     }
 
     @FXML
@@ -72,7 +72,7 @@ public class WriteReviewController extends Controller{
         System.out.println("MANCA IL REDIRECT AL PROFILE DELL'UTENTE");
         Review review = new Review(getSession().getApartmentId(),getSession().getUser().getEmail(),textArea.getText(), (int)ratingSlider.getValue());
         getNeo4jConnectionManager().addReview(review);
-        super.changeWindow("writeReview","myProfile");
+        super.changeWindow("myProfile");
 
     }
 }

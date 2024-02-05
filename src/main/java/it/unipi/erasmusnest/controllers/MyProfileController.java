@@ -188,7 +188,7 @@ public class MyProfileController extends Controller {
             analyticsButton.setOnAction(event -> {
                 // Handle the analytics button click
                 System.out.println("Analytics button clicked");
-                super.changeWindow("myProfile","analytics");
+                super.changeWindow("analytics");
             });
 
             adminContainer.getChildren().add(analyticsButton);
@@ -206,7 +206,7 @@ public class MyProfileController extends Controller {
     private void onChangeView(String apartmentId)
     {
         getSession().setApartmentId(apartmentId);
-        super.changeWindow("myprofile","apartment");
+        super.changeWindow("apartment");
     }
 
     public TitledPane createTitledPane(List<String> userCities) {
@@ -242,7 +242,7 @@ public class MyProfileController extends Controller {
     @FXML
     protected void logoutButtonClick(){
         getSession().reset();
-        super.changeWindow("myprofile","login");
+        super.changeWindow("login");
     }
 
     @FXML
@@ -379,22 +379,22 @@ public class MyProfileController extends Controller {
 
 
     public void onUploadHouseButtonClick(ActionEvent actionEvent) {
-        super.changeWindow("myprofile","uploadHouse");
+        super.changeWindow("uploadHouse");
     }
 
     public void onApartmentView(String apartmentId) {
         getSession().setApartmentId(apartmentId);
-        super.changeWindow("myprofile","modifyApartment");
+        super.changeWindow("modifyApartment");
     }
 
     public void onBack() {
-        super.changeWindow("myprofile","login");
+        super.changeWindow("login");
     }
 
     @FXML
     protected void onReservationsButtonClick() {
         getSession().setApartmentsId(null);
-        super.changeWindow("myprofile","myreservations");
+        super.changeWindow("myreservations");
     }
 
     @FXML
@@ -405,11 +405,11 @@ public class MyProfileController extends Controller {
             ids.add(apartment.getId());
         }
         getSession().setApartmentsId(ids);
-        super.changeWindow("myprofile","myreservations");
+        super.changeWindow("myreservations");
     }
 
     public void onFollowersButtonClick(ActionEvent actionEvent) {
-        super.changeWindow("myprofile","followers");
+        super.changeWindow("followers");
     }
 
     public void onFavouritesButtonClick(ActionEvent actionEvent) {
@@ -427,7 +427,7 @@ public class MyProfileController extends Controller {
                 button.setText(favourites.get(favourite));
                 button.setOnAction(event -> {
                     getSession().setApartmentId(favourite);
-                    super.changeWindow("myprofile","apartment");
+                    super.changeWindow("apartment");
                 });
                 Button dislike = new Button("dislike");
                 dislike.setOnAction(event -> {
