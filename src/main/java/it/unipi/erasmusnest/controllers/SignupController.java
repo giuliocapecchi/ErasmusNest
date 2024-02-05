@@ -141,7 +141,7 @@ public class SignupController extends Controller{
 
     @FXML
     protected void onBackButtonClick(){
-        super.changeWindow("signup","login");
+        super.changeWindow("login");
     }
 
     @FXML
@@ -157,7 +157,7 @@ public class SignupController extends Controller{
         utente.setPreferredCities(cities);
         boolean emailAvailable = super.getMongoConnectionManager().addUser(utente);
         if(emailAvailable) {
-            super.changeWindow("signup","login");
+            super.changeWindow("login");
         } else {
             signupButton.setDisable(true);
             showErrorMessage("Email not available", errorTextFlow);

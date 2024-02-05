@@ -121,7 +121,7 @@ public class ProfileController extends Controller{
                         System.out.println("Apartment button clicked");
                         // Setto l'id dell'appartamento nella sessione
                         getSession().setApartmentId(apartment.getId());
-                        super.changeWindow("profile","apartment");
+                        super.changeWindow("apartment");
                     });
 
                     //Now add the apartment image and button to the HBox
@@ -141,12 +141,12 @@ public class ProfileController extends Controller{
 
     @FXML
     protected void backToBrowse() {
-        super.changeWindow("profile","apartment");
+        super.backToPreviousWindow();
     }
 
     @FXML
     protected void backToHomepage() {
-        super.changeWindow("profile","homepage");
+        super.changeWindow("homepage");
     }
 
     @FXML
@@ -187,6 +187,6 @@ public class ProfileController extends Controller{
     }
 
     public void showReviews() {
-        super.changeWindow("profile","reviews");
+        super.changeWindow("reviews");
     }
 }

@@ -51,11 +51,11 @@ public class AnalyticsController extends Controller {
 
     @FXML
     void goBack() {
-        super.changeWindow("analytics","myProfile");
+        super.changeWindow("myProfile");
     }
 
     public void goToTheHomePage() {
-        super.changeWindow("analytics","homepage");
+        super.changeWindow("homepage");
     }
 
     public void analytics1(ActionEvent actionEvent) {

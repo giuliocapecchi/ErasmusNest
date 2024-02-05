@@ -124,7 +124,7 @@ public class UploadHouseController extends Controller {
             if (getMongoConnectionManager().uploadApartment(apartment)) {
                 System.out.println("sei qui");
                 new AlertDialogGraphicManager("House uploaded correctly","House correctly uploaded.","You will be redirected to your profile","information").show();
-                super.changeWindow("uploadHouse","myProfile");
+                super.changeWindow("myProfile");
                 return;
             } else {
                 System.out.println("impossibile caricare casa");}
@@ -138,7 +138,7 @@ public class UploadHouseController extends Controller {
 
     @FXML
     void onBackButtonClick() {
-        super.changeWindow("uploadHouse","myProfile");
+        super.changeWindow("myProfile");
     }
 
     @FXML
