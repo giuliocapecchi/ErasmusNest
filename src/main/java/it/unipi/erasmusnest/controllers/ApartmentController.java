@@ -28,6 +28,8 @@ import java.util.Objects;
 public class ApartmentController extends Controller{
 
     @FXML
+    HBox reviewHBox;
+    @FXML
     private WebView webView;
     @FXML
     private DatePicker startDatePicker;
@@ -85,11 +87,10 @@ public class ApartmentController extends Controller{
 
     @FXML
     private void initialize() {
-
+        likeButton.setDisable(!getSession().isLogged());
         apartment = getMongoConnectionManager().getApartment(getSession().getApartmentId());
         System.out.println("Apartment: "+apartment);
-        if(apartment==null)
-        {
+        if(apartment==null){
             // If apartment is null seems that the apartment has been removed from Mongo
             // and so need to be removed also from Neo4j
             if(getNeo4jConnectionManager().removeApartment(getSession().getApartmentId()))
@@ -175,12 +176,6 @@ public class ApartmentController extends Controller{
 
             hostEmail.setText(apartment.getHostEmail());
 
-            Button likeButton = getLikeButton();
-
-            leftFirstBorderPane.setBottom(likeButton);
-            BorderPane.setAlignment(likeButton, Pos.CENTER);
-
-
             if(apartment.getAverageRating() != null) {
                 ratingImage1.fitHeightProperty().bind(leftFirstBorderPane.heightProperty());
                 ratingImage2.fitHeightProperty().bind(leftFirstBorderPane.heightProperty());
@@ -197,9 +192,9 @@ public class ApartmentController extends Controller{
 
                 RatingGraphicManager ratingGraphicManager = new RatingGraphicManager(ratingImages, ratingImages.size());
                 ratingGraphicManager.showRating(apartment.getAverageRating());
-                if(apartment.getAverageRating() == 0){
-                    reviewsButton.setVisible(false);
-                }
+            }else{
+                reviewHBox.getChildren().clear();
+                reviewHBox.getChildren().add(reviewsButton);
             }
 
             reservationGraphicManager = new ReservationGraphicManager(startDatePicker, endDatePicker, confirmButton,
@@ -222,8 +217,8 @@ public class ApartmentController extends Controller{
         imageView.setPreserveRatio(true);
         slideImage();
 
-        imageView.fitHeightProperty().bind(leftFirstBorderPane.heightProperty().multiply(0.8));
-        imageView.fitHeightProperty().bind(leftFirstBorderPane.heightProperty().multiply(0.8));
+        imageView.fitHeightProperty().bind(leftFirstBorderPane.heightProperty().multiply(0.9));
+        imageView.fitHeightProperty().bind(leftFirstBorderPane.heightProperty().multiply(0.9));
 
         imageOverlay.setContent(imageView);
         if(apartment.getImageURLs().size() > 1){
@@ -266,19 +261,15 @@ public class ApartmentController extends Controller{
         imageView.setImage(image);
     }
 
-    private Button getLikeButton() {
-        likeButton.setText("Like");
-        likeButton.setDisable(!getSession().isLogged());
-        likeButton.setOnAction(event -> {
-            if (getNeo4jConnectionManager().likeApartment(getSession().getApartmentId(), getSession().getUser().getEmail())) {
-                showConfirmationMessage("Like added", likeButton);
-            } else {
-                showConfirmationMessage("Already liked, go to My Profile section to delete", likeButton);
-            }
-            likeButton.setText("Already liked");
-            likeButton.setDisable(true);
-        });
-        return likeButton;
+    @FXML
+    private void onLikeButtonClicked(){
+        if (getNeo4jConnectionManager().likeApartment(getSession().getApartmentId(), getSession().getUser().getEmail())) {
+            showConfirmationMessage("Like added", likeButton);
+        } else {
+            showConfirmationMessage("Already liked, go to My Profile section to delete", likeButton);
+        }
+        likeButton.setText("Already liked");
+        likeButton.setDisable(true);
     }
 
     private void onStartDatePickerFirstClick(){
@@ -290,7 +281,6 @@ public class ApartmentController extends Controller{
 
     @FXML
     protected void onShowReviewsButtonClick() {
-        //cleanAverageRatingInSession();
         super.changeWindow("reviews");
     }
 

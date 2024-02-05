@@ -495,7 +495,7 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
     }
 
     public boolean likeApartment(String id, String email) {
-        boolean queryExecuted = false;
+        boolean result = false;
         if (!getFavourites(email).containsKey(id)) {
             try (Session session = driver.session()) {
                 session.writeTransaction((TransactionWork<Void>) tx -> {
@@ -506,13 +506,13 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
                             parameters("email", email, "id", id));
                     return null;
                 });
-                queryExecuted = true;
+                result = true;
             } catch (Exception e) {
                 e.printStackTrace();
                 new AlertDialogGraphicManager("Neo4j connection failed").show();
             }
         }
-        return queryExecuted;
+        return result;
     }
 
     public Map<String, String> getFavourites(String email) {

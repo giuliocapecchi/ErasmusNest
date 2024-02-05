@@ -57,8 +57,6 @@ public class MyProfileController extends Controller {
     @FXML
     private ComboBox<String> studyFieldComboBox;
     @FXML
-    private VBox reservationsContainerVBox;
-    @FXML
     private VBox favouritesContainerVBox;
 
     private String selectedStudyField;
