@@ -204,8 +204,10 @@ public class ApartmentController extends Controller{
 
             if(!getSession().isLogged()){
                 showErrorMessage("Login required", loginMessage);
+                startDatePicker.setDisable(true);
             }else{
                 loginButton.setVisible(false);
+                startDatePicker.setDisable(false);
             }
         }
     }

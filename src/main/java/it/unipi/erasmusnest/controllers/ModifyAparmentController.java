@@ -76,9 +76,6 @@ public class ModifyAparmentController extends Controller{
         neighborhoodVBox.getChildren().add(descriptionTextArea);
         //Aggiunta foto:
 
-
-        // pictureUrlTextField.onKeyReleasedProperty().set(event -> checkFields());
-
         pictureUrlsTextField = new ArrayList<>();
         pictureUrlsVBox.setSpacing(5);
         if(apartment.getImageURLs() != null)
@@ -86,17 +83,18 @@ public class ModifyAparmentController extends Controller{
             for (String url : apartment.getImageURLs()) {
                 TextField pictureUrlTextField = new TextField();
                 pictureUrlTextField.setText(url);
+                pictureUrlTextField.onKeyReleasedProperty().set(event -> checkFields());
                 pictureUrlsVBox.getChildren().add(pictureUrlTextField);
                 pictureUrlsTextField.add(pictureUrlTextField);
             }
         }
-        else
+        /*else
         {
             TextField pictureUrlTextField = new TextField();
             pictureUrlTextField.setPromptText("Insert picture URL");
             pictureUrlsVBox.getChildren().add(pictureUrlTextField);
             pictureUrlsTextField.add(pictureUrlTextField);
-        }
+        }*/
 
     }
 
@@ -115,9 +113,9 @@ public class ModifyAparmentController extends Controller{
             if(pictureUrlTextField.getText() != null && !pictureUrlTextField.getText().isEmpty() && !pictureUrlTextField.getText().isBlank())
                 pictureUrls.add(pictureUrlTextField.getText());
         }
-        boolean change = false;
+        //boolean change = false;
         //if(!pictureUrls.get(0).equals(apartment.getImageURLs().get(0)) || apartment.getImageURLs()==null || apartment.getImageURLs().isEmpty())
-            change = true;
+        //    change = true;
         apartment.setImageURL(pictureUrls);
         System.out.println("\n\n\nIMMAGINI DENTRO ALL'APPARTAMENTO:");
         for (String s : apartment.getImageURLs()) {
@@ -244,7 +242,6 @@ public class ModifyAparmentController extends Controller{
     protected void onMorePictureButtonClick() {
         if(pictureUrlsTextField.size() <= 5) {
             TextField pictureUrlTextField = new TextField();
-            //pictureUrlTextField.onKeyReleasedProperty().set(event -> checkFields());
             pictureUrlTextField.setPromptText("Insert picture URL");
             pictureUrlTextField.onKeyReleasedProperty().set(event -> checkFields());
             pictureUrlsVBox.getChildren().add(pictureUrlTextField);
@@ -270,7 +267,7 @@ public class ModifyAparmentController extends Controller{
         if(pictureUrlsTextField.isEmpty()) {
             lessPictureButton.setDisable(true);
         }
-        //checkFields();
+        checkFields();
     }
 
     @FXML
@@ -280,29 +277,26 @@ public class ModifyAparmentController extends Controller{
         Integer price = apartment.getDollarPriceMonth();
         String description = apartment.getDescription();
         ArrayList<String> pictureUrls = apartment.getImageURLs();
-        boolean res = Objects.equals(inputAccommodates.getValue(), accommodates) && Objects.equals(inputBathrooms.getValue(), bathrooms) && Objects.equals(inputPrice.getValue(), price) && Objects.equals(descriptionTextArea.getText(), description);
-        //res = accommodates != null && bathrooms != null && price != null && description != null && pictureUrls != null && res;
-        System.out.println("\n\n\naccommodates: "+accommodates+" inputAccommodates: "+inputAccommodates.getValue());
-        System.out.println("bathrooms: "+bathrooms+" inputBathrooms: "+inputBathrooms.getValue());
-        System.out.println("price: "+price+" inputPrice: "+inputPrice.getValue());
-        System.out.println("description: "+description+" inputDescription: "+descriptionTextArea.getText());
-        System.out.println("pictureUrls: "+pictureUrls+" pictureUrlsTextField: "+pictureUrlsTextField);
-        System.out.println("picture url size: "+pictureUrls.size()+" picture url text field size: "+pictureUrlsTextField.size());
-        for (int i = 0; i < pictureUrlsTextField.size(); i++) {
-            if(pictureUrlsTextField.get(i).getText().isBlank() || pictureUrlsTextField.get(i).getText().isEmpty())
-            {
-                res = false;
-            } else {
-                if(pictureUrls.get(i)!=null) {
-                    if(!Objects.equals(pictureUrls.get(i), pictureUrlsTextField.get(i).getText()))
-                    {
-                        res = false;
-                        break;
+        boolean fieldsModified = !(Objects.equals((inputAccommodates).getValue(), accommodates)
+                && Objects.equals(inputBathrooms.getValue(), bathrooms)
+                && Objects.equals(inputPrice.getValue(), price)
+                && Objects.equals(descriptionTextArea.getText(), description));
+        if(pictureUrls.size() != pictureUrlsTextField.size()) {
+            fieldsModified = true;
+        }
+        for (int i = 0; i < pictureUrlsTextField.size() && !fieldsModified; i++) {
+            if(!pictureUrlsTextField.get(i).getText().isBlank() && !pictureUrlsTextField.get(i).getText().isEmpty()) {
+                if(pictureUrls.size() > i) {
+                    if(!pictureUrlsTextField.get(i).getText().equals(pictureUrls.get(i))) {
+                        fieldsModified = true;
                     }
+                } else {
+                    fieldsModified = true;
                 }
             }
+
         }
-        updateHouse.setDisable(res);
+        updateHouse.setDisable(!fieldsModified);
     }
 
 }
