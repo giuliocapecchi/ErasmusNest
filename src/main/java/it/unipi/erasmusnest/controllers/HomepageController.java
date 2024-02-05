@@ -54,6 +54,7 @@ public class HomepageController extends Controller{
         System.out.println("HomepageController constructor");
         getSession().setCurrent_filter(0);
         getSession().setCurrent_page(1);
+        setFirstWindow("homepage");
     }
 
     @FXML
@@ -68,7 +69,7 @@ public class HomepageController extends Controller{
             if(cities == null){
                 getSession().reset();
                 getSession().setConnectionError(true);
-                super.changeWindow("homepage","login");
+                super.changeWindow("login");
             }
         }else{
             cities = getSession().getCities();
@@ -124,24 +125,24 @@ public class HomepageController extends Controller{
 
     private void handleCitySelection(String city) {
         getSession().setCity(city);
-        super.changeWindow("homepage","apartments");
+        super.changeWindow("apartments");
     }
 
     @FXML void handleLogoutAction() {
         getSession().reset();
-        super.changeWindow("homepage","login");
+        super.changeWindow("login");
     }
 
     @FXML void handleSignupAction() {
-        super.changeWindow("homepage","signup");
+        super.changeWindow("signup");
     }
 
     @FXML void handleLoginAction() {
-        super.changeWindow("homepage","login");
+        super.changeWindow("login");
     }
 
     @FXML void handleProfileAction() {
-        super.changeWindow("homepage","myProfile");
+        super.changeWindow("myProfile");
     }
 
     @FXML void lookForCities() {
@@ -181,7 +182,7 @@ public class HomepageController extends Controller{
             alert.showAndWait();
         }else{ // user was found
             getSession().setOtherProfileMail(user.getEmail());
-            super.changeWindow("homepage", "profile");
+            super.changeWindow("profile");
         }
     }
 

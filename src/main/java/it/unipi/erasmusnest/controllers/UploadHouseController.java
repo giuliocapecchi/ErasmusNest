@@ -126,7 +126,7 @@ public class UploadHouseController extends Controller {
                 //TODO : è corretta sta roba? Caricamento "atomico" su MongoDB poi su Neo4J se tutto è andato a buon fine
                 if(getNeo4jConnectionManager().addApartment(apartment)){ // tutto è andato a buon fine
                     new AlertDialogGraphicManager("House uploaded correctly","House correctly uploaded.","You will be redirected to your profile","information").show();
-                    super.changeWindow("uploadHouse","myProfile");
+                    super.changeWindow("myProfile");
                     return;
                 }else{ // necessario rollback dell'upload su MongoDB
                     System.out.println("Caricamento casa su Neo4j FALLITO");
@@ -143,7 +143,7 @@ public class UploadHouseController extends Controller {
 
     @FXML
     void onBackButtonClick() {
-        super.changeWindow("uploadHouse","myProfile");
+        super.changeWindow("myProfile");
     }
 
     @FXML

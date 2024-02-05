@@ -63,7 +63,7 @@ public class ApartmentsController extends Controller{
 
     @FXML
     protected void onBackButtonPressed() {
-        changeWindow("apartments","homepage");
+        changeWindow("homepage");
     }
 
     @FXML
@@ -146,7 +146,7 @@ public class ApartmentsController extends Controller{
                 getSession().setApartmentAverageRating(apartment.getAverageRating());
                 getSession().setCurrent_filter(selectedFilter);
                 getSession().setCurrent_page(page);
-                changeWindow("apartments","apartment");
+                changeWindow("apartment");
             });
 
             apartmentPageButton.setTextFill(Color.web("#03612a"));

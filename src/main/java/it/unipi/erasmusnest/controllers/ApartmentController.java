@@ -103,7 +103,7 @@ public class ApartmentController extends Controller{
                 alert.setOnCloseRequest(event -> {
                     // Qui puoi aggiungere il codice per reindirizzare a un'altra pagina
                     cleanAverageRatingInSession();
-                    super.changeWindow("apartment","apartments");
+                    super.changeWindow("apartments");
                 });
 
                 // Mostra la finestra di dialogo
@@ -124,7 +124,7 @@ public class ApartmentController extends Controller{
                 alert.setOnCloseRequest(event -> {
                     // Qui puoi aggiungere il codice per reindirizzare a un'altra pagina
                     cleanAverageRatingInSession();
-                    super.changeWindow("apartment","apartments");
+                    super.changeWindow("apartments");
                 });
 
                 // Mostra la finestra di dialogo
@@ -282,20 +282,20 @@ public class ApartmentController extends Controller{
     @FXML
     protected void onShowReviewsButtonClick() {
         //cleanAverageRatingInSession();
-        super.changeWindow("apartment","reviews");
+        super.changeWindow("reviews");
     }
 
     @FXML
     protected void onContactHostButtonClick() {
         getSession().setOtherProfileMail(hostEmail.getText());
         cleanAverageRatingInSession();
-        super.changeWindow("apartment","profile");
+        super.changeWindow("profile");
     }
 
     @FXML
     protected void onLoginButtonClick() throws IOException {
         cleanAverageRatingInSession();
-        super.changeWindow("apartment","login");
+        super.changeWindow("login");
     }
 
     @FXML
@@ -317,14 +317,15 @@ public class ApartmentController extends Controller{
             getRedisConnectionManager().addReservation(userEmail, houseId, String.valueOf(startYear), String.valueOf(startMonth), String.valueOf(numberOfMonths), getSession().getCity(), apartment.getImageURLs().get(0));
 
             cleanAverageRatingInSession();
-            super.changeWindow("apartment","myreservations");
+            super.changeWindow("myreservations");
         }
     }
 
     public void onGoBackButtonClick() {
         cleanAverageRatingInSession();
         System.out.println(getPreviousWindowName());
-        super.changeWindow("apartment", "apartments");
+        super.backToPreviousWindow();
+        //super.changeWindow("apartment", "apartments");
 
     }
 
