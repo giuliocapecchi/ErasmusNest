@@ -1,5 +1,6 @@
 package it.unipi.erasmusnest.controllers;
 
+import it.unipi.erasmusnest.graphicmanagers.RatingGraphicManager;
 import it.unipi.erasmusnest.model.Apartment;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -9,10 +10,10 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -136,15 +137,61 @@ public class ApartmentsController extends Controller{
             nameLabel.prefWidthProperty().bind(apartmentHBox.widthProperty().multiply(nameWidthRatio));
             nameLabel.setWrapText(true);
 
-            // Average rating //TODO: ci sta aggiungere le stelline in maniera grafica
-            Label ratingLabel = new Label( "Average rating: " + apartment.getAverageRating().toString()+"\nNumber of reviews: "+apartment.getNumberOfReviews().toString());
+            // Apartment page button
+            Button apartmentPageButton = new Button("View apartment page");
+            apartmentPageButton.setOnAction(event -> {
+                cancelImageLoading();
+                getSession().setApartmentId(apartment.getId());
+                System.out.println("Apartment id: "+apartment.getId());
+                getSession().setApartmentAverageRating(apartment.getAverageRating());
+                getSession().setCurrent_filter(selectedFilter);
+                getSession().setCurrent_page(page);
+                changeWindow("apartments","apartment");
+            });
+
+            apartmentPageButton.setTextFill(Color.web("#03612a"));
+            apartmentPageButton.setMaxWidth(Double.MAX_VALUE);
+            BorderPane nameBorderPane= new BorderPane();
+            nameBorderPane.setCenter(nameLabel);
+            nameBorderPane.setBottom(apartmentPageButton);
+            BorderPane.setMargin(nameLabel, new Insets(10, 10, 10, 10));
+            BorderPane.setMargin(apartmentPageButton, new Insets(10, 10, 10, 10));
+            BorderPane.setAlignment(nameLabel, Pos.CENTER);
+            BorderPane.setAlignment(apartmentPageButton, Pos.CENTER);
+
+            // Average rating Box
+            VBox ratingVBox = new VBox();
+            ratingVBox.setAlignment(Pos.CENTER);
+
+            Label ratingLabel = new Label( "Average: " + apartment.getAverageRating().toString()+"\nReviews: "+apartment.getNumberOfReviews().toString());
             ratingLabel.setStyle("-fx-font-size: 18px;");
             ratingLabel.setAlignment(Pos.CENTER);
             ratingLabel.setMaxWidth(Double.MAX_VALUE);
             ratingLabel.prefWidthProperty().bind(apartmentHBox.widthProperty().multiply(ratingWidthRatio));
             ratingLabel.setWrapText(true);
 
-            // Image
+            HBox ratingHBox = new HBox();
+            HBox.setMargin(ratingHBox, new Insets(5));
+
+            if(apartment.getAverageRating() != null){
+                ratingHBox.prefWidthProperty().bind(apartmentHBox.widthProperty().multiply(ratingWidthRatio));
+                ratingHBox.setAlignment(Pos.CENTER);
+                ArrayList<ImageView> ratingImages = new ArrayList<>();
+                for(int i=0;i<5;i++){
+                    ImageView ratingImage = new ImageView();
+                    ratingImage.setFitHeight(20);
+                    ratingImage.setFitWidth(20);
+                    ratingImage.setPreserveRatio(true);
+                    ratingImages.add(ratingImage);
+                    ratingHBox.getChildren().add(ratingImage);
+                }
+                RatingGraphicManager ratingGraphicManager = new RatingGraphicManager(ratingImages, ratingImages.size());
+                ratingGraphicManager.showRating(apartment.getAverageRating());
+            }
+            ratingVBox.getChildren().addAll(ratingLabel,ratingHBox);
+
+
+            // Image Box
             VBox imageVBox = new VBox();
             ImageView imageView = new ImageView();
             try {
@@ -162,34 +209,12 @@ public class ApartmentsController extends Controller{
             imageVBox.prefWidthProperty().bind(apartmentHBox.widthProperty().multiply(imageWidthRatio));
             HBox.setMargin(imageVBox, new Insets(5));
 
-
-            // Apartment page button
-            Button apartmentPageButton = new Button("View apartment page");
-            apartmentPageButton.setOnAction(event -> {
-                cancelImageLoading();
-                getSession().setApartmentId(apartment.getId());
-                System.out.println("Apartment id: "+apartment.getId());
-                getSession().setApartmentAverageRating(apartment.getAverageRating());
-                getSession().setCurrent_filter(selectedFilter);
-                getSession().setCurrent_page(page);
-                changeWindow("apartments","apartment");
-            });
-
-            apartmentPageButton.setTextFill(Color.web("#03612a"));
-            apartmentPageButton.setMaxWidth(Double.MAX_VALUE);
-            BorderPane nameBorderPane= new BorderPane();
-            nameBorderPane.setTop(nameLabel);
-            nameBorderPane.setBottom(apartmentPageButton);
-            BorderPane.setMargin(apartmentPageButton, new Insets(10, 10, 10, 10));
-            BorderPane.setAlignment(apartmentPageButton, Pos.CENTER);
-
             // Adding elements to the horizontal box
-            apartmentHBox.getChildren().addAll(nameBorderPane, ratingLabel, imageVBox);
+            apartmentHBox.getChildren().addAll(nameBorderPane, ratingVBox, imageVBox);
 
             // Adding the apartment entry to the main VBox
             apartmentsVBox.getChildren().add(apartmentHBox);
             pageNumber.setText("Page Number: "+page.toString());
-
         }
         if(apartments.size() < elementsPerPage){
             // non ci sono appartamenti
