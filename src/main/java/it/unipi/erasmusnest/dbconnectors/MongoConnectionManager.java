@@ -2,12 +2,14 @@ package it.unipi.erasmusnest.dbconnectors;
 
 import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
 import it.unipi.erasmusnest.graphicmanagers.AlertDialogGraphicManager;
 import it.unipi.erasmusnest.model.Apartment;
 import it.unipi.erasmusnest.model.User;
 import javafx.geometry.Point2D;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
@@ -30,10 +32,10 @@ public class MongoConnectionManager extends ConnectionManager{
             MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
             MongoCollection<Document> collection = database.getCollection("users");
             Document userDocument = collection.find(Filters.eq("email", email)).first();
-            System.out.println("\n\n\nUser document: " + userDocument.toJson());
             if (userDocument == null) {
                 return null;
             }
+            System.out.println("\n\n\nUser document: " + userDocument.toJson());
 
             // Object houseObject = userDocument.get("house");
 
@@ -163,10 +165,13 @@ public class MongoConnectionManager extends ConnectionManager{
             MongoCollection<Document> collection = database.getCollection("apartments");
 
             // find one document with new Document that have the object id field equal to the apartmentId
-            Document apartment = collection.find(eq("_id", new ObjectId(apartmentId))).first();
+            System.out.println("\n\n\nAPARTMENTID: " + apartmentId);
+            ObjectId id = new ObjectId(apartmentId);
+            Document apartment = collection.find(eq("_id", id)).first();
             if(apartment!=null)
                 System.out.println("\n\n\nAPPARTAMENTO TROVATO GET APARTMENT:\n" + apartment.toJson());
-
+            else
+                System.out.println("\n\n\nAPPARTAMENTO NON TROVATO GET APARTMENT:\n" + id);
             String coordinates = apartment.getString("position");
             // remove space from coordinates
             coordinates = coordinates.replaceAll("\\s","");
@@ -194,16 +199,11 @@ public class MongoConnectionManager extends ConnectionManager{
             else
                 id = (Long) apartment.get("id");
             */
-            ArrayList<String> pictureURLs = new ArrayList<>();
-            Object urlObj = apartment.get("picture_url");
-            if(urlObj instanceof String) {
-                pictureURLs.add((String) urlObj);
-            }
-            else if(urlObj instanceof ArrayList<?>) {
-                for(Object o : (ArrayList<?>) urlObj) {
-                    pictureURLs.add((String) o);
-                }
-            }
+            ArrayList<String> picURLs = new ArrayList<>();
+            if(apartment.get("picture_url")!=null)
+                picURLs = apartment.get("picture_url",ArrayList.class);
+            System.out.println("\n\n\nPICURLS: " + picURLs);
+
 
             // to retrieve also studyFields
             resultApartment = new Apartment(
@@ -215,7 +215,7 @@ public class MongoConnectionManager extends ConnectionManager{
                     apartment.getInteger("price"),
                     apartment.getInteger("accommodates"),
                     apartment.getString("email"),
-                    pictureURLs,
+                    picURLs,
                     apartment.getInteger("bathrooms")
             );
 
@@ -379,62 +379,74 @@ public class MongoConnectionManager extends ConnectionManager{
         return availableEmail;
     }
 
-    public boolean updateApartment(Apartment updatedHouse)
-    {
+    public boolean updateApartment(Apartment updatedHouse) {
         boolean updated = false;
-        try(MongoClient mongoClient = MongoClients.create("mongodb://"+super.getHost()+":"+super.getPort()))
-        {
+        try (MongoClient mongoClient = MongoClients.create("mongodb://" + super.getHost() + ":" + super.getPort())) {
             MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
-            MongoCollection<Document> collection = database.getCollection("apartments");
-            Document updatedHouseDocument = new Document("house_name", updatedHouse.getName())
+            MongoCollection<Document> apartmentsCollection = database.getCollection("apartments");
+            MongoCollection<Document> usersCollection = database.getCollection("users");
+
+            System.out.println("\n\n\nLA CASA DOVRA AVERE:" + updatedHouse.toString()+"\n\n\n");
+
+            // Documento per l'operazione $set
+            Document setDocument = new Document()
+                    .append("house_name", updatedHouse.getName())
                     .append("price", updatedHouse.getDollarPriceMonth())
                     .append("accommodates", updatedHouse.getMaxAccommodates())
-                    .append("email", updatedHouse.getHostEmail())
-                    .append("position", updatedHouse.getLocation().getX() + ", " + updatedHouse.getLocation().getY())
+                    .append("picture_url", updatedHouse.getImageURLs())
                     .append("bathrooms", updatedHouse.getBathrooms());
+            if (updatedHouse.getDescription() != null && !updatedHouse.getDescription().isBlank()) {
+                setDocument.append("description", updatedHouse.getDescription());
+            }
 
-            System.out.println("\n\n\nDescription: " + updatedHouse.getDescription());
-            Document updateOperation = new Document();
-
+            // Documento per l'operazione $unset
+            Document unsetDocument = new Document();
             if (updatedHouse.getDescription() == null || updatedHouse.getDescription().isEmpty() || updatedHouse.getDescription().isBlank()) {
-                // Aggiungi l'operazione $unset al documento di aggiornamento
-                updateOperation.append("$unset", new Document("description", ""));
+                unsetDocument.append("description", "");
+            }
+
+            // Preparazione del documento di aggiornamento completo
+            Document updatedHouseDocument = new Document();
+            if (!setDocument.isEmpty()) {
+                updatedHouseDocument.append("$set", setDocument);
+            }
+            if (!unsetDocument.isEmpty()) {
+                updatedHouseDocument.append("$unset", unsetDocument);
+            }
+
+            // Applica l'operazione di aggiornamento per l'appartamento
+            apartmentsCollection.updateOne(Filters.eq("_id", new ObjectId(updatedHouse.getId())), updatedHouseDocument);
+
+            // Controlla se la lista delle immagini è vuota prima di tentare di accedere al primo elemento
+            Document pictureOperation = new Document();
+            if (updatedHouse.getImageURLs() != null && !updatedHouse.getImageURLs().isEmpty()) {
+                String firstImageUrl = updatedHouse.getImageURLs().get(0);
+                pictureOperation.append("$set", new Document("houses.$[elem].picture_url", firstImageUrl));
             } else {
-                // Aggiungi o aggiorna la descrizione nel documento di aggiornamento
-                updatedHouseDocument.append("description", updatedHouse.getDescription());
+                pictureOperation.append("$unset", new Document("houses.$[elem].picture_url", ""));
             }
 
-
-            // Se ci sono altri campi da aggiornare, aggiungili con l'operatore $set
-            if (!updatedHouseDocument.isEmpty()) {
-                updateOperation.append("$set", updatedHouseDocument);
-            }
+            // Creazione del filtro per l'utente e dell'array filter per l'elemento specifico nell'array houses
+            Bson userFilter = Filters.eq("email", updatedHouse.getHostEmail());
+            Bson houseFilter = Filters.eq("elem.object_id", new ObjectId(updatedHouse.getId()));
 
             // Applica l'operazione di aggiornamento
-            collection.updateOne(Filters.eq("_id", new ObjectId(updatedHouse.getId())), updateOperation);
-
-            List<String> pictureUrls = updatedHouse.getImageURLs();
-            if (pictureUrls == null || pictureUrls.isEmpty()) {
-                // Se la lista è vuota o null, rimuovi il campo picture_url
-                updateOperation.append("$unset", new Document("picture_url", ""));
-            } else {
-                // Se la lista contiene almeno un URL, aggiorna il campo picture_url con la lista
-                updateOperation.append("$set", new Document("picture_url", pictureUrls));
-            }
-
-            // Applica l'operazione di aggiornamento
-            collection.updateOne(Filters.eq("_id", new ObjectId(updatedHouse.getId())), updateOperation);
+            usersCollection.updateOne(
+                    userFilter,
+                    pictureOperation,
+                    new UpdateOptions().arrayFilters(List.of(houseFilter))
+            );
 
             updated = true;
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
             new AlertDialogGraphicManager("MongoDB UPDATE failed").show();
             System.out.println("Error in updateApartment: " + e.getMessage());
         }
         return updated;
     }
+
+
 
     public boolean removeApartment(String objectIdToRemove, String userEmail) {
         boolean res = false;

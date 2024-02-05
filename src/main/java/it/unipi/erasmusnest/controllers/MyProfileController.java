@@ -12,9 +12,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox; // Import per il banner/pop-up
 import org.controlsfx.control.PopOver; // Import per il banner/pop-up
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+
+import java.util.*;
 
 public class MyProfileController extends Controller {
 
@@ -415,23 +414,27 @@ public class MyProfileController extends Controller {
 
     public void onFavouritesButtonClick(ActionEvent actionEvent) {
         System.out.println("Favourites button clicked");
-        List<String> favourites = getNeo4jConnectionManager().getFavourites(getSession().getUser().getEmail());
+        Map<String,String> favourites = getNeo4jConnectionManager().getFavourites(getSession().getUser().getEmail());
         if(favourites==null || favourites.isEmpty()){
             // favouritesContainerVBox.getChildren().clear();
             System.out.println("\n\n\nNo favourites found\n\n\n");
             favouritesContainerVBox.getChildren().add(new Label("No favourites found"));
         }
         else {
-            for(String favourite : favourites){
+            for(String favourite : favourites.keySet()) {
                 Button button = new Button("favourite");
                 System.out.println("\n\n\nfavourite: "+favourite);
-                //String name = getMongoConnectionManager().getApartment(favourite).getName();
-                button.setText(favourite);
+                button.setText(favourites.get(favourite));
                 button.setOnAction(event -> {
                     getSession().setApartmentId(favourite);
                     super.changeWindow("myprofile","apartment");
                 });
-                favouritesContainerVBox.getChildren().add(button);
+                Button dislike = new Button("dislike");
+                dislike.setOnAction(event -> {
+                    getNeo4jConnectionManager().removeFavourite(getSession().getUser().getEmail(),favourite);
+                    super.changeWindow("myprofile","myprofile");
+                });
+                favouritesContainerVBox.getChildren().addAll(button,dislike);
             }
         }
     }

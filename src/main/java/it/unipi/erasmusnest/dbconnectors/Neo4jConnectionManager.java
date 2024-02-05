@@ -444,14 +444,14 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
     }
 
     // Method to update apartment information
-    public boolean updateApartment(Long apartmentId, String name, String pictureUrl)
+    public boolean updateApartment(String apartmentId, String pictureUrl)
     {
         try (Session session = driver.session())
         {
             session.writeTransaction((TransactionWork<Void>) tx -> {
                 tx.run("MATCH (a:Apartment {apartmentId: $apartmentId}) " +
-                                "SET a.name = $name, a.pictureUrl = $pictureUrl",
-                        parameters("apartmentId", apartmentId, "name", name, "pictureUrl", pictureUrl));
+                                "SET a.pictureUrl = $pictureUrl",
+                        parameters("apartmentId", apartmentId, "pictureUrl", pictureUrl));
                 return null;
             });
             return true;
@@ -492,7 +492,7 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
 
     public boolean likeApartment(String id, String email) {
         boolean queryExecuted = false;
-        if (!getFavourites(email).contains(id)) {
+        if (!getFavourites(email).containsKey(id)) {
             try (Session session = driver.session()) {
                 session.writeTransaction((TransactionWork<Void>) tx -> {
                     tx.run(
@@ -511,6 +511,41 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         return queryExecuted;
     }
 
+    public Map<String, String> getFavourites(String email) {
+        try (Session session = driver.session()) {
+            return session.readTransaction(tx -> {
+                Result result = tx.run("MATCH (u:User {email: $email})-[l:LIKES]->(a:Apartment) RETURN a.apartmentId, a.name", parameters("email", email));
+                Map<String, String> favourites = new HashMap<>();
+                while (result.hasNext()) {
+                    Record record = result.next();
+                    String apartmentId = record.get("a.apartmentId").asString();
+                    String name = record.get("a.name").asString();
+                    favourites.put(apartmentId, name);
+                }
+                return favourites;
+            });
+        } catch (Exception e) {
+            System.out.println("Exception: " + e);
+            new AlertDialogGraphicManager("Neo4j connection failed").show();
+            // Gestisci l'errore come preferisci o ritorna una mappa vuota
+            return Collections.emptyMap();
+        }
+    }
+
+    public void removeFavourite(String email, String favourite) {
+        try (Session session = driver.session()) {
+            session.writeTransaction(tx -> {
+                tx.run("MATCH (u:User {email: $email})-[l:LIKES]->(a:Apartment {apartmentId: $favourite}) DELETE l",
+                        parameters("email", email, "favourite", favourite));
+                return null;
+            });
+        } catch (Exception e) {
+            System.out.println("Exception: " + e);
+            new AlertDialogGraphicManager("Neo4j connection failed").show();
+        }
+    }
+
+    /*
     public List<String> getFavourites(String email) {
         try (Session session = driver.session()) {
             return session.readTransaction(tx -> {
@@ -530,6 +565,7 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
             return Collections.emptyList();
         }
     }
+    */
 }
 
 
