@@ -73,16 +73,10 @@ public class MyProfileController extends Controller {
 
     @FXML
     private void initialize() {
-        //todo rimuovi
-        getSession().setLogged(true);
-        getSession().setUser(getMongoConnectionManager().findUser("adriana33@gmail.com"));
-        // todo fine todo
-
         getSession().setCity(null); // serve per la change window
         personalInfoVbox.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.4));
         apartmentsContainerVBox.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.4));
         passwordChangeOuterBox.prefWidthProperty().bind(super.getRootPane().widthProperty());
-        //todo qui sotto
         updateCitiesOfInterestButton.setDisable(true); // viene abilitato solo se l'utente effettivamente modifica le città di interesse
 
 
