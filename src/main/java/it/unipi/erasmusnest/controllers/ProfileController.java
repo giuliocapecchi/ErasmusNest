@@ -68,7 +68,7 @@ public class ProfileController extends Controller{
             suggestedOuterBox.prefWidthProperty().bind(super.getRootPane().widthProperty());
             suggestedOuterBox.setVisible(false);
 
-            if(utente.getStudyField().isEmpty() || utente.getStudyField().isBlank())
+            if(utente.getStudyField() == null ||utente.getStudyField().isEmpty() || utente.getStudyField().isBlank())
                 studyFieldLabel.setText("not specified");
             else
                 studyFieldLabel.setText(utente.getStudyField());

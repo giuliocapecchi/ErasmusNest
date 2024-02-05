@@ -30,10 +30,11 @@ public class MongoConnectionManager extends ConnectionManager{
             MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
             MongoCollection<Document> collection = database.getCollection("users");
             Document userDocument = collection.find(Filters.eq("email", email)).first();
-            System.out.println("\n\n\nUser document: " + userDocument.toJson());
             if (userDocument == null) {
                 return null;
             }
+            System.out.println("\n\n\nUser document: " + userDocument.toJson());
+
 
             // Object houseObject = userDocument.get("house");
 

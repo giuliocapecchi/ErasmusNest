@@ -164,25 +164,24 @@ public class HomepageController extends Controller{
     }
 
     public void handleSearchUserAction() {
-        System.out.println("searching user...");
+        System.out.println("searching for user : "+cityTextField.getText());
         User user = getMongoConnectionManager().findUser(cityTextField.getText());
         if(user == null) {
+            System.out.println("User not found in MongoDB");
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText("User "+cityTextField.getText()+" not found");
             alert.setContentText("The user you are looking for does not exist.");
             alert.showAndWait();
-        }else{
-            if(Objects.equals(getSession().getUser().getEmail(), user.getEmail())){
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error");
-                alert.setHeaderText("You can't search yourself");
-                alert.setContentText("Use the \"Profile\" button below.");
-                alert.showAndWait();
-                return;
-            }
+        }else if(Objects.equals(getSession().getUser().getEmail(), user.getEmail())){
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("You can't search yourself");
+            alert.setContentText("Use the \"Profile\" button below.");
+            alert.showAndWait();
+        }else{ // user was found
             getSession().setOtherProfileMail(user.getEmail());
-            super.changeWindow("homepage","profile");
+            super.changeWindow("homepage", "profile");
         }
     }
 
