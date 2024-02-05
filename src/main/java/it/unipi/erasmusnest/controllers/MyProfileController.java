@@ -2,7 +2,6 @@ package it.unipi.erasmusnest.controllers;
 
 import it.unipi.erasmusnest.model.Apartment;
 import it.unipi.erasmusnest.model.User;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -11,10 +10,13 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox; // Import per il banner/pop-up
-import org.controlsfx.control.PopOver; // Import per il banner/pop-up
+import javafx.scene.layout.VBox;
+import org.controlsfx.control.PopOver;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class MyProfileController extends Controller {
 
@@ -52,7 +54,6 @@ public class MyProfileController extends Controller {
     PasswordField newPasswordField; // Campo per la nuova password
     @FXML
     PasswordField confirmNewPasswordField; // Campo per la conferma della nuova password
-    boolean isEditingPassword = false; // Aggiunto per gestire la modifica della password
     @FXML
     Label passwordErrorLabel; // Etichetta per visualizzare gli errori
     @FXML
@@ -65,7 +66,7 @@ public class MyProfileController extends Controller {
 
     private String selectedStudyField;
     private ArrayList<String> citiesOfInterestInNeo4j = new ArrayList<>();
-    private ArrayList<String> selectedCitiesOfInterest = new ArrayList<>();
+    private final ArrayList<String> selectedCitiesOfInterest = new ArrayList<>();
 
 
 
@@ -91,18 +92,6 @@ public class MyProfileController extends Controller {
         System.out.println("USER DELLA MYPROFILE: "+utente.toString());
         // Set the password field with asterisks, one for each character
         passwordField.setText("*".repeat(utente.getPassword().length()));
-        // List<String> userCities = utente.getPreferredCities();
-        // cityTitlePane = createTitledPane(userCities);
-        // cityVBox.getChildren().add(cityTitlePane);
-
-        // Update preferred cities
-        updateCitiesButton.setOnAction(event -> {
-            if (updateCitiesInDatabase(selectedCities)) {
-                showConfirmationMessageCities("Preferred cities updated successfully!");
-            } else {
-                showConfirmationMessageCities("Error while updating preferred cities!");
-            }
-        });
 
         // Nascondi il banner/pop-up per la modifica della password all'inizio
         passwordChangeBox.setVisible(false);
@@ -166,9 +155,7 @@ public class MyProfileController extends Controller {
                     onApartmentView(apartmentButton.getId());
                 });
                 Button viewButton = new Button(apartment.getName());
-                viewButton.setOnAction(event -> {
-                    onChangeView(apartmentButton.getId());
-                });
+                viewButton.setOnAction(event -> onChangeView(apartmentButton.getId()));
 
                 apartmentBox.getChildren().addAll(apartmentImage, viewButton, apartmentButton);
                 apartmentsContainer.getChildren().add(apartmentBox); // This should add the apartment to the UI
@@ -334,7 +321,7 @@ public class MyProfileController extends Controller {
         popOver.setContentNode(label);
         popOver.setDetachable(false);
         popOver.setAutoHide(true);
-        popOver.show(updateCitiesButton);
+        popOver.show(updateCitiesOfInterestButton);
     }
 
     private void showConfirmationMessageSF(String message) {
