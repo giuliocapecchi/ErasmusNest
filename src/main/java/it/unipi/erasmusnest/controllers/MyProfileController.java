@@ -254,6 +254,7 @@ public class MyProfileController extends Controller {
         //  oldPasswordField.clear();
         newPasswordField.clear();
         confirmNewPasswordField.clear();
+        onModifyPasswordButtonClick();
     }
 
     @FXML
