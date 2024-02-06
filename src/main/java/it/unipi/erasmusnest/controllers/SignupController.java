@@ -145,8 +145,10 @@ public class SignupController extends Controller{
         utente.setEmail(emailField.getEmailAddress());
         utente.setName(nameField.getText());
         utente.setSurname(surnameField.getText());
-        String hashedPassword = BCrypt.hashpw(passwordField.getText().trim(), BCrypt.gensalt(12));
-        utente.setPassword(hashedPassword);
+        String password = passwordField.getText().trim();
+        //TODO : scommentare per fare l'hash della password. Duale alla verifica che si trova nella login controller
+       // String password = BCrypt.hashpw(password, BCrypt.gensalt(12));
+        utente.setPassword(password);
         utente.setStudyField(studiesComboBox.getValue());
         // Aggiungere citta di interesse
         utente.setPreferredCities(selectedCities);
