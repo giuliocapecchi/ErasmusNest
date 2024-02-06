@@ -211,18 +211,28 @@ public class MyReservationsController extends Controller {
     private void buildButtons(VBox buttonsVBox, Reservation reservation, String userType, String msgPeriod){
         if(userType.equals("student")) {
             if(!reservation.getState().equals("rejected")) {
-                Button deleteButton = new Button("Delete reservation");
-                deleteButton.setStyle("-fx-background-color: #ff0000; -fx-text-fill: #ffffff; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 5px;");
-                deleteButton.setOnAction(event -> {
-                    boolean remove = new AlertDialogGraphicManager("Delete confirmation","Are you sure you want to delete this reservation\n"
-                            + msgPeriod + " in " + reservation.getCity()
-                            + "?", "You will not be able to recover it","confirmation").showAndGetConfirmation();
-                    if (remove) {
-                        getRedisConnectionManager().deleteReservation(reservation);
-                        super.refreshWindow();
-                    }
-                });
-                buttonsVBox.getChildren().add(deleteButton);
+                if(reservation.getState().equals("expired")){
+                    Button deleteButton = new Button("Write a review");
+                    deleteButton.setStyle("-fx-background-color: #019fe1; -fx-text-fill: #ffffff; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 5px;");
+                    deleteButton.setOnAction(event -> {
+                        getSession().setApartmentId(reservation.getApartmentId());
+                        changeWindow("writeReview");
+                    });
+                    buttonsVBox.getChildren().add(deleteButton);
+                } else {
+                    Button deleteButton = new Button("Delete reservation");
+                    deleteButton.setStyle("-fx-background-color: #ff0000; -fx-text-fill: #ffffff; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 5px;");
+                    deleteButton.setOnAction(event -> {
+                        boolean remove = new AlertDialogGraphicManager("Delete confirmation", "Are you sure you want to delete this reservation\n"
+                                + msgPeriod + " in " + reservation.getCity()
+                                + "?", "You will not be able to recover it", "confirmation").showAndGetConfirmation();
+                        if (remove) {
+                            getRedisConnectionManager().deleteReservation(reservation);
+                            super.refreshWindow();
+                        }
+                    });
+                    buttonsVBox.getChildren().add(deleteButton);
+                }
             }
         } else if(reservation.getState().equals("pending")){
             Button approveButton = new Button("Approve reservation");
