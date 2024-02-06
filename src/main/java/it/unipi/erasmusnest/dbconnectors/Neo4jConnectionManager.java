@@ -138,7 +138,6 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
             session.writeTransaction((TransactionWork<Void>) tx -> {
                 tx.run("MATCH (u:User {email: $email})-[r:INTERESTS]->(c:City) DELETE r",
                         parameters("email", email));
-                System.out.println("fatto questo");
                 for (String cityName : city) {
                     HashMap<String, Object> parameters = new HashMap<>();
                     parameters.put("email", email);
@@ -148,7 +147,6 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
                                     "MATCH (c:City {name: $cityName}) " +
                                     "MERGE (u)-[:INTERESTS]->(c)",
                             parameters);
-                    System.out.println("Aggiungo INTERESTS per email: " + email + " città: " + cityName);
                 }
                 return null;
             });
