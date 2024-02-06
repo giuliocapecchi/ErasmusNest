@@ -104,7 +104,6 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         String comment = review.getComments();
         int score = review.getRating();
         LocalDate timestamp = review.getTimestamp();
-        System.out.println("email:" + email + " apartmentId:" + apartmentId + " comment:" + comment + " score:" + score + " timestamp:" + timestamp);
         try (Session session = driver.session()) {
             session.writeTransaction((TransactionWork<Void>) tx -> {
 
@@ -118,15 +117,12 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
                 tx.run("MERGE (u:User {email: $email}) " +
                                  "WITH u "+
                                 "MATCH (a:Apartment {apartmentId: $apartmentId}) " +
-                                "CREATE (u)-[r:REVIEW]->(a) " +
-                                "SET r.comment = $comment, r.score = $score, r.timestamp = $timestamp " +
+                                "MERGE (u)-[r:REVIEW]->(a) " +
+                                "SET r.comment = $comment, r.score = $score, r.date = $timestamp " +
                                 "RETURN r", parameters);
-
-                System.out.println("Review added");
-                updateApartmentAverageReviewScore(apartmentId);
-                System.out.println("Average review score updated");
                 return null;
             });
+            updateApartmentAverageReviewScore(apartmentId);
         }catch (Exception e){
             System.out.println("Exception: " + e);
             new AlertDialogGraphicManager("Neo4j connection failed").show();
@@ -354,6 +350,37 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         }
     }
 
+    public Review getReview(String email, String apartmentId) {
+        try (Session session = driver.session()) {
+            return session.readTransaction(tx -> {
+                HashMap<String, Object> parameters = new HashMap<>();
+                parameters.put("email", email);
+                parameters.put("apartmentId", apartmentId);
+                System.out.println("email: " + email + " apartmentId: " + apartmentId);
+                Result result = tx.run("MATCH (u:User {email: $email})-[r:REVIEW]->(a:Apartment {apartmentId: $apartmentId}) RETURN r",
+                        parameters);
+                if (result.hasNext()) {
+                    Record record = result.next();
+                    Relationship reviewRel = record.get("r").asRelationship();
+                    String comment = reviewRel.get("comment").asString();
+                    int rating = reviewRel.get("score").asInt();
+                    String timestamp = reviewRel.get("date").asString();
+
+                    System.out.println("Review found: " + comment + " " + rating + " " + timestamp);
+
+                    return new Review(apartmentId, email, comment, rating, timestamp);
+                } else {
+                    return null;
+                }
+            });
+        }catch (Exception e){
+            System.out.println("Exception: " + e);
+            new AlertDialogGraphicManager("Neo4j connection failed").show();
+            return null;
+        }
+    }
+
+
     public ArrayList<String> getCitiesOfInterest(String email) {
         try (Session session = driver.session()) {
             return (ArrayList<String>) session.readTransaction((TransactionWork<List<String>>) tx -> {
@@ -375,11 +402,13 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
     //UPDATE
     public void updateApartmentAverageReviewScore(String apartmentId) {
         try (Session session = driver.session()) {
+            System.out.println("sei qui con apartmentId: " + apartmentId);
             session.writeTransaction((TransactionWork<Void>) tx -> {
                 tx.run("MATCH ()-[r:REVIEW]->(a:Apartment {apartmentId:$apartmentId}) " +
                                 "WITH a, AVG(r.score) AS averageScore " +
                                 "SET a.averageReviewScore = ROUND(averageScore * 100) / 100",
                         parameters("apartmentId", apartmentId));
+                System.out.println("sei dopo");
                 return null;
             });
         }catch (Exception e){

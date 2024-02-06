@@ -52,11 +52,13 @@ public class ProfileController extends Controller{
     @FXML
     private void initialize() {
 
-        Session session = getSession();
 
-        if (session.getOtherProfileMail() != null) {
+        if (getSession().getOtherProfileMail() != null) {
 
-            User utente = getMongoConnectionManager().findUser(session.getOtherProfileMail());
+            if(Objects.equals(getSession().getOtherProfileMail(), getSession().getUser().getEmail()))
+                super.changeWindow("myprofile");
+
+            User utente = getMongoConnectionManager().findUser(getSession().getOtherProfileMail());
 
             pageTitle.setText("Profile of " + utente.getName() + " " + utente.getSurname());
 
