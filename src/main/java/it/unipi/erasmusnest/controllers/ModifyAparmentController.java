@@ -24,7 +24,6 @@ public class ModifyAparmentController extends Controller{
     private Spinner<Integer> inputAccommodates;
     private Spinner<Integer> inputBathrooms;
     private Spinner<Integer> inputPrice;
-    private TextField textField;
     private TextArea descriptionTextArea;
     @FXML
     private Button updateHouse;
@@ -39,25 +38,22 @@ public class ModifyAparmentController extends Controller{
     private ArrayList<TextField> pictureUrlsTextField;
     private Apartment apartment;
 
-    public ModifyAparmentController()
-    {
-
+    public ModifyAparmentController(){
     }
 
     @FXML
-    private void initialize()
-    {
+    private void initialize() {
         String apartmentId = getSession().getApartmentId();
-        System.out.println("\n\n\nL'ID dell'appartamento è: "+apartmentId);
+        System.out.println("\n\n\nL'ID dell'appartamento è: " + apartmentId);
         apartment = getMongoConnectionManager().getApartment(apartmentId);
-        System.out.println("\n\n\n"+apartment.toString());
+        System.out.println("\n\n\n" + apartment.toString());
         inputAccommodates = new Spinner<>();
         inputBathrooms = new Spinner<>();
         inputPrice = new Spinner<>();
 
-        SpinnerValueFactory<Integer> valoriAccommodates = new SpinnerValueFactory.IntegerSpinnerValueFactory(1,10,apartment.getMaxAccommodates());
-        SpinnerValueFactory<Integer> valoriBathrooms = new SpinnerValueFactory.IntegerSpinnerValueFactory(1,10,apartment.getBathrooms());
-        SpinnerValueFactory<Integer> valoriPrice = new SpinnerValueFactory.IntegerSpinnerValueFactory(1,1000,apartment.getDollarPriceMonth());
+        SpinnerValueFactory<Integer> valoriAccommodates = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 10, apartment.getMaxAccommodates());
+        SpinnerValueFactory<Integer> valoriBathrooms = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 10, apartment.getBathrooms());
+        SpinnerValueFactory<Integer> valoriPrice = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 1000, apartment.getDollarPriceMonth());
         // setting suitable values for the spinners
         inputAccommodates.setValueFactory(valoriAccommodates);
         inputBathrooms.setValueFactory(valoriBathrooms);
@@ -68,18 +64,33 @@ public class ModifyAparmentController extends Controller{
         priceVBox.getChildren().add(inputPrice);
         apartmentVBox.getChildren().add(inputAccommodates);
         bathroomsVBox.getChildren().add(inputBathrooms);
-        // pulsante.setOnAction(e->calcola());
+        // Aggiunta del messaggio di errore per la lunghezza massima della descrizione
+        Label maxDescriptionLengthReached = new Label("Maximum description length reached");
+        maxDescriptionLengthReached.setStyle("-fx-text-fill: red");
+        maxDescriptionLengthReached.setVisible(false);
+        // Aggiunta della descrizione
         descriptionTextArea = new TextArea();
+        // rendo la text area ad altezza dinamic
+        descriptionTextArea.minHeightProperty().bind(super.getRootPane().heightProperty().multiply(0.2));
         descriptionTextArea.setText(apartment.getDescription());
         descriptionTextArea.setWrapText(true); // Abilita il word wrapping per l'area di testo
         descriptionTextArea.onKeyReleasedProperty().set(event -> checkFields());
+        descriptionTextArea.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.length() > 1000) {
+                descriptionTextArea.setText(oldValue); // Revert al valore precedente se supera 1000 caratteri
+                descriptionTextArea.setScrollTop(Double.MAX_VALUE); // rimette lo scroll in fondo
+                maxDescriptionLengthReached.setVisible(true);
+            } else {
+                maxDescriptionLengthReached.setVisible(false);
+            }
+        });
         neighborhoodVBox.getChildren().add(descriptionTextArea);
-        //Aggiunta foto:
+        neighborhoodVBox.getChildren().add(maxDescriptionLengthReached);
 
+        //Aggiunta foto:
         pictureUrlsTextField = new ArrayList<>();
         pictureUrlsVBox.setSpacing(5);
-        if(apartment.getImageURLs() != null)
-        {
+        if (apartment.getImageURLs() != null) {
             for (String url : apartment.getImageURLs()) {
                 TextField pictureUrlTextField = new TextField();
                 pictureUrlTextField.setText(url);
@@ -88,13 +99,6 @@ public class ModifyAparmentController extends Controller{
                 pictureUrlsTextField.add(pictureUrlTextField);
             }
         }
-        /*else
-        {
-            TextField pictureUrlTextField = new TextField();
-            pictureUrlTextField.setPromptText("Insert picture URL");
-            pictureUrlsVBox.getChildren().add(pictureUrlTextField);
-            pictureUrlsTextField.add(pictureUrlTextField);
-        }*/
 
     }
 

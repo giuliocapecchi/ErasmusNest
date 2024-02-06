@@ -3,6 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<?import javafx.scene.paint.Color?>
 <StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.erasmusnest.controllers.UploadHouseController">
     <ScrollPane fitToWidth="true">
         <VBox spacing="10" style="-fx-border-color: orange; -fx-border-width: 2px; -fx-padding: 10px;">
@@ -25,7 +26,12 @@
             <Label text="Price per Month:" />
                 <Spinner fx:id="inputPrice" amountToStepBy="1" initialValue="200" max="9999" min="1" />
          <Label text="House Description :" />
-            <TextField fx:id="houseDescriptionTextField" alignment="TOP_LEFT" onKeyReleased="#checkFields" prefHeight="143.0" prefWidth="624.0" />
+            <TextArea fx:id="houseDescriptionTextArea" onKeyReleased="#checkFields" prefHeight="143.0" prefWidth="624.0" wrapText="true" />
+         <Label fx:id="houseDescriptionMaxLengthReached" layoutX="22.0" layoutY="535.0" text="Max description length reached">
+             <textFill>
+                 <Color red="1.0"/>
+             </textFill>
+         </Label>
            <Label text="Please provide 'street, city' of the house:" />
          <TextField fx:id="addressTextField" layoutX="22.0" layoutY="287.0" onKeyReleased="#checkFields" />
             <Button fx:id="geocodeButton" onAction="#onGeocodeButtonClick" style="-fx-background-color: #b4bd00; -fx-text-fill: white; -fx-padding: 5px 10px;" text="Check address" />
