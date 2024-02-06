@@ -306,7 +306,7 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
                     String userEmail = record.get("u.email").asString();
                     Relationship reviewRel = record.get("r").asRelationship();
                     String comment = reviewRel.get("comment").asString();
-                    float rating = reviewRel.get("score").asFloat();
+                    int rating = reviewRel.get("score").asInt();
                     String timestamp = reviewRel.get("date").asString();
                     Review review = new Review(apartmentId,userEmail, comment,rating, timestamp);
                     reviewList.add(review);
@@ -339,7 +339,7 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
                     Record record = result.next();
                     Relationship reviewRel = record.get("r").asRelationship();
                     String comment = reviewRel.get("comment").asString();
-                    float rating = reviewRel.get("score").asFloat();
+                    int rating = reviewRel.get("score").asInt();
                     String timestamp = reviewRel.get("date").asString();
                     Review review = new Review(null,email, comment,rating, timestamp);
                     reviewList.add(review);
