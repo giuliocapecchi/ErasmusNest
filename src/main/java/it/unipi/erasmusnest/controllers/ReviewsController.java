@@ -100,6 +100,7 @@ public class ReviewsController extends Controller{
                 ratingImages.add(ratingImage5);
                 RatingGraphicManager ratingGraphicManager = new RatingGraphicManager(ratingImages, ratingImages.size());
                 ratingGraphicManager.showRating(averageRating);
+                getSession().setApartmentAverageRating(averageRating);
             }
         }
 
@@ -127,9 +128,9 @@ public class ReviewsController extends Controller{
 
             // Calculate width proportions for each cell
             double emailWidthRatio = 0.2; // 20% of the width
-            double ratingWidthRatio = 0.2; // 20% of the width
-            double commentsWidthRatio = 0.6; // 60% of the width
-            double timestampWidthRatio = 0.2; // 20% of the width
+            double ratingWidthRatio = 0.1; // 20% of the width
+            double commentsWidthRatio = 0.55; // 60% of the width
+            double timestampWidthRatio = 0.15; // 20% of the width
 
             // Apartment name
             Label emailLabel = new Label(review.getUserEmail());
@@ -140,7 +141,7 @@ public class ReviewsController extends Controller{
 
             // RatingLabel
             Label ratingLabel = new Label("Rating: " + review.getRating());
-            ratingLabel.setStyle("-fx-font-size: 18px;");
+            ratingLabel.setStyle("-fx-font-size: 16px;");
             ratingLabel.setAlignment(Pos.CENTER);
             ratingLabel.setMaxWidth(Double.MAX_VALUE);
             ratingLabel.prefWidthProperty().bind(reviewHBox.widthProperty().multiply(ratingWidthRatio));

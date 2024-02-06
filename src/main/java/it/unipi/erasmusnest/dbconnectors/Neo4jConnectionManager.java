@@ -132,6 +132,30 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         }
     }
 
+    public boolean updateCitiesOfInterest(String email, ArrayList<String> city) {
+        try (Session session = driver.session()) {
+            session.writeTransaction((TransactionWork<Void>) tx -> {
+                tx.run("MATCH (u:User {email: $email})-[r:INTERESTS]->(c:City) DELETE r",
+                        parameters("email", email));
+                for (String cityName : city) {
+                    HashMap<String, Object> parameters = new HashMap<>();
+                    parameters.put("email", email);
+                    parameters.put("cityName", cityName);
+                    tx.run("MATCH (u:User {email: $email}) " +
+                                    "MATCH (c:City {name: $cityName}) " +
+                                    "MERGE (u)-[:INTERESTS]->(c)",
+                            parameters);
+                }
+                return null;
+            });
+            return true;
+        }catch (Exception e){
+            System.out.println("Exception: " + e);
+            new AlertDialogGraphicManager("Neo4j connection failed").show();
+            return false;
+        }
+    }
+
 
 
     //READ
@@ -328,6 +352,24 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         }
     }
 
+    public ArrayList<String> getCitiesOfInterest(String email) {
+        try (Session session = driver.session()) {
+            return (ArrayList<String>) session.readTransaction((TransactionWork<List<String>>) tx -> {
+                Result result = tx.run("MATCH (u:User {email: $email})-[:INTERESTS]->(c:City) RETURN c.name",
+                        parameters("email", email));
+                ArrayList<String> interests = new ArrayList<>();
+                while (result.hasNext()) {
+                    interests.add(result.next().get("c.name").asString());
+                }
+                return interests;
+            });
+        }catch (Exception e){
+            System.out.println("Exception: " + e);
+            new AlertDialogGraphicManager("Neo4j connection failed").show();
+            return null;
+        }
+    }
+
     //UPDATE
     public void updateApartmentAverageReviewScore(String apartmentId) {
         try (Session session = driver.session()) {
@@ -495,7 +537,7 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
     }
 
     public boolean likeApartment(String id, String email) {
-        boolean queryExecuted = false;
+        boolean result = false;
         if (!getFavourites(email).containsKey(id)) {
             try (Session session = driver.session()) {
                 session.writeTransaction((TransactionWork<Void>) tx -> {
@@ -506,13 +548,13 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
                             parameters("email", email, "id", id));
                     return null;
                 });
-                queryExecuted = true;
+                result = true;
             } catch (Exception e) {
                 e.printStackTrace();
                 new AlertDialogGraphicManager("Neo4j connection failed").show();
             }
         }
-        return queryExecuted;
+        return result;
     }
 
     public Map<String, String> getFavourites(String email) {

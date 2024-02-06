@@ -6,7 +6,6 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextFlow;
 
@@ -45,11 +44,10 @@ public class SignupController extends Controller{
     @FXML
     private ComboBox<String> studiesComboBox;
 
-    private ArrayList<String> selectedCities = new ArrayList<>();
+    private final ArrayList<String> selectedCities = new ArrayList<>();
 
-    public VBox cityVBox;
-
-    public  TitledPane cityTidlePane;
+    @FXML
+    private VBox cityVBox;
 
 
     @FXML
@@ -65,9 +63,9 @@ public class SignupController extends Controller{
         surnameField.textProperty().addListener((observable, oldValue, newValue) -> checkFields());
         studiesComboBox.valueProperty().addListener((observable, oldValue, newValue) -> checkFields());
 
-        cityTidlePane = createTitledPane();
+        TitledPane preferredCitiesPane = createTitledPane();
 
-        cityVBox.getChildren().add(cityTidlePane);
+        cityVBox.getChildren().add(preferredCitiesPane);
 
         for(String studyField : getSession().getStudyFields()){
             studiesComboBox.getItems().add(studyField);
@@ -81,8 +79,8 @@ public class SignupController extends Controller{
         backButton.maxWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.3));
         errorTextFlow.maxWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.5));
         studiesComboBox.maxWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.3));
-        cityTidlePane.maxWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.3));
-        cityTidlePane.setPadding(new Insets(10, 10, 10, 10));
+        preferredCitiesPane.maxWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.3));
+        preferredCitiesPane.setPadding(new Insets(10, 10, 10, 10));
     }
 
     public TitledPane createTitledPane() {
@@ -104,9 +102,6 @@ public class SignupController extends Controller{
         }
 
         TitledPane titledPane = new TitledPane("Cities interested in", gridPane);
-        // titledPane.setStyle("-fx-pref-width: 10px;"); // Imposta la larghezza preferita inline
-        // titledPane.setPadding(new Insets(2, 2, 2, 2));
-
         titledPane.setExpanded(false);
 
         return titledPane;
