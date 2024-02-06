@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.erasmusnest.controllers.MyProfileController">
+<StackPane fx:id="rootPane" prefHeight="356.0" prefWidth="423.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.erasmusnest.controllers.MyProfileController">
     <BorderPane prefHeight="200.0" prefWidth="200.0">
         <top>
             <HBox alignment="CENTER_LEFT" style="-fx-background-color: #ff8000">
@@ -16,7 +16,7 @@
             </HBox>
         </top>
         <center>
-            <ScrollPane fitToWidth="true" BorderPane.alignment="CENTER">
+            <ScrollPane fx:id="scrollPane" fitToWidth="true" BorderPane.alignment="CENTER">
                 <VBox>
                     <VBox fx:id="personalInfoVbox" spacing="10">
                         <padding>
@@ -45,21 +45,21 @@
                             <VBox fx:id="passwordChangeBox" style="-fx-border-color: red; -fx-border-width: 5px; -fx-padding: 10px; -fx-background-color: white; -fx-background-radius: 5px; -fx-border-radius: 5px;">
                                 <HBox alignment="CENTER_LEFT" spacing="10">
                                     <Label minWidth="75" text="New password:" />
-                                    <PasswordField fx:id="newPasswordField" minWidth="200" onKeyReleased="#checkNewPassword"/>
+                                    <PasswordField fx:id="newPasswordField" minWidth="200" onKeyReleased="#checkNewPassword" />
                                 </HBox>
                                 <HBox alignment="CENTER_LEFT" spacing="10">
                                     <Label minWidth="75" text="Confirm password:" />
                                     <PasswordField fx:id="confirmNewPasswordField" minWidth="200" onKeyReleased="#checkNewPassword" />
                                 </HBox>
                                 <HBox>
-                                    <Button fx:id="buttonPwdUpdate" onAction="#onUpdatePasswordClick" text="Update" disable="true" />
-                                    <Button onAction="#onBackButtonClick" text="Back"/>
+                                    <Button fx:id="buttonPwdUpdate" disable="true" onAction="#onUpdatePasswordClick" text="Update" />
+                                    <Button onAction="#onBackButtonClick" text="Back" />
                                 </HBox>
                             </VBox>
                         </VBox>
                         <HBox alignment="CENTER_LEFT" spacing="10">
                             <Label minWidth="75" style="-fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Study Field:" />
-                            <ComboBox fx:id="studyFieldComboBox" minWidth="200" onAction="#onStudyFieldSelectionChanged"/>
+                            <ComboBox fx:id="studyFieldComboBox" minWidth="200" onAction="#onStudyFieldSelectionChanged" />
                         </HBox>
                         <HBox spacing="10">
                             <Label minWidth="75" style="-fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Cities of Interest:">
@@ -67,9 +67,9 @@
                                 <Insets top="5.0" />
                             </HBox.margin>
                             </Label>
-                            <VBox fx:id="citiesVBox" alignment="CENTER" >
+                            <VBox fx:id="citiesVBox" alignment="CENTER">
                                 <!-- Qui verranno inserite le checkbox -->
-                                <TitledPane fx:id="cityTitlePane" text="Update cities of interest" onMouseClicked="#getCitiesOfInterest"/>
+                                <TitledPane fx:id="cityTitlePane" onMouseClicked="#getCitiesOfInterest" text="Update cities of interest" />
                             </VBox>
                             <Button fx:id="updateCitiesOfInterestButton" onAction="#onUpdateCitiesOfInterestButtonClick" style="-fx-background-color: orange; -fx-border-color: red; -fx-border-width: 1px;" text="Update" />
                         </HBox>
@@ -125,8 +125,8 @@
             </ScrollPane>
         </center>
         <bottom>
-            <VBox fx:id="adminContainer" alignment="CENTER_RIGHT"/>
-            <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: orange;" BorderPane.alignment="CENTER">
+            <VBox fx:id="adminContainer" alignment="CENTER_RIGHT" />
+            <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" prefWidth="256.0" style="-fx-background-color: orange;" BorderPane.alignment="CENTER">
                 <Button onAction="#logoutButtonClick" text="Logout" />
                 <Button onAction="#onBack" text="Homepage" />
             </ToolBar>

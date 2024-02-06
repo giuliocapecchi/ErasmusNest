@@ -21,6 +21,8 @@ import java.util.Objects;
 public class MyProfileController extends Controller {
 
     @FXML
+    ScrollPane scrollPane;
+    @FXML
     Button updateCitiesOfInterestButton;
     @FXML
     private VBox personalInfoVbox;
@@ -296,6 +298,7 @@ public class MyProfileController extends Controller {
 
     // Metodo per mostrare un messaggio di conferma
     private void showConfirmationMessage(String message, Node node) {
+        scrollPane.setVvalue(0.05);
         PopOver popOver = new PopOver();
         Label label = new Label(message);
         label.setStyle("-fx-padding: 10px;");
@@ -314,12 +317,10 @@ public class MyProfileController extends Controller {
             {
                 // Aggiorna la variabile con il nuovo valore
                 selectedStudyField = newStudyField;
-                //showConfirmationMessageSF("Study Field aggiornato con successo!");
                 showConfirmationMessage("Study Field aggiornato con successo!", studyFieldComboBox);
             }
             else
             {
-                //showConfirmationMessageSF("Errore nell'aggiornamento di study field!");
                 showConfirmationMessage("Errore nell'aggiornamento di study field!", studyFieldComboBox);
             }
         }
@@ -403,11 +404,11 @@ public class MyProfileController extends Controller {
 
     public void onUpdateCitiesOfInterestButtonClick() {
         if(getNeo4jConnectionManager().updateCitiesOfInterest(getSession().getUser().getEmail(), selectedCitiesOfInterest)){
-            updateCitiesOfInterestButton.setDisable(true);
             citiesOfInterestInNeo4j.clear();
             citiesOfInterestInNeo4j.addAll(selectedCitiesOfInterest);
-            cityTitlePane.setExpanded(false);
             showConfirmationMessage("Città di interesse aggiornate con successo!", updateCitiesOfInterestButton);
+            updateCitiesOfInterestButton.setDisable(true);
+            cityTitlePane.setExpanded(false);
         }else{
             showConfirmationMessage("Errore nell'aggiornamento delle città di interesse!", updateCitiesOfInterestButton);
         }
