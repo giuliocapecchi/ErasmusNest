@@ -166,6 +166,7 @@ public class MyReservationsController extends Controller {
             imageView.setPreserveRatio(true);
             imageView.setSmooth(true);
             imageView.setCache(true);
+            imageView.setSmooth(true);
         } catch (Exception e) {
             String imagePath = "/media/no_photo_available.png"; // Path inside the classpath
             imageView.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath))));
