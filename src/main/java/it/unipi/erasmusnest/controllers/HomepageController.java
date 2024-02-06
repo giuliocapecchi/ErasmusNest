@@ -67,6 +67,7 @@ public class HomepageController extends Controller{
         if(getSession().getCities() == null || getSession().getCities().isEmpty()) {
             cities = getNeo4jConnectionManager().getAllCities();
             if(cities == null){
+                setFirstWindow("login");
                 getSession().reset();
                 getSession().setConnectionError(true);
                 super.changeWindow("login");
@@ -129,6 +130,7 @@ public class HomepageController extends Controller{
     }
 
     @FXML void handleLogoutAction() {
+        setFirstWindow("login");
         getSession().reset();
         super.changeWindow("login");
     }
