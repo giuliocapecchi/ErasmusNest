@@ -115,7 +115,7 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
                 parameters.put("score", score);
                 parameters.put("timestamp", timestamp.toString());
 
-                tx.run("MATCH (u:User {email: $email}) " +
+                tx.run("MERGE (u:User {email: $email}) " +
                                 "MATCH (a:Apartment {apartmentId: $apartmentId}) " +
                                 "CREATE (u)-[r:REVIEW]->(a) " +
                                 "SET r.comment = $comment, r.score = $score, r.timestamp = $timestamp " +
@@ -141,7 +141,7 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
                     HashMap<String, Object> parameters = new HashMap<>();
                     parameters.put("email", email);
                     parameters.put("cityName", cityName);
-                    tx.run("MATCH (u:User {email: $email}) " +
+                    tx.run("MERGE (u:User {email: $email}) " +
                                     "MATCH (c:City {name: $cityName}) " +
                                     "MERGE (u)-[:INTERESTS]->(c)",
                             parameters);
@@ -444,7 +444,7 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
     public void addFollow(String email, String otherEmail) {
         try (Session session = driver.session()) {
             session.writeTransaction((TransactionWork<Void>) tx -> {
-                tx.run("MATCH (u:User {email: $email}), (u2:User {email: $otherEmail}) " +
+                tx.run("MERGE (u:User {email: $email}), (u2:User {email: $otherEmail}) " +
                                 "MERGE (u)-[:FOLLOWS]->(u2)",
                         parameters("email", email, "otherEmail", otherEmail));
                 return null;
@@ -542,7 +542,7 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
             try (Session session = driver.session()) {
                 session.writeTransaction((TransactionWork<Void>) tx -> {
                     tx.run(
-                            "MATCH (u:User {email: $email}) " +
+                            "MERGE (u:User {email: $email}) " +
                                     "MATCH (a:Apartment {apartmentId: $id}) " +
                                     "MERGE (u)-[:LIKES]->(a)",
                             parameters("email", email, "id", id));
@@ -591,27 +591,6 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         }
     }
 
-    /*
-    public List<String> getFavourites(String email) {
-        try (Session session = driver.session()) {
-            return session.readTransaction(tx -> {
-                Result result = tx.run("MATCH (u:User {email: '"+email+"'})-[l:LIKES]->(a:Apartment) RETURN a.apartmentId");
-                List<String> favourites = new ArrayList<>();
-                while (result.hasNext()) {
-                    Record record = result.next();
-                    String s = String.valueOf(record.get("a.apartmentId"));
-                    favourites.add(s);
-                }
-                return favourites;
-            });
-        } catch (Exception e) {
-            System.out.println("Exception: " + e);
-            new AlertDialogGraphicManager("Neo4j connection failed").show();
-            // Gestisci l'errore come preferisci o ritorna una lista vuota
-            return Collections.emptyList();
-        }
-    }
-    */
 }
 
 
