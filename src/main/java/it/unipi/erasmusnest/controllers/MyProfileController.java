@@ -223,6 +223,7 @@ public class MyProfileController extends Controller {
 
     @FXML
     protected void logoutButtonClick(){
+        setFirstWindow("login");
         getSession().reset();
         super.changeWindow("login");
     }
