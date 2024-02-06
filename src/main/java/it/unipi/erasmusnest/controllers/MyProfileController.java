@@ -402,15 +402,13 @@ public class MyProfileController extends Controller {
     }
 
     public void onUpdateCitiesOfInterestButtonClick() {
-        if(getNeo4jConnectionManager().updateCitiesOfInterest(getSession().getUser().getEmail(), citiesOfInterestInNeo4j)){
+        if(getNeo4jConnectionManager().updateCitiesOfInterest(getSession().getUser().getEmail(), selectedCitiesOfInterest)){
             updateCitiesOfInterestButton.setDisable(true);
             citiesOfInterestInNeo4j.clear();
             citiesOfInterestInNeo4j.addAll(selectedCitiesOfInterest);
             cityTitlePane.setExpanded(false);
-            //showConfirmationMessageCities("Città di interesse aggiornate con successo!");
             showConfirmationMessage("Città di interesse aggiornate con successo!", updateCitiesOfInterestButton);
         }else{
-            //showConfirmationMessageCities("Errore nell'aggiornamento delle città di interesse!");
             showConfirmationMessage("Errore nell'aggiornamento delle città di interesse!", updateCitiesOfInterestButton);
         }
     }
