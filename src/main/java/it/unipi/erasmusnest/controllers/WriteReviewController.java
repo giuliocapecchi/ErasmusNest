@@ -55,9 +55,8 @@ public class WriteReviewController extends Controller{
 
     }
 
-    @FXML void goBack(ActionEvent actionEvent) {
-        System.out.println("go back action. IMPLEMENT USER PROFILE TO DO THIS");
-       // super.changeWindow("profile");
+    @FXML void goBack() {
+        backToPreviousWindow();
     }
 
     @FXML
@@ -69,7 +68,6 @@ public class WriteReviewController extends Controller{
     @FXML
     void submit() {
         System.out.println("submit action");
-        System.out.println("MANCA IL REDIRECT AL PROFILE DELL'UTENTE");
         Review review = new Review(getSession().getApartmentId(),getSession().getUser().getEmail(),textArea.getText(), (int)ratingSlider.getValue());
         getNeo4jConnectionManager().addReview(review);
         super.changeWindow("myProfile");

@@ -102,7 +102,7 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         String email = review.getUserEmail();
         String apartmentId = review.getApartmentId();
         String comment = review.getComments();
-        float score = review.getRating();
+        int score = review.getRating();
         LocalDate timestamp = review.getTimestamp();
         System.out.println("email:" + email + " apartmentId:" + apartmentId + " comment:" + comment + " score:" + score + " timestamp:" + timestamp);
         try (Session session = driver.session()) {
