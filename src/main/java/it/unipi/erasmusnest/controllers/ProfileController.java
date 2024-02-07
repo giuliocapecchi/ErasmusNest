@@ -186,7 +186,7 @@ public class ProfileController extends Controller{
     }
 
     @FXML
-    protected void removeProfile(ActionEvent actionEvent) {
+    protected void removeUser(ActionEvent actionEvent) {
         String otherEmail = getSession().getOtherProfileMail();
         String email = getSession().getUser().getEmail();
         if(!email.equals(otherEmail)) {
