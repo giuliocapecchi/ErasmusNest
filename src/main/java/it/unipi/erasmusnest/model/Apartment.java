@@ -82,6 +82,14 @@ public class Apartment {
         this.name = houseName;
     }
 
+    public Apartment(String apartmentId, String name, String pictureUrl, double averageReviewScore) {
+        this.id = apartmentId;
+        this.name = name;
+        this.imageUrls = new ArrayList<>();
+        this.imageUrls.add(pictureUrl);
+        this.averageRating = averageReviewScore;
+    }
+
     public String getHostName() {
         return hostName;
     }

@@ -23,6 +23,11 @@
                   <Insets top="5.0" bottom="5.0" left="5.0" right="5.0"/>
                </BorderPane.margin>
             </Button>
+            <Button fx:id="removeButton" text="Remove Apartment" onAction="#onRemoveButtonClicked">
+               <BorderPane.margin>
+                  <Insets top="5.0" bottom="5.0" left="5.0" right="5.0"/>
+               </BorderPane.margin>
+            </Button>
          </HBox>
 
       </top>
@@ -115,7 +120,9 @@
                         </HBox.margin>
                      </Button>
                   </HBox>
-
+                  <VBox fx:id="suggestedApartmentsVBox" alignment="CENTER" visible="false" >
+                     <Label fx:id="suggestionsLabel" style="-fx-font-size: 20px; -fx-text-fill: #019fe1;" />
+                  </VBox>
                </VBox>
                <VBox fx:id="rightVBox" alignment="TOP_CENTER">
                   <Label style="-fx-font-size: 20px; -fx-text-fill: #019fe1;" text="Make a reservation">
@@ -155,7 +162,6 @@
                   </TextFlow>
                </VBox>
             </HBox>
-
          </VBox>
       </center>
       <bottom>

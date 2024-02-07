@@ -500,6 +500,25 @@ public class MongoConnectionManager extends ConnectionManager{
         return res;
     }
 
+    public void removeUser(String email) {
+        // Method should remove user from users collection and all apartments from apartments collection associated with the user
+        try (MongoClient mongoClient = MongoClients.create("mongodb://" + super.getHost() + ":" + super.getPort())) {
+            MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
+            MongoCollection<Document> usersCollection = database.getCollection("users");
+            MongoCollection<Document> apartmentsCollection = database.getCollection("apartments");
+
+            // Remove user from users collection
+            usersCollection.deleteOne(Filters.eq("email", email));
+
+            // Remove all apartments associated with the user from apartments collection
+            apartmentsCollection.deleteMany(Filters.eq("email", email));
+        } catch (Exception e) {
+            e.printStackTrace();
+            new AlertDialogGraphicManager("MongoDB REMOVE failed").show();
+            System.out.println("Error in removeUser: " + e.getMessage());
+        }
+    }
+
     /*
     public boolean removeApartment(String apartmentId)
     {
