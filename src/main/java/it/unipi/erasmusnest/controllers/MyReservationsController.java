@@ -52,10 +52,13 @@ public class MyReservationsController extends Controller {
             // ordering the reservations by timestamp
             sortReservationsByTimestampAsc();
 
-            for(Reservation reservation : reservations){
-                add(reservation, "host");
+            if(reservations.isEmpty()){
+                noReservation();
+            }else{
+                for(Reservation reservation : reservations){
+                    add(reservation, "host");
+                }
             }
-
         }
 
         scrollPane.setVvalue(0.0);
