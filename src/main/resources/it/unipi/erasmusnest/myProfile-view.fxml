@@ -130,6 +130,7 @@
             <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" prefWidth="256.0" style="-fx-background-color: orange;" BorderPane.alignment="CENTER">
                 <Button onAction="#logoutButtonClick" text="Logout" />
                 <Button onAction="#onBack" text="Homepage" />
+                <Button fx:id="adminButton" onAction="#onAdminView" text="Admin View" visible="false" />
             </ToolBar>
         </bottom>
     </BorderPane>

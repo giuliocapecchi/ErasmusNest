@@ -35,8 +35,6 @@ public class MyProfileController extends Controller {
     @FXML
     VBox apartmentsContainer;
     @FXML
-    VBox adminContainer;
-    @FXML
     Label emailLabel;
     @FXML
     Label nameLabel;
@@ -67,6 +65,8 @@ public class MyProfileController extends Controller {
     private Button buttonPwdUpdate;
     @FXML
     private Label favouritesLabel;
+    @FXML
+    private Button adminButton;
 
     private String selectedStudyField;
     private ArrayList<String> citiesOfInterestInNeo4j = new ArrayList<>();
@@ -89,6 +89,7 @@ public class MyProfileController extends Controller {
         apartmentsContainerVBox.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.4));
         passwordChangeOuterBox.prefWidthProperty().bind(super.getRootPane().widthProperty());
         updateCitiesOfInterestButton.setDisable(true); // viene abilitato solo se l'utente effettivamente modifica le città di interesse
+        //adminButton = new Button();
 
         String userEmail = getSession().getUser().getEmail();
 
@@ -173,16 +174,7 @@ public class MyProfileController extends Controller {
         // Parte riservata all'ADMIN
         // Se sono admin, allora appare un bottone per accedere alla vista analitiche
         if (utente.isAdmin()){
-            Button analyticsButton = new Button();
-            analyticsButton.setText("Analytics");
-            analyticsButton.setStyle("-fx-background-color: orange; -fx-border-color: red; -fx-border-width: 1px;");
-            analyticsButton.setOnAction(event -> {
-                // Handle the analytics button click
-                System.out.println("Analytics button clicked");
-                super.changeWindow("analytics");
-            });
-
-            adminContainer.getChildren().add(analyticsButton);
+            adminButton.setVisible(true);
         }
         getSession().setUser(utente);
     }
@@ -419,4 +411,10 @@ public class MyProfileController extends Controller {
             showConfirmationMessage("Errore nell'aggiornamento delle città di interesse!", updateCitiesOfInterestButton);
         }
     }
+
+    @FXML
+    public void onAdminView(){
+        super.changeWindow("analytics");
+    }
+
 }
