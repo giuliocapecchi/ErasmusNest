@@ -27,6 +27,7 @@ import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Stack;
 
 public class ApartmentController extends Controller{
 
@@ -94,8 +95,26 @@ public class ApartmentController extends Controller{
 
     private int imageIndex = 0;
 
+    private static final Stack<String> apartmentsStack = new Stack<>();
+    private static boolean backPressed = false;
+
     @FXML
     private void initialize() {
+
+        System.out.println("INTIALIZE backPressed: "+backPressed);
+
+        if(getSession().isLogged()) {
+            if(apartmentsStack.isEmpty()) {
+                backPressed = false;
+            }
+            if (backPressed) {
+                getSession().setApartmentId(apartmentsStack.pop());
+            }
+        } else {
+            apartmentsStack.clear();
+            backPressed = false;
+        }
+
         likeButton.setDisable(!getSession().isLogged());
         apartment = getMongoConnectionManager().getApartment(getSession().getApartmentId());
         System.out.println("Apartment: "+apartment);
@@ -147,6 +166,7 @@ public class ApartmentController extends Controller{
         }
         else
         {
+
             removeButton.setVisible(false);
             if(getSession().isLogged()) {
                 System.out.println("Logged user: "+getSession().getUser().getEmail());
@@ -310,6 +330,12 @@ public class ApartmentController extends Controller{
                 suggestedApartmentsVBox.getChildren().add(imageView);
                 Button button = new Button(apartment.getName());
                 button.setOnAction(event -> {
+
+                    if(getSession().isLogged()){
+                        apartmentsStack.push(getSession().getApartmentId());
+                        backPressed = false;
+                    }
+
                     getSession().setApartmentId(apartment.getId());
                     cleanAverageRatingInSession();
                     super.changeWindow("apartment");
@@ -372,6 +398,10 @@ public class ApartmentController extends Controller{
     public void onGoBackButtonClick() {
         cleanAverageRatingInSession();
         System.out.println(getPreviousWindowName());
+
+        if(getSession().isLogged()) {
+            backPressed = true;
+        }
         super.backToPreviousWindow();
         //super.changeWindow("apartment", "apartments");
 
