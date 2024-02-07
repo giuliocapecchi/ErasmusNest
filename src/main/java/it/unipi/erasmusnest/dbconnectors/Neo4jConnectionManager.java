@@ -582,8 +582,9 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
                     tx.run(
                             "MERGE (u:User {email: $email}) " +
                                     "WITH u "+
-                                    "MATCH (a:Apartment {apartmentId: $id}) " +
-                                    "MERGE (u)-[:LIKES]->(a)",
+                                    "MATCH (a:Apartment {apartmentId: $id})-[:LOCATED]->(c:City) " +
+                                    "MERGE (u)-[:LIKES]->(a)" +
+                                    "MERGE (u)-[:INTERESTS]->(c)",
                             parameters("email", email, "id", id));
                     return null;
                 });
@@ -630,6 +631,53 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         }
     }
 
+    // Method to get suggested apartments
+    public List<Apartment> getSuggestedApartments(String email, String cityName) {
+        try (Session session = driver.session()) {
+            return session.readTransaction(tx -> {
+                Result result = tx.run(
+                        "MATCH (u:User {email: $email})-[:FOLLOWS]->(f:User)-[r:REVIEW]->(a:Apartment)-[:LOCATED]->(c:City {name: $cityName}) " +
+                                "WHERE r.score >= 3 " +
+                                "WITH a, MAX(r.score) AS maxScore " +
+                                "RETURN a.apartmentId AS apartmentId, a.name AS name, a.pictureUrl AS pictureUrl, a.averageReviewScore AS averageReviewScore " +
+                                "ORDER BY maxScore DESC " +
+                                "LIMIT 3",
+                        parameters("email", email, "cityName", cityName));
+
+                List<Apartment> suggestedApartments = new ArrayList<>();
+                while (result.hasNext()) {
+                    Record record = result.next();
+                    String apartmentId = record.get("apartmentId").asString();
+                    String name = record.get("name").asString();
+                    String pictureUrl = record.get("pictureUrl").asString();
+                    double averageReviewScore = record.get("averageReviewScore").asDouble();
+                    suggestedApartments.add(new Apartment(apartmentId, name, pictureUrl, averageReviewScore));
+                }
+                return suggestedApartments;
+            });
+        } catch (Exception e) {
+            System.out.println("Exception: " + e);
+            new AlertDialogGraphicManager("Neo4j connection failed").show();
+            // Gestisci l'errore come preferisci o ritorna una lista vuota
+            return Collections.emptyList();
+        }
+    }
+
+    public void removeReview(Review review) {
+        try (Session session = driver.session()) {
+            session.writeTransaction((TransactionWork<Void>) tx -> {
+                tx.run("MATCH (u:User {email: $email})-[r:REVIEW]->(a:Apartment {apartmentId: $apartmentId}) " +
+                                "WHERE r.comment = $comment AND r.score = $score AND r.date = $timestamp " +
+                                "DELETE r",
+                        parameters("email", review.getUserEmail(), "apartmentId", review.getApartmentId(), "comment", review.getComments(), "score", review.getRating(), "timestamp", review.getTimestamp().toString()));
+                return null;
+            });
+            updateApartmentAverageReviewScore(review.getApartmentId());
+        } catch (Exception e) {
+            System.out.println("Exception: " + e);
+            new AlertDialogGraphicManager("Neo4j connection failed").show();
+        }
+    }
 }
 
 

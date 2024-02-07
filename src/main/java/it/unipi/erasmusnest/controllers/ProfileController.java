@@ -43,6 +43,8 @@ public class ProfileController extends Controller{
     private VBox suggestedVBox;
     @FXML
     private Button followButton;
+    @FXML
+    private Button removeProfileButton;
 
     public ProfileController() {
 
@@ -61,6 +63,8 @@ public class ProfileController extends Controller{
             User utente = getMongoConnectionManager().findUser(getSession().getOtherProfileMail());
 
             pageTitle.setText("Profile of " + utente.getName() + " " + utente.getSurname());
+
+            removeProfileButton.setVisible(getSession().getUser().isAdmin());
 
             emailLabel.setText(utente.getEmail());
             nameLabel.setText(utente.getName());
@@ -178,6 +182,16 @@ public class ProfileController extends Controller{
         else {
             showConfirmationMessage("You can't follow yourself", followButton);
             followButton.setDisable(true);
+        }
+    }
+
+    @FXML
+    protected void removeUser(ActionEvent actionEvent) {
+        String otherEmail = getSession().getOtherProfileMail();
+        String email = getSession().getUser().getEmail();
+        if(!email.equals(otherEmail)) {
+            getMongoConnectionManager().removeUser(email);
+            super.changeWindow("login");
         }
     }
 

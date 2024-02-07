@@ -1,9 +1,11 @@
 package it.unipi.erasmusnest.controllers;
 
+import it.unipi.erasmusnest.graphicmanagers.AlertDialogGraphicManager;
 import it.unipi.erasmusnest.model.Apartment;
 import it.unipi.erasmusnest.graphicmanagers.MapGraphicManager;
 import it.unipi.erasmusnest.graphicmanagers.RatingGraphicManager;
 import it.unipi.erasmusnest.graphicmanagers.ReservationGraphicManager;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -23,6 +25,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class ApartmentController extends Controller{
@@ -78,6 +81,12 @@ public class ApartmentController extends Controller{
     private TextFlow loginMessage;
     @FXML
     private Button likeButton;
+    @FXML
+    private VBox suggestedApartmentsVBox;
+    @FXML
+    private Button removeButton;
+    @FXML
+    private Label suggestionsLabel;
 
     private Apartment apartment;
     private ReservationGraphicManager reservationGraphicManager;
@@ -138,6 +147,11 @@ public class ApartmentController extends Controller{
         }
         else
         {
+            removeButton.setVisible(false);
+            if(getSession().isLogged()) {
+                System.out.println("Logged user: "+getSession().getUser().getEmail());
+                removeButton.setVisible(getSession().getUser().isAdmin());
+            }
             apartment.setAverageRating(getSession().getApartmentAverageRating());
 
             MapGraphicManager mapGraphicManager = new MapGraphicManager(webView, apartment.getLocation());
@@ -210,6 +224,7 @@ public class ApartmentController extends Controller{
                 startDatePicker.setDisable(false);
             }
         }
+        suggestedApartmentsVBox.setVisible(false);
     }
 
     private void buildImage(){
@@ -264,12 +279,46 @@ public class ApartmentController extends Controller{
     @FXML
     private void onLikeButtonClicked(){
         if (getNeo4jConnectionManager().likeApartment(getSession().getApartmentId(), getSession().getUser().getEmail())) {
+            seeSuggestedApartments();
             showConfirmationMessage("Like added", likeButton);
         } else {
+            seeSuggestedApartments();
             showConfirmationMessage("Already liked, go to My Profile section to delete", likeButton);
         }
         likeButton.setText("Already liked");
         likeButton.setDisable(true);
+    }
+
+    private void seeSuggestedApartments() {
+        List<Apartment> suggestedApartments = getNeo4jConnectionManager().getSuggestedApartments(getSession().getUser().getEmail(),getSession().getCity());
+        if(suggestedApartments != null && !suggestedApartments.isEmpty()) {
+            suggestionsLabel.setVisible(true);
+            suggestedApartmentsVBox.setVisible(true);
+            suggestionsLabel.setText("Suggested apartments:");
+            for (Apartment apartment : suggestedApartments) {
+                VBox vBox = new VBox();
+                vBox.setAlignment(Pos.CENTER);
+                vBox.setSpacing(10);
+                vBox.setPrefWidth(150);
+                vBox.setPrefHeight(150);
+                vBox.setStyle("-fx-border-color: black; -fx-border-width: 1px; -fx-border-radius: 10px; -fx-background-color: white; -fx-padding: 10px;");
+                ImageView imageView = new ImageView();
+                imageView.setPreserveRatio(true);
+                imageView.setFitWidth(150);
+                imageView.setFitHeight(150);
+                imageView.setImage(new Image(apartment.getImageURLs().get(0)));
+                suggestedApartmentsVBox.getChildren().add(imageView);
+                Button button = new Button(apartment.getName());
+                button.setOnAction(event -> {
+                    getSession().setApartmentId(apartment.getId());
+                    cleanAverageRatingInSession();
+                    super.changeWindow("apartment");
+                });
+                suggestedApartmentsVBox.getChildren().add(button);
+            }
+        } else {
+            suggestionsLabel.setText("No Suggested apartments found");
+        }
     }
 
     private void onStartDatePickerFirstClick(){
@@ -342,4 +391,52 @@ public class ApartmentController extends Controller{
         popOver.show(likeButton);
     }
 
+    @FXML
+    protected void onRemoveButtonClicked(ActionEvent actionEvent) {
+        boolean remove = new AlertDialogGraphicManager("Delete confirmation","Are you sure you want to remove this apartment?\n",
+                "You will not be able to recover it","confirmation").showAndGetConfirmation();
+        if(remove)
+        {
+            if(!getRedisConnectionManager().isApartmentReserved(apartment.getId()))
+            {
+                // non ci sono prenotazioni attive, si puo eliminare la casa
+                if(getMongoConnectionManager().removeApartment(apartment.getId(), getSession().getUser().getEmail()))
+                {
+                    // Apartment removed from MongoDB
+                    // Apartment is still available on Neo4j, apartments view
+                    // While someone try to find out more information on apartment view, this'll be removed
+                    alertDialog("House correctly removed");
+                    super.changeWindow("myProfile");
+                }
+                else
+                {
+                    alertDialog("Impossible to remove house");
+                }
+            }
+            else
+            {
+                showConfirmationMessage("Remove failed", removeButton);
+            }
+
+        }
+    }
+
+    private void alertDialog(String s)
+    {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Information Dialog");
+        alert.setHeaderText(null);
+        alert.setContentText(s);
+
+        ButtonType okButton = new ButtonType("OK");
+        alert.getButtonTypes().setAll(okButton);
+
+        alert.setOnCloseRequest(event -> {
+            // Qui puoi aggiungere il codice per reindirizzare a un'altra pagina
+            //super.refreshWindow();
+        });
+
+        // Mostra la finestra di dialogo
+        alert.showAndWait();
+    }
 }

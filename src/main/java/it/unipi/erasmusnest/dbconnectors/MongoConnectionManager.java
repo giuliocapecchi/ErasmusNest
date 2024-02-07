@@ -161,13 +161,8 @@ public class MongoConnectionManager extends ConnectionManager{
             MongoCollection<Document> collection = database.getCollection("apartments");
 
             // find one document with new Document that have the object id field equal to the apartmentId
-            System.out.println("\n\n\nAPARTMENTID: " + apartmentId);
             ObjectId id = new ObjectId(apartmentId);
             Document apartment = collection.find(eq("_id", id)).first();
-            if(apartment!=null)
-                System.out.println("\n\n\nAPPARTAMENTO TROVATO GET APARTMENT:\n" + apartment.toJson());
-            else
-                System.out.println("\n\n\nAPPARTAMENTO NON TROVATO GET APARTMENT:\n" + id);
             String coordinates = apartment.getString("position");
             // remove space from coordinates
             coordinates = coordinates.replaceAll("\\s","");
@@ -381,10 +376,7 @@ public class MongoConnectionManager extends ConnectionManager{
             MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
             MongoCollection<Document> apartmentsCollection = database.getCollection("apartments");
             MongoCollection<Document> usersCollection = database.getCollection("users");
-
-            System.out.println("\n\n\nLA CASA DOVRA AVERE:" + updatedHouse.toString()+"\n\n\n");
-
-            // Documento per l'operazione $set
+            // Preparing document for $set operation
             Document setDocument = new Document()
                     .append("house_name", updatedHouse.getName())
                     .append("price", updatedHouse.getDollarPriceMonth())
@@ -498,6 +490,25 @@ public class MongoConnectionManager extends ConnectionManager{
             res = false;
         }
         return res;
+    }
+
+    public void removeUser(String email) {
+        // Method should remove user from users collection and all apartments from apartments collection associated with the user
+        try (MongoClient mongoClient = MongoClients.create("mongodb://" + super.getHost() + ":" + super.getPort())) {
+            MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
+            MongoCollection<Document> usersCollection = database.getCollection("users");
+            MongoCollection<Document> apartmentsCollection = database.getCollection("apartments");
+
+            // Remove user from users collection
+            usersCollection.deleteOne(Filters.eq("email", email));
+
+            // Remove all apartments associated with the user from apartments collection
+            apartmentsCollection.deleteMany(Filters.eq("email", email));
+        } catch (Exception e) {
+            e.printStackTrace();
+            new AlertDialogGraphicManager("MongoDB REMOVE failed").show();
+            System.out.println("Error in removeUser: " + e.getMessage());
+        }
     }
 
     /*

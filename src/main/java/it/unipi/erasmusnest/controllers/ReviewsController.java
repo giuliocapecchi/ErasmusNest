@@ -195,6 +195,11 @@ public class ReviewsController extends Controller{
 
             // Adding the apartment entry to the main VBox
             reviewsVBox.getChildren().add(reviewHBox);
+            Button removeButton = new Button("Remove Review");
+            removeButton.setOnAction(e -> {
+                getNeo4jConnectionManager().removeReview(review);
+                printReviews();
+            });
             pageNumber.setText("Page Number: "+page.toString());
         }
         if(reviews.size() < elementsPerPage){
