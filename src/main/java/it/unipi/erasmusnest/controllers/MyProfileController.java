@@ -83,6 +83,13 @@ public class MyProfileController extends Controller {
 
     @FXML
     private void initialize() {
+
+        //TODO : rimuovi
+        getSession().setUser(getMongoConnectionManager().findUser("adriana33@gmail.com"));
+        getSession().setLogged(true);
+
+
+
         getSession().setCity(null); // serve per la change window
         personalInfoVbox.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.4));
         apartmentsContainerVBox.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.4));
