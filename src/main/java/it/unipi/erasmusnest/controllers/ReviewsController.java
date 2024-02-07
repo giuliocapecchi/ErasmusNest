@@ -10,6 +10,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
@@ -132,12 +133,18 @@ public class ReviewsController extends Controller{
             double commentsWidthRatio = 0.55; // 60% of the width
             double viewHouseVBoxWidthRatio = 0.15; // 20% of the width
 
+            String dividerColor = "-fx-border-color: #aeb000;";
+
             // Apartment name
+            VBox apartmentNameVBox = new VBox();
+            apartmentNameVBox.setStyle(dividerColor+" -fx-border-width: 0 2px 0 0;");
+            apartmentNameVBox.setAlignment(Pos.CENTER);
             Label emailLabel = new Label(review.getUserEmail());
             emailLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 18px;");
             emailLabel.setAlignment(Pos.CENTER_LEFT);
             emailLabel.prefWidthProperty().bind(reviewHBox.widthProperty().multiply(emailWidthRatio));
             emailLabel.setWrapText(true);
+            apartmentNameVBox.getChildren().add(emailLabel);
 
             // RatingLabel
             Label ratingLabel = new Label("Rating: " + review.getRating());
@@ -148,12 +155,16 @@ public class ReviewsController extends Controller{
             ratingLabel.setWrapText(true);
 
             // Comments
+            ScrollPane scrollPane = new ScrollPane();
+            scrollPane.setStyle(dividerColor+" -fx-border-width: 0 2px 0 2px;");
             Label commentsLabel = new Label(review.getComments());
             commentsLabel.setStyle("-fx-font-size: 18px;");
             commentsLabel.setAlignment(Pos.CENTER);
             commentsLabel.setMaxWidth(Double.MAX_VALUE);
             commentsLabel.prefWidthProperty().bind(reviewHBox.widthProperty().multiply(commentsWidthRatio));
             commentsLabel.setWrapText(true);
+            scrollPane.setContent(commentsLabel);
+            scrollPane.setFitToWidth(true);
 
             // Timestamp & ViewHouseButton
             VBox viewHouseVBox = new VBox();
@@ -174,11 +185,11 @@ public class ReviewsController extends Controller{
             viewHouseVBox.prefWidthProperty().bind(reviewHBox.widthProperty().multiply(viewHouseVBoxWidthRatio));
 
             // Adding elements to the horizontal box
-            reviewHBox.getChildren().addAll(emailLabel, ratingLabel, commentsLabel, viewHouseVBox);
+            reviewHBox.getChildren().addAll(apartmentNameVBox, ratingLabel, scrollPane, viewHouseVBox);
             reviewHBox.setAlignment(Pos.CENTER);
-            HBox.setMargin(emailLabel, new Insets(5.0, 5.0, 5.0, 5.0));
+            VBox.setMargin(emailLabel, new Insets(5.0, 5.0, 5.0, 5.0));
             HBox.setMargin(ratingLabel, new Insets(5.0, 5.0, 5.0, 5.0));
-            HBox.setMargin(commentsLabel, new Insets(5.0, 5.0, 5.0, 5.0));
+            VBox.setMargin(commentsLabel, new Insets(5.0, 5.0, 5.0, 5.0));
             VBox.setMargin(viewHouseButton, new Insets(5.0, 5.0, 5.0, 5.0));
             VBox.setMargin(timestampLabel, new Insets(5.0, 5.0, 5.0, 5.0));
 
