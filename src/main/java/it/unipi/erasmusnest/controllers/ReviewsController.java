@@ -130,7 +130,7 @@ public class ReviewsController extends Controller{
             double emailWidthRatio = 0.2; // 20% of the width
             double ratingWidthRatio = 0.1; // 20% of the width
             double commentsWidthRatio = 0.55; // 60% of the width
-            double timestampWidthRatio = 0.15; // 20% of the width
+            double viewHouseVBoxWidthRatio = 0.15; // 20% of the width
 
             // Apartment name
             Label emailLabel = new Label(review.getUserEmail());
@@ -155,21 +155,32 @@ public class ReviewsController extends Controller{
             commentsLabel.prefWidthProperty().bind(reviewHBox.widthProperty().multiply(commentsWidthRatio));
             commentsLabel.setWrapText(true);
 
-            // Timestamp
+            // Timestamp & ViewHouseButton
+            VBox viewHouseVBox = new VBox();
+            Button viewHouseButton = new Button("View House");
+            viewHouseButton.prefWidthProperty().bind(viewHouseVBox.widthProperty().multiply(0.9));
+            viewHouseButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 12px;");
+            viewHouseButton.setOnAction(e -> {
+                getSession().setApartmentId(review.getApartmentId());
+                super.changeWindow("apartment");
+            });
             Label timestampLabel = new Label(review.getTimestamp().toString());
             timestampLabel.setStyle("-fx-font-size: 12px;");
             timestampLabel.setAlignment(Pos.CENTER);
             timestampLabel.setMaxWidth(Double.MAX_VALUE);
-            timestampLabel.prefWidthProperty().bind(reviewHBox.widthProperty().multiply(timestampWidthRatio));
             timestampLabel.setWrapText(true);
+            viewHouseVBox.getChildren().addAll(timestampLabel, viewHouseButton);
+            viewHouseVBox.setAlignment(Pos.CENTER);
+            viewHouseVBox.prefWidthProperty().bind(reviewHBox.widthProperty().multiply(viewHouseVBoxWidthRatio));
 
             // Adding elements to the horizontal box
-            reviewHBox.getChildren().addAll(emailLabel, ratingLabel, commentsLabel, timestampLabel);
+            reviewHBox.getChildren().addAll(emailLabel, ratingLabel, commentsLabel, viewHouseVBox);
             reviewHBox.setAlignment(Pos.CENTER);
             HBox.setMargin(emailLabel, new Insets(5.0, 5.0, 5.0, 5.0));
             HBox.setMargin(ratingLabel, new Insets(5.0, 5.0, 5.0, 5.0));
             HBox.setMargin(commentsLabel, new Insets(5.0, 5.0, 5.0, 5.0));
-            HBox.setMargin(timestampLabel, new Insets(2.0, 2.0, 2.0, 2.0));
+            VBox.setMargin(viewHouseButton, new Insets(5.0, 5.0, 5.0, 5.0));
+            VBox.setMargin(timestampLabel, new Insets(5.0, 5.0, 5.0, 5.0));
 
             // Adding the apartment entry to the main VBox
             reviewsVBox.getChildren().add(reviewHBox);
