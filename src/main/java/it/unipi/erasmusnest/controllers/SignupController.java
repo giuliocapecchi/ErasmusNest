@@ -8,7 +8,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextFlow;
-
+import org.mindrot.jbcrypt.BCrypt;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -145,11 +145,13 @@ public class SignupController extends Controller{
         utente.setEmail(emailField.getEmailAddress());
         utente.setName(nameField.getText());
         utente.setSurname(surnameField.getText());
-        utente.setPassword(passwordField.getText());
+        String password = passwordField.getText().trim();
+        //TODO : scommentare per fare l'hash della password. Duale alla verifica che si trova nella login controller
+       // String password = BCrypt.hashpw(password, BCrypt.gensalt(12));
+        utente.setPassword(password);
         utente.setStudyField(studiesComboBox.getValue());
         // Aggiungere citta di interesse
-        ArrayList<String> cities = selectedCities;
-        utente.setPreferredCities(cities);
+        utente.setPreferredCities(selectedCities);
         boolean emailAvailable = super.getMongoConnectionManager().addUser(utente);
         if(emailAvailable) {
             super.changeWindow("login");

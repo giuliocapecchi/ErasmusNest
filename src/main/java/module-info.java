@@ -12,6 +12,7 @@ module it.unipi.erasmusnest {
     requires org.neo4j.driver;
     requires org.controlsfx.controls;
     requires java.desktop;
+    requires jbcrypt;
 
 
     opens it.unipi.erasmusnest to javafx.fxml;

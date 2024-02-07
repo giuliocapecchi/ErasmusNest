@@ -203,6 +203,8 @@ public class ApartmentsController extends Controller{
             }
             imageView.fitHeightProperty().bind(apartmentHBox.heightProperty().multiply(0.9));
             imageView.setPreserveRatio(true);
+            imageView.setCache(true);
+            imageView.setSmooth(true);
             // aggiungo l'immagine al VBox
             imageVBox.getChildren().add(imageView);
             imageVBox.setAlignment(Pos.CENTER);

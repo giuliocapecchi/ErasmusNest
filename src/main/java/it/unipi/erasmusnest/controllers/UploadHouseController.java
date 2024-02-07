@@ -18,6 +18,8 @@ public class UploadHouseController extends Controller {
 
 
     @FXML
+    Label houseDescriptionMaxLengthReached;
+    @FXML
     TextField houseNameTextField;
     @FXML
     VBox pictureUrlsVBox;
@@ -32,7 +34,7 @@ public class UploadHouseController extends Controller {
     @FXML
     Spinner<Integer> inputPrice;
     @FXML
-    TextField houseDescriptionTextField;
+    TextArea houseDescriptionTextArea;
     @FXML
     TextField addressTextField;
     @FXML
@@ -54,7 +56,7 @@ public class UploadHouseController extends Controller {
     private void initialize() {
         mapGraphicManager = new MapGraphicManager();
         uploadButton.setDisable(true);
-
+        houseDescriptionMaxLengthReached.setVisible(false);
         TextField pictureUrlTextField = new TextField();
         pictureUrlTextField.onKeyReleasedProperty().set(event -> checkFields());
         pictureUrlTextField.setPromptText("Insert picture URL");
@@ -63,6 +65,15 @@ public class UploadHouseController extends Controller {
         pictureUrlsTextField.add(pictureUrlTextField);
         pictureUrlsVBox.setSpacing(5);
         lessPictureButton.setDisable(true);
+        houseDescriptionTextArea.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.length() > 1000) {
+                houseDescriptionTextArea.setText(oldValue); // Revert al valore precedente se supera 1000 caratteri
+                houseDescriptionTextArea.setScrollTop(Double.MAX_VALUE); // rimette lo scroll in fondo
+                houseDescriptionMaxLengthReached.setVisible(true);
+            }else{
+                houseDescriptionMaxLengthReached.setVisible(false);
+            }
+        });
 
     }
 
@@ -109,7 +120,7 @@ public class UploadHouseController extends Controller {
         Integer accommodates = inputAccommodates.getValue();
         Integer bathrooms = inputBathrooms.getValue();
         Integer price = inputPrice.getValue();
-        String houseDescription = houseDescriptionTextField.getText();
+        String houseDescription = houseDescriptionTextArea.getText();
         double latitude = mapGraphicManager.getLatitude();
         double longitude = mapGraphicManager.getLongitude();
         String city = mapGraphicManager.getCity();

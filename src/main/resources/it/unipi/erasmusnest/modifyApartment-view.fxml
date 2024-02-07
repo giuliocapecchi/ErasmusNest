@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+
 <StackPane fx:id="rootPane" prefHeight="554.0" prefWidth="652.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.erasmusnest.controllers.ModifyAparmentController">
     <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="ALWAYS">
         <VBox spacing="10" style="-fx-border-color: orange; -fx-border-width: 2px; -fx-padding: 10px;">
@@ -23,6 +24,7 @@
             <VBox fx:id="neighborhoodVBox">
 
             </VBox>
+         <Label layoutX="22.0" layoutY="134.0" text="Links to the pictures:" />
 
             <VBox fx:id="pictureUrlsVBox" />
             <HBox spacing="5">
@@ -31,7 +33,7 @@
             </HBox>
 
             <VBox fx:id="buttons">
-                <Button fx:id="updateHouse" onAction="#onUpdateHouseButtonClick" disable="true" text="Update House" />
+                <Button fx:id="updateHouse" disable="true" onAction="#onUpdateHouseButtonClick" text="Update House" />
                 <Button fx:id="removeHouse" onAction="#onRemoveHouseButtonClick" text="Remove House" />
                 <Button onAction="#onGoBackButtonClick" text="Back to Profile" />
             </VBox>

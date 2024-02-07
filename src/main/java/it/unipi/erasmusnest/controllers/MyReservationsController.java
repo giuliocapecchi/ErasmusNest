@@ -97,8 +97,12 @@ public class MyReservationsController extends Controller {
         // color the reservationHBox border
         reservationHBox.setStyle("-fx-border-color: #ff6f00; -fx-border-width: 1px; -fx-border-radius: 0px; -fx-background-radius: 5px; -fx-background-color: #ffffff;");
 
-        VBox imageVBox = new VBox();
-        imageVBox.setAlignment(Pos.CENTER_LEFT);
+        reservationHBox.minHeightProperty().bind(super.getRootPane().heightProperty().multiply(0.2));
+        reservationHBox.maxHeightProperty().bind(super.getRootPane().heightProperty().multiply(0.2));
+
+        //VBox imageVBox = new VBox();
+        //imageVBox.setAlignment(Pos.CENTER_LEFT);
+
         VBox cityVBox = new VBox();
         cityVBox.setAlignment(javafx.geometry.Pos.CENTER);
         VBox stateVBox = new VBox();
@@ -106,23 +110,7 @@ public class MyReservationsController extends Controller {
         VBox buttonsVBox = new VBox();
         buttonsVBox.setAlignment(javafx.geometry.Pos.CENTER);
 
-        ImageView imageView = new ImageView();
-        try {
-            // get the pat of reservation
-            Path path = Path.of(reservation.getApartmentImage());
 
-            Image image = new Image(path.toUri().toURL().toExternalForm(), 800, 0, true, true, true);
-            //Image image = new Image(reservation.getApartmentImage(), true); //true let the application continue without waiting for the image to fully load
-            imageView.setImage(image);
-            imageView.setPreserveRatio(true);
-            imageView.setSmooth(true);
-        } catch (Exception e) {
-            String imagePath = "/media/no_photo_available.png"; // Path inside the classpath
-            imageView.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath))));
-        }
-
-        imageView.fitWidthProperty().bind(reservationHBox.widthProperty().multiply(0.2));
-        imageView.setPreserveRatio(true);
 
         Label city = new Label(reservation.getCity());
 
@@ -149,7 +137,7 @@ public class MyReservationsController extends Controller {
         Label period = new Label(periodFromTo);
         period.setStyle("-fx-font-size: 15px; -fx-text-fill: #ff6f00;");
 
-
+        ImageView imageView = buildImage(reservation, reservationHBox);
 
         // remove '\n' from periodFromTo
         String msgPeriod = periodFromTo.replace("\n", " ");
@@ -157,17 +145,47 @@ public class MyReservationsController extends Controller {
         buildLabels(stateVBox, reservation, userType);
         buildButtons(buttonsVBox, reservation, userType, msgPeriod);
 
-        imageVBox.getChildren().add(imageView);
+        //imageVBox.getChildren().add(imageView);
         cityVBox.setSpacing(10);
         cityVBox.getChildren().addAll(city, period);
 
-        imageVBox.prefWidthProperty().bind(reservationHBox.widthProperty().multiply(0.5));
+        //imageVBox.prefWidthProperty().bind(reservationHBox.widthProperty().multiply(0.5));
         cityVBox.prefWidthProperty().bind(reservationHBox.widthProperty().multiply(0.5));
         stateVBox.prefWidthProperty().bind(reservationHBox.widthProperty().multiply(0.5));
         buttonsVBox.prefWidthProperty().bind(reservationHBox.widthProperty().multiply(0.5));
-        reservationHBox.getChildren().addAll(imageVBox, cityVBox, stateVBox, buttonsVBox);
+        reservationHBox.getChildren().addAll(imageView, cityVBox, stateVBox, buttonsVBox);
         centerVBox.getChildren().add(reservationHBox);
 
+    }
+
+    private ImageView buildImage(Reservation reservation, HBox reservationHBox){
+        ImageView imageView = new ImageView();
+        try {
+            Image image = new Image(reservation.getApartmentImage(), true); //true let the application continue without waiting for the image to fully load
+            imageView.setImage(image);
+            imageView.setPreserveRatio(true);
+            imageView.setSmooth(true);
+            imageView.setCache(true);
+            imageView.setSmooth(true);
+        } catch (Exception e) {
+            String imagePath = "/media/no_photo_available.png"; // Path inside the classpath
+            imageView.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath))));
+        }
+
+        imageView.setPreserveRatio(true);
+        imageView.fitHeightProperty().bind(reservationHBox.heightProperty().multiply(0.98));
+        // on mouse hover the cursor changes
+        imageView.setOnMouseEntered(event -> imageView.getScene().setCursor(javafx.scene.Cursor.HAND));
+        imageView.setOnMouseExited(event -> imageView.getScene().setCursor(javafx.scene.Cursor.DEFAULT));
+        // on click go to the apartment page
+        imageView.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
+            @Override
+            public void handle(javafx.scene.input.MouseEvent event) {
+                getSession().setApartmentId(reservation.getApartmentId());
+                MyReservationsController.super.changeWindow("apartment");
+            }
+        });
+        return imageView;
     }
 
     private void buildLabels(VBox stateVBox, Reservation reservation, String userType){
@@ -195,18 +213,28 @@ public class MyReservationsController extends Controller {
     private void buildButtons(VBox buttonsVBox, Reservation reservation, String userType, String msgPeriod){
         if(userType.equals("student")) {
             if(!reservation.getState().equals("rejected")) {
-                Button deleteButton = new Button("Delete reservation");
-                deleteButton.setStyle("-fx-background-color: #ff0000; -fx-text-fill: #ffffff; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 5px;");
-                deleteButton.setOnAction(event -> {
-                    boolean remove = new AlertDialogGraphicManager("Delete confirmation","Are you sure you want to delete this reservation\n"
-                            + msgPeriod + " in " + reservation.getCity()
-                            + "?", "You will not be able to recover it","confirmation").showAndGetConfirmation();
-                    if (remove) {
-                        getRedisConnectionManager().deleteReservation(reservation);
-                        super.refreshWindow();
-                    }
-                });
-                buttonsVBox.getChildren().add(deleteButton);
+                if(reservation.getState().equals("expired")){
+                    Button deleteButton = new Button("Write a review");
+                    deleteButton.setStyle("-fx-background-color: #019fe1; -fx-text-fill: #ffffff; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 5px;");
+                    deleteButton.setOnAction(event -> {
+                        getSession().setApartmentId(reservation.getApartmentId());
+                        changeWindow("writeReview");
+                    });
+                    buttonsVBox.getChildren().add(deleteButton);
+                } else {
+                    Button deleteButton = new Button("Delete reservation");
+                    deleteButton.setStyle("-fx-background-color: #ff0000; -fx-text-fill: #ffffff; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 5px;");
+                    deleteButton.setOnAction(event -> {
+                        boolean remove = new AlertDialogGraphicManager("Delete confirmation", "Are you sure you want to delete this reservation\n"
+                                + msgPeriod + " in " + reservation.getCity()
+                                + "?", "You will not be able to recover it", "confirmation").showAndGetConfirmation();
+                        if (remove) {
+                            getRedisConnectionManager().deleteReservation(reservation);
+                            super.refreshWindow();
+                        }
+                    });
+                    buttonsVBox.getChildren().add(deleteButton);
+                }
             }
         } else if(reservation.getState().equals("pending")){
             Button approveButton = new Button("Approve reservation");
@@ -241,6 +269,7 @@ public class MyReservationsController extends Controller {
 
     @FXML
     protected void logoutButtonClick(){
+        setFirstWindow("login");
         getSession().reset();
         super.changeWindow("login");
     }

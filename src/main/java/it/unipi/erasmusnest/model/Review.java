@@ -8,10 +8,10 @@ public class Review {
     private String apartmentId;
     private String userEmail;
     private String comments;
-    private float rating;
+    private int rating;
     LocalDate timestamp;
 
-    public Review(String apartmentId, String userEmail, String text, float rating) {
+    public Review(String apartmentId, String userEmail, String text, int rating) {
         this.apartmentId = apartmentId;
         this.userEmail = userEmail;
         this.comments = text;
@@ -21,7 +21,7 @@ public class Review {
         this.timestamp = LocalDate.parse(LocalDate.now().toString(), formatter);
     }
 
-    public Review(String apartmentId, String userEmail, String text, float rating, String timestamp) throws DateTimeParseException{
+    public Review(String apartmentId, String userEmail, String text, int rating, String timestamp) throws DateTimeParseException{
         this.apartmentId = apartmentId;
         this.userEmail = userEmail;
         this.comments = text;
@@ -47,7 +47,7 @@ public class Review {
         this.comments = comments;
     }
 
-    public float getRating() {
+    public int getRating() {
         return rating;
     }
 

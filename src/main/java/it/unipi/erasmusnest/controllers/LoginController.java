@@ -8,6 +8,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -86,14 +87,49 @@ public class LoginController extends Controller{
 
     @FXML
     protected void onLoginButtonClick() {
-        boolean logged = false;
+        getSession().setLogged(false);
+
+        //TODO : login usando HASH delle password; scommenta solo quando sarà il momento
+        /*if(isEmailFieldValid(emailField) && isTextFieldValid(passwordField)) {
+            String redisPassword = getRedisConnectionManager().getPassword(emailField.getEmailAddress());
+            String typedPassword = passwordField.getText().trim();
+
+            if(redisPassword == null){ // Password not found in Redis
+                System.out.println("Credentials not found in Redis. Let's check in MongoDB");
+                String mongoPassword = getMongoConnectionManager().getPassword(emailField.getEmailAddress());
+
+                if(mongoPassword != null && BCrypt.checkpw(typedPassword, mongoPassword)) {
+                    getSession().setLogged(true);
+                    getSession().getUser().setEmail(emailField.getEmailAddress());
+                    super.getRedisConnectionManager().addUser(emailField.getEmailAddress(), BCrypt.hashpw(typedPassword, BCrypt.gensalt(12)));
+                }else{
+                    showErrorMessage("Invalid email or password", errorTextFlow);
+                }
+            }else if(BCrypt.checkpw(typedPassword, redisPassword)) { // Password taken from Redis is equal to real pw
+                getSession().setLogged(true);
+                getSession().getUser().setEmail(emailField.getEmailAddress());
+
+            }else{ // Wrong password
+                showErrorMessage("Invalid email or password", errorTextFlow);
+
+            }
+
+            if(getSession().isLogged()){
+                if(getPreviousWindowName() != null && !getPreviousWindowName().equals("signup")) {
+                    super.backToPreviousWindow();
+                } else {
+                    super.changeWindow("homepage");
+                }
+            }
+        }
+    */
         if(isEmailFieldValid(emailField) && isTextFieldValid(passwordField)) {
             String password = getRedisConnectionManager().getPassword(emailField.getEmailAddress());
             System.out.println("REDIS Password: " + password);
             if(password != null && password.equals(passwordField.getText())) {
                 getSession().setLogged(true);
                 getSession().getUser().setEmail(emailField.getEmailAddress());
-                logged = true;
+                getSession().setLogged(true);
             }
             else if(password != null && !password.equals(passwordField.getText()))
             {
@@ -109,12 +145,12 @@ public class LoginController extends Controller{
                     getSession().setLogged(true);
                     getSession().getUser().setEmail(emailField.getEmailAddress());
                     super.getRedisConnectionManager().addUser(emailField.getEmailAddress(), passwordField.getText());
-                    logged = true;
+                    getSession().setLogged(true);
                 }else{
                     showErrorMessage("Invalid email or password", errorTextFlow);
                 }
             }
-            if(logged){
+            if(getSession().isLogged()){
                 if(getPreviousWindowName() != null && !getPreviousWindowName().equals("signup")) {
                     super.backToPreviousWindow();
                 } else {
@@ -122,6 +158,8 @@ public class LoginController extends Controller{
                 }
             }
         }
+
+
 
     }
 
