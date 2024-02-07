@@ -329,7 +329,9 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
 
                 System.out.println("email: " + email + " elementsToSkip: " + elementsToSkip + " elementsPerPage: " + elementsPerPage);
 
-                result = tx.run("MATCH (u:User {email: $email})-[r:REVIEW]->() RETURN r SKIP $elementsToSkip LIMIT $elementsPerPage;", parameters);
+                result = tx.run("MATCH (u:User {email: $email})-[r:REVIEW]->(a:Apartment) " +
+                        "RETURN r, a.apartmentId " +
+                        "SKIP $elementsToSkip LIMIT $elementsPerPage;", parameters);
                 List<Review> reviewList = new ArrayList<>();
                 while (result.hasNext()) {
                     Record record = result.next();
@@ -337,7 +339,8 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
                     String comment = reviewRel.get("comment").asString();
                     int rating = reviewRel.get("score").asInt();
                     String timestamp = reviewRel.get("date").asString();
-                    Review review = new Review(null,email, comment,rating, timestamp);
+                    String apartmentId = record.get("a.apartmentId").asString();
+                    Review review = new Review(apartmentId,email, comment,rating, timestamp);
                     reviewList.add(review);
                 }
                 return reviewList;
