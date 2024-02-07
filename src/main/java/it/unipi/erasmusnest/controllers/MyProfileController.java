@@ -172,7 +172,7 @@ public class MyProfileController extends Controller {
         }
         // Parte riservata all'ADMIN
         // Se sono admin, allora appare un bottone per accedere alla vista analitiche
-        if (utente.isAdmin(utente.getEmail())){
+        if (utente.isAdmin()){
             Button analyticsButton = new Button();
             analyticsButton.setText("Analytics");
             analyticsButton.setStyle("-fx-background-color: orange; -fx-border-color: red; -fx-border-width: 1px;");

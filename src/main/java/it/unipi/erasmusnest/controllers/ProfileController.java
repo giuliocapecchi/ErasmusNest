@@ -64,7 +64,7 @@ public class ProfileController extends Controller{
 
             pageTitle.setText("Profile of " + utente.getName() + " " + utente.getSurname());
 
-            removeProfileButton.setVisible(getSession().getUser().isAdmin(getSession().getUser().getEmail()));
+            removeProfileButton.setVisible(getSession().getUser().isAdmin());
 
             emailLabel.setText(utente.getEmail());
             nameLabel.setText(utente.getName());

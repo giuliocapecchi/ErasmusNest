@@ -83,11 +83,11 @@ public class User {
         this.houses = houses;
     }
 
-    public boolean isAdmin(String email) {
+    public boolean isAdmin() {
+        if(email == null) return false;
         //Per ora l'admin è solo l'utente con email "admin"
         //Parsing dell'email
         String[] emailParts = email.split("@");
-        String emailName = emailParts[0];
         String emailDomain = emailParts[1];
         return emailDomain.equals("erasmusnest.com");
     }

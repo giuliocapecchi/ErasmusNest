@@ -147,7 +147,11 @@ public class ApartmentController extends Controller{
         }
         else
         {
-            removeButton.setVisible(getSession().getUser().isAdmin(getSession().getUser().getEmail()));
+            removeButton.setVisible(false);
+            if(getSession().isLogged()) {
+                System.out.println("Logged user: "+getSession().getUser().getEmail());
+                removeButton.setVisible(getSession().getUser().isAdmin());
+            }
             apartment.setAverageRating(getSession().getApartmentAverageRating());
 
             MapGraphicManager mapGraphicManager = new MapGraphicManager(webView, apartment.getLocation());
