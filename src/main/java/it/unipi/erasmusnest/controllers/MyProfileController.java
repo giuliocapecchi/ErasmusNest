@@ -65,6 +65,8 @@ public class MyProfileController extends Controller {
     boolean isEditingPassword = false; // Aggiunto per gestire la modifica della password
     @FXML
     private Button buttonPwdUpdate;
+    @FXML
+    private Label favouritesLabel;
 
     private String selectedStudyField;
     private ArrayList<String> citiesOfInterestInNeo4j = new ArrayList<>();
@@ -114,6 +116,9 @@ public class MyProfileController extends Controller {
         nameLabel.setText(utente.getName());
         lastNameLabel.setText(utente.getSurname());
         emailLabel.setText(utente.getEmail());
+
+        favouritesLabel = new Label();
+        favouritesContainerVBox.getChildren().add(favouritesLabel);
 
         if(utente.getHouses() != null  && !utente.getHouses().isEmpty()){
             // Recupera gli appartamenti dell'utente e li aggiunge al VBox apartmentsContainer
@@ -371,14 +376,14 @@ public class MyProfileController extends Controller {
     public void onFavouritesButtonClick() {
         System.out.println("Favourites button clicked");
         Map<String,String> favourites = getNeo4jConnectionManager().getFavourites(getSession().getUser().getEmail());
+        favouritesLabel.setVisible(true);
         if(favourites==null || favourites.isEmpty()){
-            System.out.println("\n\n\nNo favourites found\n\n\n");
-            favouritesContainerVBox.getChildren().add(new Label("No favourites found"));
+            favouritesLabel.setText("No favourites apartment found");
         }
         else {
+            favouritesLabel.setText("Favourites apartments:");
             for(String favourite : favourites.keySet()) {
-                Button button = new Button("favourite");
-                System.out.println("\n\n\nfavourite: "+favourite);
+                Button button = new Button();
                 button.setText(favourites.get(favourite));
                 button.setOnAction(event -> {
                     getSession().setApartmentId(favourite);

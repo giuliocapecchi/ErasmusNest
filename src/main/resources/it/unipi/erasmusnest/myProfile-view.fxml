@@ -120,6 +120,7 @@
                         <HBox.margin>
                             <Insets right="60.0" top="50.0" />
                         </HBox.margin>
+                        <Label fx:id="favouritesLabel" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ff6200;" visible="false" />
                     </VBox>
                 </VBox>
             </ScrollPane>

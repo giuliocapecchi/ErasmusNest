@@ -289,19 +289,19 @@ public class ApartmentController extends Controller{
         List<Apartment> suggestedApartments = getNeo4jConnectionManager().getSuggestedApartments(getSession().getUser().getEmail(),getSession().getCity());
         if(suggestedApartments != null && !suggestedApartments.isEmpty()) {
             suggestionsLabel.setVisible(true);
+            suggestedApartmentsVBox.setVisible(true);
             suggestionsLabel.setText("Suggested apartments:");
             for (Apartment apartment : suggestedApartments) {
-                System.out.println(apartment.getName());
                 VBox vBox = new VBox();
                 vBox.setAlignment(Pos.CENTER);
                 vBox.setSpacing(10);
-                vBox.setPrefWidth(100);
-                vBox.setPrefHeight(100);
+                vBox.setPrefWidth(150);
+                vBox.setPrefHeight(150);
                 vBox.setStyle("-fx-border-color: black; -fx-border-width: 1px; -fx-border-radius: 10px; -fx-background-color: white; -fx-padding: 10px;");
                 ImageView imageView = new ImageView();
                 imageView.setPreserveRatio(true);
-                imageView.setFitWidth(100);
-                imageView.setFitHeight(100);
+                imageView.setFitWidth(150);
+                imageView.setFitHeight(150);
                 imageView.setImage(new Image(apartment.getImageURLs().get(0)));
                 suggestedApartmentsVBox.getChildren().add(imageView);
                 Button button = new Button(apartment.getName());
@@ -315,7 +315,6 @@ public class ApartmentController extends Controller{
         } else {
             suggestionsLabel.setText("No Suggested apartments found");
         }
-        suggestedApartmentsVBox.getChildren().add(suggestionsLabel);
     }
 
     private void onStartDatePickerFirstClick(){

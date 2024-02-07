@@ -579,8 +579,9 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
                     tx.run(
                             "MERGE (u:User {email: $email}) " +
                                     "WITH u "+
-                                    "MATCH (a:Apartment {apartmentId: $id}) " +
-                                    "MERGE (u)-[:LIKES]->(a)",
+                                    "MATCH (a:Apartment {apartmentId: $id})-[:LOCATED]->(c:City) " +
+                                    "MERGE (u)-[:LIKES]->(a)" +
+                                    "MERGE (u)-[:INTERESTS]->(c)",
                             parameters("email", email, "id", id));
                     return null;
                 });
@@ -630,7 +631,6 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
     // Method to get suggested apartments
     public List<Apartment> getSuggestedApartments(String email, String cityName) {
         try (Session session = driver.session()) {
-            System.out.println("\n\n\nL'utente "+email+" cerca casa a  "+cityName+"\n\n\n");
             return session.readTransaction(tx -> {
                 Result result = tx.run(
                         "MATCH (u:User {email: $email})-[:FOLLOWS]->(f:User)-[r:REVIEW]->(a:Apartment)-[:LOCATED]->(c:City {name: $cityName}) " +
@@ -638,7 +638,7 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
                                 "WITH a, MAX(r.score) AS maxScore " +
                                 "RETURN a.apartmentId AS apartmentId, a.name AS name, a.pictureUrl AS pictureUrl, a.averageReviewScore AS averageReviewScore " +
                                 "ORDER BY maxScore DESC " +
-                                "LIMIT 5",
+                                "LIMIT 3",
                         parameters("email", email, "cityName", cityName));
 
                 List<Apartment> suggestedApartments = new ArrayList<>();
@@ -650,9 +650,6 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
                     double averageReviewScore = record.get("averageReviewScore").asDouble();
                     suggestedApartments.add(new Apartment(apartmentId, name, pictureUrl, averageReviewScore));
                 }
-                System.out.println("\n\n\nAPPARTAMENTI SUGGERITI: ");
-                for(Apartment a : suggestedApartments)
-                    System.out.println(a.getName());
                 return suggestedApartments;
             });
         } catch (Exception e) {
