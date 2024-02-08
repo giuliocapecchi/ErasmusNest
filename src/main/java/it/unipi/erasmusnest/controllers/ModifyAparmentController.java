@@ -1,5 +1,6 @@
 package it.unipi.erasmusnest.controllers;
 
+import it.unipi.erasmusnest.dbconnectors.ConsistencyManager;
 import it.unipi.erasmusnest.graphicmanagers.AlertDialogGraphicManager;
 import it.unipi.erasmusnest.model.Apartment;
 import javafx.event.ActionEvent;
@@ -129,11 +130,9 @@ public class ModifyAparmentController extends Controller{
 
         if(getMongoConnectionManager().updateApartment(apartment))
         {
-            //if(change)
-                if(getNeo4jConnectionManager().updateApartment(apartment.getId(), apartment.getImageURLs().get(0)))
-                    System.out.println("\n\n\nCasa modificata correttamente"+apartment.toString());
-                else
-                    System.out.println("\n\n\nCasa non modificata correttamente"+apartment.toString());
+
+            new ConsistencyManager(getMongoConnectionManager(), getNeo4jConnectionManager()).updateApartmentImageOnNeo4J(apartment.getId(), apartment.getImageURLs().get(0));
+
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Information Dialog");
             alert.setHeaderText(null);
