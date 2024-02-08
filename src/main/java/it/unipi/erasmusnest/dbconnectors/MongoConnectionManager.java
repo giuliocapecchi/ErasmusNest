@@ -12,7 +12,9 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
+import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.mongodb.client.model.Filters.*;
@@ -91,6 +93,34 @@ public class MongoConnectionManager extends ConnectionManager{
         }
         return user;
     }
+
+    public void averagePriceNearCityCenter(String cityName, Point2D cityPosition, int maxDistance) {
+        try (MongoClient mongoClient = MongoClients.create("mongodb://" + super.getHost() + ":" + super.getPort())) {
+            MongoDatabase database = mongoClient.getDatabase("TEMP");
+            MongoCollection<Document> apartmentsCollection = database.getCollection("apartments");
+            AggregateIterable<Document> result = apartmentsCollection.aggregate(
+                    Arrays.asList(
+                            new Document("$geoNear", new Document()
+                                    .append("near", new Document()
+                                            .append("type", "Point")
+                                            .append("coordinates", Arrays.asList(cityPosition.getX(), cityPosition.getY())))
+                                    .append("distanceField", "distance")
+                                    .append("maxDistance", maxDistance)
+                                    .append("spherical", true)),
+                            new Document("$match", new Document("city", cityName)),
+                            new Document("$group", new Document("_id", null)
+                                    .append("price", new Document("$avg", "$price"))),
+                            new Document("$project", new Document("_id", 0)
+                                    .append("averagePrice", new Document("$round", Arrays.asList("$price", 2))))
+                    )
+            );
+
+            for (Document doc : result) {
+                System.out.println(doc.toJson());
+            }
+        }
+    }
+
 
     public Apartment uploadApartment(Apartment apartment)
     {
