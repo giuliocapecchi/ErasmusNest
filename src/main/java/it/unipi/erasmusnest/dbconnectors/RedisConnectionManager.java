@@ -5,6 +5,7 @@ import it.unipi.erasmusnest.model.Reservation;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPooled;
+import redis.clients.jedis.args.ExpiryOption;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -222,6 +223,8 @@ public class RedisConnectionManager extends ConnectionManager{
             // set expiration time on the key equal to the seconds
             jedis.expire(subKey, seconds);
 
+            setExpirationTimeOnUser(userEmail, seconds, ExpiryOption.GT);
+
         } catch (Exception e) {
             System.out.println("Connection problem: " + e.getMessage());
             new AlertDialogGraphicManager("Redis connection failed").show();
@@ -229,6 +232,22 @@ public class RedisConnectionManager extends ConnectionManager{
         System.out.println("Reservation added");
     }
 
+    private void setExpirationTimeOnUser(String email, long seconds, ExpiryOption option) {
+
+        try (JedisPooled jedis = new JedisPooled(super.getHost(), super.getPort())) {
+
+            String key = "user:" + email + ":password";
+
+            // LT option set expiry only when the new expiry is less than current one
+            // GT option set expiry only when the new expiry is greater than current one
+            jedis.expire(key, seconds, option);
+
+        } catch (Exception e) {
+            System.out.println("Connection problem: " + e.getMessage());
+            new AlertDialogGraphicManager("Redis connection failed").show();
+        }
+
+    }
     // UPDATE
 
     // TODO
@@ -276,6 +295,35 @@ public class RedisConnectionManager extends ConnectionManager{
             String subKey = getSubKey(reservation);
             jedis.del(subKey);
 
+            updateExpirationTimeOnUser(reservation.getStudentEmail());
+
+        } catch (Exception e) {
+            System.out.println("Connection problem: " + e.getMessage());
+            new AlertDialogGraphicManager("Redis connection failed").show();
+        }
+    }
+
+    private void updateExpirationTimeOnUser(String email) {
+
+        ArrayList<Reservation> reservations = getReservationsForUser(email);
+
+        try (JedisPooled jedis = new JedisPooled(super.getHost(), super.getPort())) {
+
+            long maxSeconds = LocalDateTime.now().until(LocalDateTime.now().plusWeeks(trashWeeksInterval), ChronoUnit.SECONDS);
+            System.out.println("MAX SECONDS: " + maxSeconds);
+
+            for(Reservation reservation : reservations) {
+                String subKey = getSubKey(reservation);
+                long seconds = jedis.ttl(subKey);
+                if (seconds > maxSeconds) {
+                    maxSeconds = seconds;
+                    System.out.println("MAX SECONDS: " + maxSeconds);
+                    System.out.println("SECONDS: " + seconds);
+                }
+            }
+
+            setExpirationTimeOnUser(email, maxSeconds, ExpiryOption.LT);
+
         } catch (Exception e) {
             System.out.println("Connection problem: " + e.getMessage());
             new AlertDialogGraphicManager("Redis connection failed").show();
@@ -314,6 +362,9 @@ public class RedisConnectionManager extends ConnectionManager{
             hash.put("apartmentImage", reservation.getApartmentImage());
             hash.put("state", "rejected"); // pending | approved | rejected | expired | reviewed
             jedis.hset(subKey, hash);
+
+            long seconds = LocalDateTime.now().until(LocalDateTime.now().plusWeeks(trashWeeksInterval), ChronoUnit.SECONDS);
+            jedis.expire(subKey, seconds);
 
             deleteReservation(reservation);
 

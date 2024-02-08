@@ -1,5 +1,6 @@
 package it.unipi.erasmusnest.controllers;
 
+import it.unipi.erasmusnest.dbconnectors.ConsistencyManager;
 import it.unipi.erasmusnest.graphicmanagers.AlertDialogGraphicManager;
 import it.unipi.erasmusnest.graphicmanagers.MapGraphicManager;
 import it.unipi.erasmusnest.model.Apartment;
@@ -134,15 +135,14 @@ public class UploadHouseController extends Controller {
             // Call Mongo to insert apartment
             apartment = getMongoConnectionManager().uploadApartment(apartment);
             if (apartment.getId() != null) { // se è andato a buon fine, dentro l'ID ci sarà l'object id assegnato da MongoDB
-                //TODO : è corretta sta roba? Caricamento "atomico" su MongoDB poi su Neo4J se tutto è andato a buon fine
-                if(getNeo4jConnectionManager().addApartment(apartment)){ // tutto è andato a buon fine
-                    new AlertDialogGraphicManager("House uploaded correctly","House correctly uploaded.","You will be redirected to your profile","information").show();
-                    super.changeWindow("myProfile");
-                    return;
-                }else{ // necessario rollback dell'upload su MongoDB
-                    System.out.println("Caricamento casa su Neo4j FALLITO");
-                    getMongoConnectionManager().removeApartment(apartment.getId(), apartment.getHostEmail());
-                }
+
+                // TODO JACOPO: qui bisogna fare il caricamento su Neo4j
+                new ConsistencyManager(getMongoConnectionManager(), getNeo4jConnectionManager()).addApartmentOnNeo4J(apartment);
+
+                new AlertDialogGraphicManager("House uploaded correctly","House correctly uploaded.","You will be redirected to your profile","information").show();
+                super.changeWindow("myProfile");
+                return;
+
             }else{
                 System.out.println("Caricamento casa su MongoDB FALLITO");}
         }else{
