@@ -4,49 +4,58 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Spinner;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class AnalyticsController extends Controller {
 
     @FXML
-    TextArea outputTextArea;
-
+    TextArea outputPriceTextArea;
     @FXML
-    VBox vboxQuery;
-
+    TextArea outputPositionTextArea;
     @FXML
-    VBox vboxOutput;
-
+    VBox vboxQueryPrice;
     @FXML
-    HBox hboxButton;
-
+    VBox vboxQueryPosition;
+    @FXML
+    VBox vboxPriceOutput;
+    @FXML
+    VBox vboxPositionOutput;
+    @FXML
+    HBox hboxPriceButton;
+    @FXML
+    HBox hboxPositionButton;
     @FXML
     Label title;
-
     @FXML
-    Button analyticsButton1;
-
+    Button priceAnalyticButton;
     @FXML
-    Button analyticsButton2;
-
-    @FXML
-    Button analyticsButton3;
-
+    Button PositionAnalyticButton;
     @FXML
     Button goToHomepageButton;
-
     @FXML
     Button goBackButton;
+    @FXML
+    Spinner<Integer> inputAccommodates;
+    @FXML
+    Spinner<Integer> inputBathrooms;
+    @FXML
+    Spinner<Integer> inputPrice;
 
     @FXML
     private void initialize() {
         System.out.println("Analytics controller initialize");
         title.prefWidthProperty().bind(super.getRootPane().widthProperty());
-        vboxQuery.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.5));
-        vboxOutput.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.4));
-        hboxButton.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.1));
+        vboxQueryPrice.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.5));
+        vboxQueryPosition.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.5));
+        vboxPriceOutput.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.4));
+        vboxPositionOutput.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.4));
+        hboxPriceButton.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.1));
+
     }
 
     @FXML
@@ -58,15 +67,31 @@ public class AnalyticsController extends Controller {
         super.changeWindow("homepage");
     }
 
-    public void analytics1(ActionEvent actionEvent) {
-        System.out.println("implements analytics one");
+    @FXML
+    void onPriceAnalyticButton(ActionEvent actionEvent) {
+        System.out.println("\n>>>Price analytics button pressed\n");
+        Integer accommodates = inputAccommodates.getValue();
+        Integer bathrooms = inputBathrooms.getValue();
+        Integer price = inputPrice.getValue();
+        String result = getMongoConnectionManager().getPriceAnalytics(accommodates, bathrooms, price);
+        try {
+            JSONObject jsonObject = new JSONObject(result);
+
+            String lowestAveragePriceCity = jsonObject.getString("lowestAveragePriceCity");
+            double lowestAveragePrice = Math.round(jsonObject.getDouble("lowestAveragePrice") * 100.0) / 100.0;
+            String highestAveragePriceCity = jsonObject.getString("highestAveragePriceCity");
+            double highestAveragePrice = Math.round(jsonObject.getDouble("highestAveragePrice"));
+            result = "Lowest average price city: " + lowestAveragePriceCity + "\nLowest average price: " + lowestAveragePrice + "\nHighest average price city: " + highestAveragePriceCity + "\nHighest average price: " + highestAveragePrice;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        outputPriceTextArea.setText(result);
     }
 
-    public void analytics2(ActionEvent actionEvent) {
-        System.out.println("implements analytics two");
+    @FXML
+    void onPositionAnalyticButton(ActionEvent actionEvent) {
+        System.out.println("\n>>>Position analytics button pressed\n");
     }
 
-    public void analytics3(ActionEvent actionEvent) {
-        System.out.println("implements analytics three");
-    }
+
 }

@@ -1,9 +1,7 @@
 package it.unipi.erasmusnest.dbconnectors;
 
 import com.mongodb.client.*;
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.UpdateOptions;
-import com.mongodb.client.model.Updates;
+import com.mongodb.client.model.*;
 import it.unipi.erasmusnest.graphicmanagers.AlertDialogGraphicManager;
 import it.unipi.erasmusnest.model.Apartment;
 import it.unipi.erasmusnest.model.User;
@@ -12,10 +10,13 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
+import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Projections.*;
 
 public class MongoConnectionManager extends ConnectionManager{
 
@@ -91,6 +92,34 @@ public class MongoConnectionManager extends ConnectionManager{
         }
         return user;
     }
+
+    public void averagePriceNearCityCenter(String cityName, Point2D cityPosition, int maxDistance) {
+        try (MongoClient mongoClient = MongoClients.create("mongodb://" + super.getHost() + ":" + super.getPort())) {
+            MongoDatabase database = mongoClient.getDatabase("TEMP");
+            MongoCollection<Document> apartmentsCollection = database.getCollection("apartments");
+            AggregateIterable<Document> result = apartmentsCollection.aggregate(
+                    Arrays.asList(
+                            new Document("$geoNear", new Document()
+                                    .append("near", new Document()
+                                            .append("type", "Point")
+                                            .append("coordinates", Arrays.asList(cityPosition.getX(), cityPosition.getY())))
+                                    .append("distanceField", "distance")
+                                    .append("maxDistance", maxDistance)
+                                    .append("spherical", true)),
+                            new Document("$match", new Document("city", cityName)),
+                            new Document("$group", new Document("_id", null)
+                                    .append("price", new Document("$avg", "$price"))),
+                            new Document("$project", new Document("_id", 0)
+                                    .append("averagePrice", new Document("$round", Arrays.asList("$price", 2))))
+                    )
+            );
+
+            for (Document doc : result) {
+                System.out.println(doc.toJson());
+            }
+        }
+    }
+
 
     public Apartment uploadApartment(Apartment apartment)
     {
@@ -511,37 +540,38 @@ public class MongoConnectionManager extends ConnectionManager{
         }
     }
 
-    /*
-    public boolean removeApartment(String apartmentId)
-    {
-        boolean removed = false;
-        try (MongoClient mongoClient = MongoClients.create("mongodb://" + super.getHost() + ":" + super.getPort())) {
-            MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
-            MongoCollection<Document> collection = database.getCollection("apartments");
-            // Converti l'apartmentId in un ObjectId
-            ObjectId objectId = new ObjectId(apartmentId);
+    public String getPriceAnalytics(Integer accommodates, Integer bathrooms, Integer price) {
+        MongoClient client = MongoClients.create("mongodb://localhost:27017");
+        MongoDatabase database = client.getDatabase("ErasmusNest"); // Replace with your database name
+        MongoCollection<Document> collection = database.getCollection("apartments");
 
-            // Verifica se la casa da eliminare è l'ultima associata all'utente
-            MongoCollection<Document> userCollection = database.getCollection("users");
-            long apartmentsCount = userCollection.countDocuments(Filters.eq("object_id", objectId));
+        // Define the aggregation pipeline
+        List<Bson> aggregationPipeline = Arrays.asList(
+                Aggregates.group("$city", Accumulators.avg("averagePrice", "$price")),
+                Aggregates.sort(Sorts.ascending("averagePrice")),
+                Aggregates.group(null,
+                        Accumulators.first("lowestAveragePrice", "$$ROOT"),
+                        Accumulators.last("highestAveragePrice", "$$ROOT")),
+                Aggregates.project(fields(
+                        excludeId(),
+                        computed("lowestAveragePriceCity", "$lowestAveragePrice._id"),
+                        computed("lowestAveragePrice", "$lowestAveragePrice.averagePrice"),
+                        computed("highestAveragePriceCity", "$highestAveragePrice._id"),
+                        computed("highestAveragePrice", "$highestAveragePrice.averagePrice")
+                ))
+        );
+        // Execute the aggregation
+        Document resultDocument = collection.aggregate(aggregationPipeline).first();
 
-            if (apartmentsCount > 1) {
-                collection.deleteOne(Filters.eq("object_id", objectId));
-                userCollection.updateOne(Filters.eq("object_id", objectId), Updates.pull("houses", new Document("_id", objectId)));
-                removed = true;
-            } else if (apartmentsCount == 1) {
-                collection.deleteOne(Filters.eq("object_id", objectId));
-                userCollection.deleteOne(Filters.eq("object_id", objectId));
-                removed = true;
-            } else {
-                System.out.println("L'appartamento con l'ObjectId specificato non è stato trovato negli utenti.");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            new AlertDialogGraphicManager("MongoDB REMOVE failed").show();
-            System.out.println("Error in removeApartment: " + e.getMessage());
-        }
-        return removed;
+        // Check if the result is not null and get the resulting string
+        String resultString = resultDocument != null ? resultDocument.toJson() : "No result found";
+
+        // Output the result string
+        System.out.println(resultString);
+
+        // Close the MongoDB client
+        client.close();
+        return resultString;
     }
-    */
+
 }

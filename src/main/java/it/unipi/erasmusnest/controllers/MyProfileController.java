@@ -67,6 +67,10 @@ public class MyProfileController extends Controller {
     private Label favouritesLabel;
     @FXML
     private Button adminButton;
+    @FXML
+    private Button reservationsMyApartmentsButton;
+    @FXML
+    private Label reservationsMyApartmentsLabel;
 
     private String selectedStudyField;
     private ArrayList<String> citiesOfInterestInNeo4j = new ArrayList<>();
@@ -89,7 +93,6 @@ public class MyProfileController extends Controller {
         apartmentsContainerVBox.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.4));
         passwordChangeOuterBox.prefWidthProperty().bind(super.getRootPane().widthProperty());
         updateCitiesOfInterestButton.setDisable(true); // viene abilitato solo se l'utente effettivamente modifica le città di interesse
-        //adminButton = new Button();
 
         String userEmail = getSession().getUser().getEmail();
 
@@ -125,7 +128,6 @@ public class MyProfileController extends Controller {
             // Recupera gli appartamenti dell'utente e li aggiunge al VBox apartmentsContainer
             for (Apartment apartment : utente.getHouses())
             {
-                System.out.println("\n\n\nApartment: "+apartment.toString());
                 //QUI TUTTO CORRETTO
                 HBox apartmentBox = new HBox(10);
                 apartmentBox.setAlignment(Pos.CENTER_LEFT);
@@ -164,12 +166,12 @@ public class MyProfileController extends Controller {
                 });
                 Button viewButton = new Button(apartment.getName());
                 viewButton.setOnAction(event -> onChangeView(apartmentButton.getId()));
-
                 apartmentBox.getChildren().addAll(apartmentImage, viewButton, apartmentButton);
                 apartmentsContainer.getChildren().add(apartmentBox); // This should add the apartment to the UI
             }
         }else{
-            apartmentsContainer.getChildren().add(new Label("No apartments available."));
+            reservationsMyApartmentsLabel.setText("No reservations for your apartments");
+            reservationsMyApartmentsButton.setVisible(false);
         }
         // Parte riservata all'ADMIN
         // Se sono admin, allora appare un bottone per accedere alla vista analitiche
