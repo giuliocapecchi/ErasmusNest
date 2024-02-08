@@ -117,7 +117,6 @@ public class ApartmentController extends Controller{
 
         likeButton.setDisable(!getSession().isLogged());
         apartment = getMongoConnectionManager().getApartment(getSession().getApartmentId());
-        System.out.println("Apartment: "+apartment);
         if(apartment==null){
             // If apartment is null seems that the apartment has been removed from Mongo
             // and so need to be removed also from Neo4j

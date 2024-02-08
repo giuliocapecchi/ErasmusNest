@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.mongodb.client.model.Aggregates.match;
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Projections.*;
 
@@ -163,52 +164,33 @@ public class MongoConnectionManager extends ConnectionManager{
             // find one document with new Document that have the object id field equal to the apartmentId
             ObjectId id = new ObjectId(apartmentId);
             Document apartment = collection.find(eq("_id", id)).first();
-            String coordinates = apartment.getString("position");
-            // remove space from coordinates
-            coordinates = coordinates.replaceAll("\\s","");
-            // split coordinates in latitude and longitude that are separated by ','
-            String[] latLong = coordinates.split(",");
+            if(apartment!=null) {
+                String coordinates = apartment.getString("position");
+                // remove space from coordinates
+                coordinates = coordinates.replaceAll("\\s","");
+                // split coordinates in latitude and longitude that are separated by ','
+                String[] latLong = coordinates.split(",");
+                ArrayList<String> picURLs = new ArrayList<>();
+                if(apartment.get("picture_url")!=null)
+                    picURLs = apartment.get("picture_url",ArrayList.class);
+                System.out.println("\n\n\nPICURLS: " + picURLs);
 
-            /*
-            String[] descriptionList = apartment.getString("description").split("\\s*,\\s*|(?<=\\s)-(?=\\s)");
-
-            // create a string with the neighborhood elements separated by a new line
-            String description = "";
-            for (String s : descriptionList) {
-                s = s.strip();
-            	description += s + "\n";
+                resultApartment = new Apartment(
+                        apartmentId,
+                        apartment.getString("house_name"),
+                        //description,
+                        apartment.getString("description"),
+                        new Point2D(Double.parseDouble(latLong[0]), Double.parseDouble(latLong[1])),
+                        apartment.getInteger("price"),
+                        apartment.getInteger("accommodates"),
+                        apartment.getString("email"),
+                        picURLs,
+                        apartment.getInteger("bathrooms")
+                );
             }
-            */
-
-            // description += "Bathrooms: "+apartment.getString("bathrooms_text");
-
-            // String id = apartment.get("_id").toString();
-            // if apartment.get("id") return an integer, it is necessary to cast it to Long
-            /*
-            if(apartment.get("id") instanceof Integer)
-                id = ((Integer) apartment.get("id")).longValue();
-            else
-                id = (Long) apartment.get("id");
-            */
-            ArrayList<String> picURLs = new ArrayList<>();
-            if(apartment.get("picture_url")!=null)
-                picURLs = apartment.get("picture_url",ArrayList.class);
-            System.out.println("\n\n\nPICURLS: " + picURLs);
-
-
-            // to retrieve also studyFields
-            resultApartment = new Apartment(
-                    apartmentId,
-                    apartment.getString("house_name"),
-                    //description,
-                    apartment.getString("description"),
-                    new Point2D(Double.parseDouble(latLong[0]), Double.parseDouble(latLong[1])),
-                    apartment.getInteger("price"),
-                    apartment.getInteger("accommodates"),
-                    apartment.getString("email"),
-                    picURLs,
-                    apartment.getInteger("bathrooms")
-            );
+            else {
+                new AlertDialogGraphicManager("Apartment not found in MongoDB").show();
+            }
 
         }catch (Exception e){
             e.printStackTrace();
@@ -511,13 +493,22 @@ public class MongoConnectionManager extends ConnectionManager{
         }
     }
 
-    public String getPriceAnalytics(Integer accommodates, Integer bathrooms, Integer price) {
+    public String getPriceAnalytics(Integer accommodates, Integer bathrooms, Integer priceMin, Integer priceMax) {
         MongoClient client = MongoClients.create("mongodb://localhost:27017");
-        MongoDatabase database = client.getDatabase("ErasmusNest"); // Replace with your database name
+        MongoDatabase database = client.getDatabase("ErasmusNest");
         MongoCollection<Document> collection = database.getCollection("apartments");
+
+        // Define filter conditions based on input parameters
+        Bson filters = and(
+                accommodates != 0 ? gte("accommodates", accommodates) : exists("accommodates"),
+                bathrooms != 0 ? gte("bathrooms", bathrooms) : exists("bathrooms"),
+                priceMin != 0 ? gte("price", priceMin) : exists("price"),
+                priceMax != 0 ? lte("price", priceMax) : exists("price")
+        );
 
         // Define the aggregation pipeline
         List<Bson> aggregationPipeline = Arrays.asList(
+                match(filters),
                 Aggregates.group("$city", Accumulators.avg("averagePrice", "$price")),
                 Aggregates.sort(Sorts.ascending("averagePrice")),
                 Aggregates.group(null,
@@ -531,6 +522,7 @@ public class MongoConnectionManager extends ConnectionManager{
                         computed("highestAveragePrice", "$highestAveragePrice.averagePrice")
                 ))
         );
+
         // Execute the aggregation
         Document resultDocument = collection.aggregate(aggregationPipeline).first();
 

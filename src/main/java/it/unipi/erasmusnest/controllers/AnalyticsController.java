@@ -14,8 +14,6 @@ import org.json.JSONObject;
 public class AnalyticsController extends Controller {
 
     @FXML
-    TextArea outputPriceTextArea;
-    @FXML
     TextArea outputPositionTextArea;
     @FXML
     VBox vboxQueryPrice;
@@ -44,7 +42,13 @@ public class AnalyticsController extends Controller {
     @FXML
     Spinner<Integer> inputBathrooms;
     @FXML
-    Spinner<Integer> inputPrice;
+    Spinner<Integer> minInputPrice;
+    @FXML
+    Spinner<Integer> maxInputPrice;
+    @FXML
+    Label cityHighestPrice;
+    @FXML
+    Label cityLowestPrice;
 
     @FXML
     private void initialize() {
@@ -72,20 +76,31 @@ public class AnalyticsController extends Controller {
         System.out.println("\n>>>Price analytics button pressed\n");
         Integer accommodates = inputAccommodates.getValue();
         Integer bathrooms = inputBathrooms.getValue();
-        Integer price = inputPrice.getValue();
-        String result = getMongoConnectionManager().getPriceAnalytics(accommodates, bathrooms, price);
+        Integer priceMin = minInputPrice.getValue();
+        Integer priceMax = maxInputPrice.getValue();
+        String lowestAveragePriceCity = ""; String highestAveragePriceCity = "";
+        double lowestAveragePrice =-1; double highestAveragePrice =-1;
+        String result = getMongoConnectionManager().getPriceAnalytics(accommodates, bathrooms, priceMin, priceMax);
         try {
             JSONObject jsonObject = new JSONObject(result);
-
-            String lowestAveragePriceCity = jsonObject.getString("lowestAveragePriceCity");
-            double lowestAveragePrice = Math.round(jsonObject.getDouble("lowestAveragePrice") * 100.0) / 100.0;
-            String highestAveragePriceCity = jsonObject.getString("highestAveragePriceCity");
-            double highestAveragePrice = Math.round(jsonObject.getDouble("highestAveragePrice"));
-            result = "Lowest average price city: " + lowestAveragePriceCity + "\nLowest average price: " + lowestAveragePrice + "\nHighest average price city: " + highestAveragePriceCity + "\nHighest average price: " + highestAveragePrice;
+            lowestAveragePriceCity = jsonObject.getString("lowestAveragePriceCity");
+            lowestAveragePrice = Math.round(jsonObject.getDouble("lowestAveragePrice") * 100.0) / 100.0;
+            highestAveragePriceCity = jsonObject.getString("highestAveragePriceCity");
+            highestAveragePrice = Math.round(jsonObject.getDouble("highestAveragePrice"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        outputPriceTextArea.setText(result);
+        if(highestAveragePrice==-1 && highestAveragePriceCity.isEmpty()){
+            cityHighestPrice.setText("No data available");
+        } else {
+            cityHighestPrice.setText(highestAveragePriceCity + " with " + highestAveragePrice + "$");
+        }
+        if(lowestAveragePrice==-1 && lowestAveragePriceCity.isEmpty()){
+            cityLowestPrice.setText("No data available");
+        } else {
+            cityLowestPrice.setText(lowestAveragePriceCity + " with " + lowestAveragePrice + "$");
+        }
+        cityHighestPrice.setVisible(true); cityLowestPrice.setVisible(true);
     }
 
     @FXML
