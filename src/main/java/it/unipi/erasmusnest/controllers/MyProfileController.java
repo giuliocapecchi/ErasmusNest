@@ -35,8 +35,6 @@ public class MyProfileController extends Controller {
     @FXML
     VBox apartmentsContainer;
     @FXML
-    VBox adminContainer;
-    @FXML
     Label emailLabel;
     @FXML
     Label nameLabel;
@@ -67,6 +65,12 @@ public class MyProfileController extends Controller {
     private Button buttonPwdUpdate;
     @FXML
     private Label favouritesLabel;
+    @FXML
+    private Button adminButton;
+    @FXML
+    private Button reservationsMyApartmentsButton;
+    @FXML
+    private Label reservationsMyApartmentsLabel;
 
     private String selectedStudyField;
     private ArrayList<String> citiesOfInterestInNeo4j = new ArrayList<>();
@@ -124,7 +128,6 @@ public class MyProfileController extends Controller {
             // Recupera gli appartamenti dell'utente e li aggiunge al VBox apartmentsContainer
             for (Apartment apartment : utente.getHouses())
             {
-                System.out.println("\n\n\nApartment: "+apartment.toString());
                 //QUI TUTTO CORRETTO
                 HBox apartmentBox = new HBox(10);
                 apartmentBox.setAlignment(Pos.CENTER_LEFT);
@@ -163,26 +166,17 @@ public class MyProfileController extends Controller {
                 });
                 Button viewButton = new Button(apartment.getName());
                 viewButton.setOnAction(event -> onChangeView(apartmentButton.getId()));
-
                 apartmentBox.getChildren().addAll(apartmentImage, viewButton, apartmentButton);
                 apartmentsContainer.getChildren().add(apartmentBox); // This should add the apartment to the UI
             }
         }else{
-            apartmentsContainer.getChildren().add(new Label("No apartments available."));
+            reservationsMyApartmentsLabel.setText("No reservations for your apartments");
+            reservationsMyApartmentsButton.setVisible(false);
         }
         // Parte riservata all'ADMIN
         // Se sono admin, allora appare un bottone per accedere alla vista analitiche
         if (utente.isAdmin()){
-            Button analyticsButton = new Button();
-            analyticsButton.setText("Analytics");
-            analyticsButton.setStyle("-fx-background-color: orange; -fx-border-color: red; -fx-border-width: 1px;");
-            analyticsButton.setOnAction(event -> {
-                // Handle the analytics button click
-                System.out.println("Analytics button clicked");
-                super.changeWindow("analytics");
-            });
-
-            adminContainer.getChildren().add(analyticsButton);
+            adminButton.setVisible(true);
         }
         getSession().setUser(utente);
     }
@@ -419,4 +413,10 @@ public class MyProfileController extends Controller {
             showConfirmationMessage("Errore nell'aggiornamento delle città di interesse!", updateCitiesOfInterestButton);
         }
     }
+
+    @FXML
+    public void onAdminView(){
+        super.changeWindow("analytics");
+    }
+
 }

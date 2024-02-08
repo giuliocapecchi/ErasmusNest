@@ -105,8 +105,8 @@
                         <padding>
                             <Insets bottom="20" left="20" right="20" top="20" />
                         </padding>
-                        <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Reservations for my apartments" wrapText="true" />
-                        <Button onAction="#onReservationsMyApartmentsButtonClick" style="-fx-background-color: orange; -fx-border-color: red; -fx-border-width: 1px;" text="Go to reservations for my apartments" />
+                        <Label fx:id="reservationsMyApartmentsLabel" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Reservations for my apartments" wrapText="true" />
+                        <Button fx:id="reservationsMyApartmentsButton" onAction="#onReservationsMyApartmentsButtonClick" style="-fx-background-color: orange; -fx-border-color: red; -fx-border-width: 1px;" text="Go to reservations for my apartments" />
                         <HBox.margin>
                             <Insets right="60.0" top="50.0" />
                         </HBox.margin>
@@ -126,10 +126,10 @@
             </ScrollPane>
         </center>
         <bottom>
-            <VBox fx:id="adminContainer" alignment="CENTER_RIGHT" />
             <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" prefWidth="256.0" style="-fx-background-color: orange;" BorderPane.alignment="CENTER">
                 <Button onAction="#logoutButtonClick" text="Logout" />
                 <Button onAction="#onBack" text="Homepage" />
+                <Button fx:id="adminButton" onAction="#onAdminView" text="Admin View" visible="false" />
             </ToolBar>
         </bottom>
     </BorderPane>
