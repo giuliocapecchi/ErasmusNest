@@ -217,7 +217,7 @@ public class ModifyAparmentController extends Controller{
             }
             else
             {
-                showConfirmationMessage("Remove failed", removeHouse);
+                showConfirmationMessage("Remove failed. This apartment has active reservations.", removeHouse);
             }
 
         }
