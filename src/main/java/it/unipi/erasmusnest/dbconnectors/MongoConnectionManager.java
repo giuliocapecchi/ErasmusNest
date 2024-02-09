@@ -37,29 +37,12 @@ public class MongoConnectionManager extends ConnectionManager{
                 return null;
             }
 
-            // Object houseObject = userDocument.get("house");
-
             // Set the user's email, password, name and surname
             user.setEmail(userDocument.getString("email"));
-            user.setPassword(userDocument.getString("password"));
             user.setName(userDocument.getString("first_name"));
             user.setSurname(userDocument.getString("last_name"));
             if(userDocument.containsKey("study_field") && userDocument.get("study_field")!=null)
                 user.setStudyField(userDocument.getString("study_field"));
-            // Retrieve the list of preferred cities
-            /*
-            ArrayList<String> preferredCities = new ArrayList<>();
-            Object preferredCitiesObject = userDocument.get("CoI");
-            if(preferredCitiesObject instanceof List<?>)
-            {
-                for(Object o : (List<?>) preferredCitiesObject)
-                {
-                    preferredCities.add((String) o);
-                }
-            }
-            user.setPreferredCities(preferredCities);
-            */
-            //LOgica per controllare se document o list
             // Check if the document house exists and is not empty
             if(userDocument.containsKey("houses") && userDocument.get("houses")!=null)
             {
