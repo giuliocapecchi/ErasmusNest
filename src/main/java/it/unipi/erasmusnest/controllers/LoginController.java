@@ -158,6 +158,7 @@ public class LoginController extends Controller{
                 }
             }
             if(getSession().isLogged()){
+                getSession().getUser().setPassword(passwordField.getText());
                 if(getPreviousWindowName() != null && !getPreviousWindowName().equals("signup")) {
                     super.backToPreviousWindow();
                 } else {

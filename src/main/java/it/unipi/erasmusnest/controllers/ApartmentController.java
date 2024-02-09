@@ -8,6 +8,8 @@ import it.unipi.erasmusnest.model.Apartment;
 import it.unipi.erasmusnest.graphicmanagers.MapGraphicManager;
 import it.unipi.erasmusnest.graphicmanagers.RatingGraphicManager;
 import it.unipi.erasmusnest.graphicmanagers.ReservationGraphicManager;
+import it.unipi.erasmusnest.model.Reservation;
+import it.unipi.erasmusnest.model.User;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -370,7 +372,15 @@ public class ApartmentController extends Controller{
             String userEmail = getSession().getUser().getEmail();
             String houseId = String.valueOf(getSession().getApartmentId());
 
-            getRedisConnectionManager().addReservation(userEmail, houseId, String.valueOf(startYear), String.valueOf(startMonth), String.valueOf(numberOfMonths), getSession().getCity(), apartment.getImageURLs().get(0));
+            User student = new User();
+            student.setEmail(userEmail);
+            student.setPassword(getSession().getUser().getPassword());
+
+            Reservation reservation = new Reservation(userEmail, houseId, startYear, startMonth, numberOfMonths);
+            reservation.setCity(getSession().getCity());
+            reservation.setApartmentImage(apartment.getImageURLs().get(0));
+
+            getRedisConnectionManager().addReservation(student, reservation);
 
             cleanAverageRatingInSession();
             super.changeWindow("myreservations");

@@ -2,6 +2,7 @@ package it.unipi.erasmusnest.dbconnectors;
 
 import it.unipi.erasmusnest.graphicmanagers.AlertDialogGraphicManager;
 import it.unipi.erasmusnest.model.Reservation;
+import it.unipi.erasmusnest.model.User;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPooled;
@@ -33,6 +34,22 @@ public class RedisConnectionManager extends ConnectionManager{
             new AlertDialogGraphicManager("Redis connection failed").show();
         }
         return ttl;
+    }
+
+    public boolean existsUser(String email) {
+
+        boolean exists = false;
+
+        try (JedisPooled jedis = new JedisPooled(super.getHost(), super.getPort())) {
+
+            String key = "user:" + email + ":password";
+            exists = jedis.exists(key);
+
+        } catch (Exception e) {
+            System.out.println("Connection problem: " + e.getMessage());
+            new AlertDialogGraphicManager("Redis connection failed").show();
+        }
+        return exists;
     }
 
     // TODO
@@ -213,22 +230,26 @@ public class RedisConnectionManager extends ConnectionManager{
 
 
     // OKAY
-    public void addReservation(String userEmail, String houseId, String startYear, String startMonth, String numberOfMonths, String city, String apartmentImage) {
+    public void addReservation(User student, Reservation reservation) {
+
+        if(!existsUser(student.getEmail())) {
+            addUser(student.getEmail(), student.getPassword());
+        }
 
         try(JedisPooled jedis = new JedisPooled(super.getHost(), super.getPort())) {
 
             String dateTime = LocalDateTime.now().toString();
-            String subKey = "reservation:" + userEmail + ":" + houseId + ":" + startYear + ":" + startMonth + ":" + numberOfMonths;
+            String subKey = "reservation:" + student.getEmail() + ":" + reservation.getApartmentId() + ":" + reservation.getStartYear() + ":" + reservation.getStartMonth() + ":" + reservation.getNumberOfMonths();
 
             Map<String, String> hash = new HashMap<>();;
             hash.put("timestamp", dateTime);
-            hash.put("city", city);
-            hash.put("apartmentImage", apartmentImage);
+            hash.put("city", reservation.getCity());
+            hash.put("apartmentImage", reservation.getApartmentImage());
             hash.put("state", "pending"); // pending | approved | rejected | expired | reviewed
             jedis.hset(subKey, hash);
 
             // get the first day after the whole reservation period is expired
-            LocalDateTime expirationDate = LocalDateTime.of(Integer.parseInt(startYear), Integer.parseInt(startMonth), 1, 0, 0).plusMonths(Long.parseLong(numberOfMonths));
+            LocalDateTime expirationDate = LocalDateTime.of(reservation.getStartYear(), reservation.getStartMonth(), 1, 0, 0).plusMonths(reservation.getNumberOfMonths());
             // add the "still alive months" and the "trash week" to the expiration date
             expirationDate = expirationDate.plusMonths(reservationMonthsInterval).plusWeeks(trashWeeksInterval);
             // compute the seconds between the dateTime timestamp and the end of the reservation
@@ -236,7 +257,7 @@ public class RedisConnectionManager extends ConnectionManager{
             // set expiration time on the key equal to the seconds
             jedis.expire(subKey, seconds);
 
-            setExpirationTimeOnUser(userEmail, seconds, ExpiryOption.GT);
+            setExpirationTimeOnUser(student.getEmail(), seconds, ExpiryOption.GT);
 
         } catch (Exception e) {
             System.out.println("Connection problem: " + e.getMessage());
