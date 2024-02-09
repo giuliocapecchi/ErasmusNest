@@ -128,7 +128,8 @@ public class AnalyticsController extends Controller {
             outputPositionTextArea.setText("");
             List<Map<String, Object>> result =  getMongoConnectionManager().averagePriceNearCityCenterForEachCity(distance);
             for (Map<String, Object> map : result) {
-                outputPositionTextArea.appendText(map.get("city") + ": \t" + map.get("avgPrice") + "\n");
+                if(map.get("city") != null && map.get("avgPrice") != null)
+                    outputPositionTextArea.appendText(map.get("city") + ": \t" + map.get("avgPrice") + "\n");
             }
         }
     }
