@@ -55,6 +55,10 @@ public class RedisConnectionManager extends ConnectionManager{
     // TODO
     public String getPassword(String email) {
 
+        if(!existsUser(email)) {
+            return null;
+        }
+
         String value = null;
 
         try (JedisPooled jedis = new JedisPooled(super.getHost(), super.getPort())) {
