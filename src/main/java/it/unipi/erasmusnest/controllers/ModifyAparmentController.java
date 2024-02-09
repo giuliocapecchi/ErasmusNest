@@ -1,6 +1,7 @@
 package it.unipi.erasmusnest.controllers;
 
-import it.unipi.erasmusnest.dbconnectors.ConsistencyManager;
+import it.unipi.erasmusnest.consistency.ConsistencyManager;
+import it.unipi.erasmusnest.consistency.NeoConsistencyManager;
 import it.unipi.erasmusnest.graphicmanagers.AlertDialogGraphicManager;
 import it.unipi.erasmusnest.model.Apartment;
 import javafx.event.ActionEvent;
@@ -131,7 +132,7 @@ public class ModifyAparmentController extends Controller{
         if(getMongoConnectionManager().updateApartment(apartment))
         {
 
-            new ConsistencyManager(getMongoConnectionManager(), getNeo4jConnectionManager()).updateApartmentImageOnNeo4J(apartment.getId(), apartment.getImageURLs().get(0));
+            new NeoConsistencyManager(getNeo4jConnectionManager()).updateApartmentImageOnNeo4J(apartment.getId(), apartment.getImageURLs().get(0));
 
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Information Dialog");

@@ -23,6 +23,17 @@ public class RedisConnectionManager extends ConnectionManager{
     //CRUD OPERATIONS
 
     // READ
+    public long getUserTTL(String email){
+        long ttl = -1;
+        try(JedisPooled jedis = new JedisPooled(super.getHost(), super.getPort())) {
+            String key = "user:" + email + ":password";
+            ttl = jedis.ttl(key);
+        } catch (Exception e) {
+            System.out.println("Connection problem: " + e.getMessage());
+            new AlertDialogGraphicManager("Redis connection failed").show();
+        }
+        return ttl;
+    }
 
     // TODO
     public String getPassword(String email) {
@@ -171,29 +182,27 @@ public class RedisConnectionManager extends ConnectionManager{
     // TODO
     public void addUser(String email, String password) {
 
-        if(getPassword(email) == null) {
-            try(JedisPooled jedis = new JedisPooled(super.getHost(), super.getPort())) {
+        try(JedisPooled jedis = new JedisPooled(super.getHost(), super.getPort())) {
 
-                // key design: <entity>:<email>:<attribute>
-                // entity: user
-                // attribute: password
-                String attribute = "password";
+            // key design: <entity>:<email>:<attribute>
+            // entity: user
+            // attribute: password
+            String attribute = "password";
 
-                String key = "user:" + email + ":" + attribute;
+            String key = "user:" + email + ":" + attribute;
 
-                // set the key
-                jedis.set(key, password);
+            // set the key
+            jedis.set(key, password);
 
-                // compute the seconds between now and trashWeeksInterval
-                long seconds = LocalDateTime.now().until(LocalDateTime.now().plusWeeks(trashWeeksInterval), ChronoUnit.SECONDS);
-                // set expiration time on the key equal to the seconds
-                jedis.expire(key, seconds);
+            // compute the seconds between now and trashWeeksInterval
+            long seconds = LocalDateTime.now().until(LocalDateTime.now().plusWeeks(trashWeeksInterval), ChronoUnit.SECONDS);
+            // set expiration time on the key equal to the seconds
+            jedis.expire(key, seconds);
 
-            } catch (Exception e) {
-                System.out.println("Connection problem: " + e.getMessage());
-                // Commentoo altrimenti crasha
-                // new AlertDialogGraphicManager("Redis connection failed").show();
-            }
+        } catch (Exception e) {
+            System.out.println("Connection problem: " + e.getMessage());
+            // Commentoo altrimenti crasha
+            // new AlertDialogGraphicManager("Redis connection failed").show();
         }
 
     }
@@ -260,6 +269,10 @@ public class RedisConnectionManager extends ConnectionManager{
             String key = "user:" + email + ":" + attribute;
             // set the key
             jedis.set(key, password);
+
+            // set the ttl to -1 to remove the expiration time
+            jedis.persist(key);
+
             // jedis.close(); // not needed with try-with-resources
             return true;
         } catch (Exception e) {
@@ -303,7 +316,7 @@ public class RedisConnectionManager extends ConnectionManager{
         }
     }
 
-    private void updateExpirationTimeOnUser(String email) {
+    public void updateExpirationTimeOnUser(String email) {
 
         ArrayList<Reservation> reservations = getReservationsForUser(email);
 
@@ -365,6 +378,8 @@ public class RedisConnectionManager extends ConnectionManager{
 
             long seconds = LocalDateTime.now().until(LocalDateTime.now().plusWeeks(trashWeeksInterval), ChronoUnit.SECONDS);
             jedis.expire(subKey, seconds);
+
+            updateExpirationTimeOnUser(reservation.getStudentEmail());
 
             deleteReservation(reservation);
 

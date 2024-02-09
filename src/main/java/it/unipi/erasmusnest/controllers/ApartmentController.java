@@ -1,6 +1,8 @@
 package it.unipi.erasmusnest.controllers;
 
-import it.unipi.erasmusnest.dbconnectors.ConsistencyManager;
+import it.unipi.erasmusnest.consistency.ConsistencyManager;
+import it.unipi.erasmusnest.consistency.MongoNeoConsistencyManager;
+import it.unipi.erasmusnest.consistency.NeoConsistencyManager;
 import it.unipi.erasmusnest.graphicmanagers.AlertDialogGraphicManager;
 import it.unipi.erasmusnest.model.Apartment;
 import it.unipi.erasmusnest.graphicmanagers.MapGraphicManager;
@@ -122,7 +124,7 @@ public class ApartmentController extends Controller{
             // If apartment is null seems that the apartment has been removed from Mongo
             // and so need to be removed also from Neo4j
 
-            new ConsistencyManager(getMongoConnectionManager(), getNeo4jConnectionManager()).removeApartmentFromNeo4J(getSession().getApartmentId());
+            new NeoConsistencyManager(getNeo4jConnectionManager()).removeApartmentFromNeo4J(getSession().getApartmentId());
 
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Information Dialog");

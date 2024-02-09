@@ -1,6 +1,7 @@
 package it.unipi.erasmusnest.controllers;
 
-import it.unipi.erasmusnest.dbconnectors.ConsistencyManager;
+import it.unipi.erasmusnest.consistency.ConsistencyManager;
+import it.unipi.erasmusnest.consistency.MongoNeoConsistencyManager;
 import it.unipi.erasmusnest.graphicmanagers.AlertDialogGraphicManager;
 import it.unipi.erasmusnest.graphicmanagers.MapGraphicManager;
 import it.unipi.erasmusnest.model.Apartment;
@@ -137,7 +138,7 @@ public class UploadHouseController extends Controller {
             if (apartment.getId() != null) { // se è andato a buon fine, dentro l'ID ci sarà l'object id assegnato da MongoDB
 
                 // TODO JACOPO: qui bisogna fare il caricamento su Neo4j
-                new ConsistencyManager(getMongoConnectionManager(), getNeo4jConnectionManager()).addApartmentOnNeo4J(apartment);
+                new MongoNeoConsistencyManager(getMongoConnectionManager(), getNeo4jConnectionManager()).addApartmentOnNeo4J(apartment);
 
                 new AlertDialogGraphicManager("House uploaded correctly","House correctly uploaded.","You will be redirected to your profile","information").show();
                 super.changeWindow("myProfile");
