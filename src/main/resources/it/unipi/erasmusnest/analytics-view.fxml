@@ -86,7 +86,7 @@
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </VBox.margin>
                   </ComboBox>
-                        <Slider fx:id="distanceSlider" blockIncrement="0.1" majorTickUnit="10" max="80" minorTickCount="4" showTickLabels="true" showTickMarks="true" value="40">
+                        <Slider fx:id="distanceSlider" blockIncrement="0.1" majorTickUnit="10" min="1" max="80" minorTickCount="4" showTickLabels="true" showTickMarks="true" value="40">
                             <VBox.margin>
                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                             </VBox.margin>

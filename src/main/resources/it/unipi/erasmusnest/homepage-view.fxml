@@ -56,24 +56,32 @@
            </VBox>
       </center>
        <bottom>
-           <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: orange;" BorderPane.alignment="CENTER">
-               <Button fx:id="logoutButton" mnemonicParsing="false" onAction="#handleLogoutAction" text="Logout">
+           <ToolBar nodeOrientation="LEFT_TO_RIGHT" prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: orange;" BorderPane.alignment="CENTER">
+               <Button fx:id="helpButton" mnemonicParsing="false" onAction="#handleHelpAction" text="Help">
                    <cursor>
                        <Cursor fx:constant="DEFAULT" />
                    </cursor>
                </Button>
-               <Button fx:id="profileButton" mnemonicParsing="false" onAction="#handleProfileAction" text="Profile" />
-               <Label fx:id="welcomeText" text="Hello, ${user.name}">
-                   <padding>
-                       <Insets left="20.0" />
-                   </padding></Label>
+               <Region HBox.hgrow="ALWAYS" />
+               <Button fx:id="loginButton" mnemonicParsing="false" onAction="#handleLoginAction" text="Login" />
                <Button fx:id="signUpButton" mnemonicParsing="false" onAction="#handleSignupAction" text="Signup">
                    <cursor>
                        <Cursor fx:constant="DEFAULT" />
                    </cursor>
                </Button>
-               <Button fx:id="loginButton" mnemonicParsing="false" onAction="#handleLoginAction" text="Login" />
+               <Label fx:id="welcomeText" text="Hello, ${user.name}">
+                   <padding>
+                       <Insets left="20.0" />
+                   </padding>
+               </Label>
+               <Button fx:id="profileButton" mnemonicParsing="false" onAction="#handleProfileAction" text="Profile" />
+               <Button fx:id="logoutButton" mnemonicParsing="false" onAction="#handleLogoutAction" text="Logout">
+                   <cursor>
+                       <Cursor fx:constant="DEFAULT" />
+                   </cursor>
+               </Button>
            </ToolBar>
+
        </bottom>
    </BorderPane>
 
