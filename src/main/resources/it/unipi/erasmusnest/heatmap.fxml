@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.web.WebView?>
+<?import javafx.geometry.Insets?>
+<StackPane fx:id="rootPane" prefHeight="554.0" prefWidth="652.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.erasmusnest.HeatMapTest">
+
+    <VBox prefHeight="150.0" prefWidth="150.0">
+        <WebView fx:id="webView" minHeight="150">
+            <VBox.margin>
+                <Insets bottom="5.0" left="20.0" right="20.0" />
+            </VBox.margin>
+        </WebView>
+    </VBox>
+
+</StackPane>
