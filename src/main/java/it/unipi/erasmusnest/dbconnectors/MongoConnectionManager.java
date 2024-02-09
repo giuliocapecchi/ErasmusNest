@@ -36,27 +36,21 @@ public class MongoConnectionManager extends ConnectionManager{
             if (userDocument == null) {
                 return null;
             }
-
-            // Set the user's email, password, name and surname
             user.setEmail(userDocument.getString("email"));
             user.setName(userDocument.getString("first_name"));
             user.setSurname(userDocument.getString("last_name"));
             if(userDocument.containsKey("study_field") && userDocument.get("study_field")!=null)
                 user.setStudyField(userDocument.getString("study_field"));
-            // Check if the document house exists and is not empty
             if(userDocument.containsKey("houses") && userDocument.get("houses")!=null)
             {
-                System.out.println("\n\n\nHouse document found.");
                 ArrayList<Document> houseArray = (ArrayList<Document>) userDocument.get("houses");
                 if(houseArray!=null && !houseArray.isEmpty()) {
                     ArrayList<Apartment> houses = new ArrayList<>();
                     for(Document d : houseArray)
                     {
                         String id = d.getObjectId("object_id").toHexString();
-                        System.out.println("\n\n\nID: " + id);
                         Apartment casa = new Apartment(id, d.getString("house_name"));
                         String imageURL = d.getString("picture_url");
-                        System.out.println("\n\n\nImageURL: " + imageURL);
                         if(imageURL!=null && !imageURL.isEmpty()) {
                             ArrayList<String> urlList = new ArrayList<>();
                             urlList.add(imageURL);
