@@ -26,8 +26,10 @@
                         <Spinner fx:id="inputAccommodates" amountToStepBy="1" max="20" min="0" />
                         <Label text="Bathrooms:" />
                         <Spinner fx:id="inputBathrooms" amountToStepBy="1" max="20" min="0" />
-                        <Label text="Price per Month:" />
-                        <Spinner fx:id="inputPrice" amountToStepBy="50" initialValue="0" max="9999" min="0" />
+                        <Label text="Min Price:" />
+                        <Spinner fx:id="minInputPrice" amountToStepBy="50" initialValue="0" max="9999" min="0" />
+                        <Label text="Max Price:" />
+                        <Spinner fx:id="maxInputPrice" amountToStepBy="50" initialValue="0" max="9999" min="0" />
                     </VBox>
                     <Separator orientation="VERTICAL" />
                     <VBox fx:id="vboxPriceOutput">
@@ -35,10 +37,24 @@
                      <VBox.margin>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </VBox.margin></Label>
-                        <TextArea fx:id="outputPriceTextArea" editable="false">
-                     <VBox.margin>
-                        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
-                     </VBox.margin></TextArea>
+                        <Label alignment="CENTER" style="-fx-font-weight: bold;" text="City with highest average price per apartment:">
+                            <VBox.margin>
+                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                            </VBox.margin></Label>
+                        <Label fx:id="cityHighestPrice" alignment="CENTER" style="-fx-font-weight: bold;" textFill="#093400" visible="false">
+                            <VBox.margin>
+                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                            </VBox.margin></Label>
+                        <Label />
+                        <Label alignment="CENTER" style="-fx-font-weight: bold;" text="City with lowest average price per apartment:" textFill="#093400">
+                            <VBox.margin>
+                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                            </VBox.margin></Label>
+                        <Label fx:id="cityLowestPrice" alignment="CENTER" style="-fx-font-weight: bold;" textFill="#093400" visible="false">
+                            <VBox.margin>
+                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                            </VBox.margin></Label>
+                        <Label />
                     </VBox>
                     <Separator orientation="VERTICAL" />
                     <HBox fx:id="hboxPriceButton" alignment="CENTER">

@@ -1,5 +1,6 @@
 package it.unipi.erasmusnest.controllers;
 
+import it.unipi.erasmusnest.dbconnectors.ConsistencyManager;
 import it.unipi.erasmusnest.graphicmanagers.AlertDialogGraphicManager;
 import it.unipi.erasmusnest.model.Apartment;
 import it.unipi.erasmusnest.graphicmanagers.MapGraphicManager;
@@ -117,52 +118,31 @@ public class ApartmentController extends Controller{
 
         likeButton.setDisable(!getSession().isLogged());
         apartment = getMongoConnectionManager().getApartment(getSession().getApartmentId());
-        System.out.println("Apartment: "+apartment);
         if(apartment==null){
             // If apartment is null seems that the apartment has been removed from Mongo
             // and so need to be removed also from Neo4j
-            if(getNeo4jConnectionManager().removeApartment(getSession().getApartmentId()))
-            {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Information Dialog");
-                alert.setHeaderText(null);
-                alert.setContentText("Apartment not available");
 
-                // Aggiungi un pulsante "OK"
-                ButtonType okButton = new ButtonType("Back to search");
-                alert.getButtonTypes().setAll(okButton);
+            new ConsistencyManager(getMongoConnectionManager(), getNeo4jConnectionManager()).removeApartmentFromNeo4J(getSession().getApartmentId());
 
-                // Gestisci l'azione del pulsante "OK"
-                alert.setOnCloseRequest(event -> {
-                    // Qui puoi aggiungere il codice per reindirizzare a un'altra pagina
-                    cleanAverageRatingInSession();
-                    super.changeWindow("apartments");
-                });
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Information Dialog");
+            alert.setHeaderText(null);
+            alert.setContentText("Apartment not available");
 
-                // Mostra la finestra di dialogo
-                alert.showAndWait();
-            }
-            else
-            {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Information Dialog");
-                alert.setHeaderText(null);
-                alert.setContentText("Impossible to remove the apartment from Neo4j");
+            // Aggiungi un pulsante "OK"
+            ButtonType okButton = new ButtonType("Back to search");
+            alert.getButtonTypes().setAll(okButton);
 
-                // Aggiungi un pulsante "OK"
-                ButtonType okButton = new ButtonType("Back to search");
-                alert.getButtonTypes().setAll(okButton);
+            // Gestisci l'azione del pulsante "OK"
+            alert.setOnCloseRequest(event -> {
+                // Qui puoi aggiungere il codice per reindirizzare a un'altra pagina
+                cleanAverageRatingInSession();
+                super.changeWindow("apartments");
+            });
 
-                // Gestisci l'azione del pulsante "OK"
-                alert.setOnCloseRequest(event -> {
-                    // Qui puoi aggiungere il codice per reindirizzare a un'altra pagina
-                    cleanAverageRatingInSession();
-                    super.changeWindow("apartments");
-                });
+            // Mostra la finestra di dialogo
+            alert.showAndWait();
 
-                // Mostra la finestra di dialogo
-                alert.showAndWait();
-            }
         }
         else
         {

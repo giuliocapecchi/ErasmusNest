@@ -104,18 +104,28 @@ public class ProfileController extends Controller{
                     HBox apartmentBox = new HBox();
 
                     ImageView apartmentImage = new ImageView();
-                    apartmentImage.setFitHeight(100);
-                    apartmentImage.setFitWidth(100);
                     apartmentImage.setPreserveRatio(true);
-                    // apartmentImage.setPreserveRatio(false);
-                    //String imageUrl = apartment.getImageURLs() != null && !apartment.getImageURLs().isEmpty() ? apartment.getImageURLs() : "https://hips.hearstapps.com/hmg-prod/images/lago-di-montagna-cervinia-1628008263.jpg";
 
-                    String imageUrl = apartment.getImageURLs().get(0);
-                    if (imageUrl == null || imageUrl.isEmpty()) {
-                        imageUrl = "https://hips.hearstapps.com/hmg-prod/images/lago-di-montagna-cervinia-1628008263.jpg";
+                    String imageUrl = null;
+                    if(apartment.getImageURLs()!=null && !apartment.getImageURLs().isEmpty()){
+                        imageUrl = apartment.getImageURLs().get(0);
                     }
-                    Image image = new Image(imageUrl, true);
-                    apartmentImage.setImage(image);
+                    String noImageAvaialblePath = "/media/no_photo_available.png";
+                    if(imageUrl==null || imageUrl.isEmpty()){
+                        apartmentImage.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvaialblePath))));
+                    }else{
+                        Image image;
+                        try{
+                            image = new Image(imageUrl,true); // può fallire se il link è non valido
+                        }catch (Exception e) {
+                            System.out.println("not valid URL for the image");
+                            image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvaialblePath)));
+                        }
+                        apartmentImage.setImage(image);
+                    }
+
+                    apartmentImage.setSmooth(true);
+                    apartmentImage.fitWidthProperty().bind(apartmentBox.widthProperty().multiply(0.4));
 
                     Button apartmentButton = new Button();
                     apartmentButton.setText(apartment.getName());
