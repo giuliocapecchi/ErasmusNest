@@ -1,6 +1,7 @@
 package it.unipi.erasmusnest.controllers;
 
 import com.dlsc.gemsfx.EmailField;
+import it.unipi.erasmusnest.consistency.RedisConsistencyManager;
 import it.unipi.erasmusnest.consistency.RedisMongoConsistencyManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -142,11 +143,15 @@ public class LoginController extends Controller{
                 String mongoPassword = getMongoConnectionManager().getPassword(emailField.getEmailAddress());
                 System.out.println("MongoDB Password: " + mongoPassword);
 
-                // TODO la scrittura su Redis non dovrebbere essere gestita da thread?
+                // TODO qui ho fatto in modo che la W su Redis sia gestita da thread
                 if(mongoPassword != null && mongoPassword.equals(passwordField.getText())) {
                     getSession().setLogged(true);
                     getSession().getUser().setEmail(emailField.getEmailAddress());
                     super.getRedisConnectionManager().addUser(emailField.getEmailAddress(), passwordField.getText());
+
+                    new RedisConsistencyManager(getRedisConnectionManager())
+                            .addUserOnRedis(emailField.getEmailAddress(), passwordField.getText());
+
                     getSession().setLogged(true);
                 }else{
                     showErrorMessage("Invalid email or password", errorTextFlow);

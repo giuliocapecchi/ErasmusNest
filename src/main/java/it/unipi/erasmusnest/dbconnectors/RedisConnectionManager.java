@@ -180,7 +180,9 @@ public class RedisConnectionManager extends ConnectionManager{
     // CREATE
 
     // TODO
-    public void addUser(String email, String password) {
+    public boolean addUser(String email, String password) {
+
+        boolean added = false;
 
         try(JedisPooled jedis = new JedisPooled(super.getHost(), super.getPort())) {
 
@@ -199,12 +201,14 @@ public class RedisConnectionManager extends ConnectionManager{
             // set expiration time on the key equal to the seconds
             jedis.expire(key, seconds);
 
+            added = true;
+
         } catch (Exception e) {
             System.out.println("Connection problem: " + e.getMessage());
             // Commentoo altrimenti crasha
             // new AlertDialogGraphicManager("Redis connection failed").show();
         }
-
+        return added;
     }
 
 
