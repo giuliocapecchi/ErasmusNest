@@ -36,44 +36,21 @@ public class MongoConnectionManager extends ConnectionManager{
             if (userDocument == null) {
                 return null;
             }
-
-            // Object houseObject = userDocument.get("house");
-
-            // Set the user's email, password, name and surname
             user.setEmail(userDocument.getString("email"));
-            user.setPassword(userDocument.getString("password"));
             user.setName(userDocument.getString("first_name"));
             user.setSurname(userDocument.getString("last_name"));
             if(userDocument.containsKey("study_field") && userDocument.get("study_field")!=null)
                 user.setStudyField(userDocument.getString("study_field"));
-            // Retrieve the list of preferred cities
-            /*
-            ArrayList<String> preferredCities = new ArrayList<>();
-            Object preferredCitiesObject = userDocument.get("CoI");
-            if(preferredCitiesObject instanceof List<?>)
-            {
-                for(Object o : (List<?>) preferredCitiesObject)
-                {
-                    preferredCities.add((String) o);
-                }
-            }
-            user.setPreferredCities(preferredCities);
-            */
-            //LOgica per controllare se document o list
-            // Check if the document house exists and is not empty
             if(userDocument.containsKey("houses") && userDocument.get("houses")!=null)
             {
-                System.out.println("\n\n\nHouse document found.");
                 ArrayList<Document> houseArray = (ArrayList<Document>) userDocument.get("houses");
                 if(houseArray!=null && !houseArray.isEmpty()) {
                     ArrayList<Apartment> houses = new ArrayList<>();
                     for(Document d : houseArray)
                     {
                         String id = d.getObjectId("object_id").toHexString();
-                        System.out.println("\n\n\nID: " + id);
                         Apartment casa = new Apartment(id, d.getString("house_name"));
                         String imageURL = d.getString("picture_url");
-                        System.out.println("\n\n\nImageURL: " + imageURL);
                         if(imageURL!=null && !imageURL.isEmpty()) {
                             ArrayList<String> urlList = new ArrayList<>();
                             urlList.add(imageURL);
@@ -306,7 +283,8 @@ public class MongoConnectionManager extends ConnectionManager{
                         .append("accommodates", apartment.getMaxAccommodates())
                         .append("bathrooms", apartment.getBathrooms())
                         .append("price", apartment.getDollarPriceMonth())
-                        .append("position", Arrays.asList(apartment.getLocation().getX(), apartment.getLocation().getY()));
+                        .append("position", Arrays.asList(apartment.getLocation().getX(), apartment.getLocation().getY()))
+                        .append("city", apartment.getCity());
                 // OPTIONAL: DESCRIPTION E PICTUREURL
                 String description = apartment.getDescription();
                 if(description!=null && !description.isEmpty() && !description.isBlank()) {

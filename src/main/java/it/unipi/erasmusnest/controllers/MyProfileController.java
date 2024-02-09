@@ -190,11 +190,7 @@ public class MyProfileController extends Controller {
 
     public TitledPane createTitledPane(List<String> userCities){
         GridPane gridPane = new GridPane();
-        if(getSession().getCities() == null || getSession().getCities().isEmpty()){
-            getSession().setCities(getNeo4jConnectionManager().getAllCities());
-        }
         selectedCitiesOfInterest.addAll(citiesOfInterestInNeo4j); // selected cities of interest lo uso per gestire quando abilitare il tasto di upload
-
         System.out.println("cities of interest in neo4j: "+citiesOfInterestInNeo4j);
         System.out.println("selected cities of interest: "+selectedCitiesOfInterest);
 

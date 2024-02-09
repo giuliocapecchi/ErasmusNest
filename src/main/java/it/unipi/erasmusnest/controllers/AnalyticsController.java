@@ -66,7 +66,7 @@ public class AnalyticsController extends Controller {
         vboxPriceOutput.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.4));
         vboxPositionOutput.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.4));
         hboxPriceButton.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.1));
-        citySplitComboBox.getItems().addAll(getNeo4jConnectionManager().getAllCities());
+        citySplitComboBox.getItems().addAll(getSession().getCities());
         citySplitComboBox.getItems().add("None");
         distanceSlider.valueProperty().addListener((observable, oldValue, newValue) ->
                 valueLabel.setText("Chosen distance from center: "+String.format("%.2f", newValue.doubleValue())+" km"));
@@ -124,7 +124,7 @@ public class AnalyticsController extends Controller {
             double result = getMongoConnectionManager().averagePriceNearCityCenter(city, distance);
             outputPositionTextArea.setText("City: "+city +"\nDistance from center: "+String.format("%.2f", distanceSlider.getValue())+" km\nAverage price: "+ result);
         }else{
-            System.out.println(" Distance: " + distance);
+            System.out.println("Distance: " + distance);
             outputPositionTextArea.setText("");
             List<Map<String, Object>> result =  getMongoConnectionManager().averagePriceNearCityCenterForEachCity(distance);
             for (Map<String, Object> map : result) {
