@@ -306,7 +306,8 @@ public class MongoConnectionManager extends ConnectionManager{
                         .append("accommodates", apartment.getMaxAccommodates())
                         .append("bathrooms", apartment.getBathrooms())
                         .append("price", apartment.getDollarPriceMonth())
-                        .append("position", Arrays.asList(apartment.getLocation().getX(), apartment.getLocation().getY()));
+                        .append("position", Arrays.asList(apartment.getLocation().getX(), apartment.getLocation().getY()))
+                        .append("city", apartment.getCity());
                 // OPTIONAL: DESCRIPTION E PICTUREURL
                 String description = apartment.getDescription();
                 if(description!=null && !description.isEmpty() && !description.isBlank()) {
