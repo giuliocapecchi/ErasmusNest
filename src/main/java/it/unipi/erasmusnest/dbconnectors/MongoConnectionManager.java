@@ -10,9 +10,7 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
 
 import static com.mongodb.client.model.Filters.*;
@@ -93,7 +91,9 @@ public class MongoConnectionManager extends ConnectionManager{
         return user;
     }
 
-    public void averagePriceNearCityCenter(String cityName, Point2D cityPosition, int maxDistance) {
+
+//TODO: da LASCIARE, PER CAPE
+    /*public void averagePriceNearCityCenter(String cityName, Point2D cityPosition, int maxDistance) {
         try (MongoClient mongoClient = MongoClients.create("mongodb://" + super.getHost() + ":" + super.getPort())) {
             MongoDatabase database = mongoClient.getDatabase("TEMP");
             MongoCollection<Document> apartmentsCollection = database.getCollection("apartments");
@@ -117,6 +117,172 @@ public class MongoConnectionManager extends ConnectionManager{
             for (Document doc : result) {
                 System.out.println(doc.toJson());
             }
+        }
+    }*/
+
+    public Double averagePriceNearCityCenter(String cityName, int maxDistance) {
+        try (MongoClient mongoClient = MongoClients.create("mongodb://" + super.getHost() + ":" + super.getPort())) {
+            MongoDatabase database = mongoClient.getDatabase("TEMP");
+            MongoCollection<Document> apartmentsCollection = database.getCollection("apartments");
+            AggregateIterable<Document> result = apartmentsCollection.aggregate(Arrays.asList(new Document("$match",
+                            new Document("city", cityName)),
+                    new Document("$group",
+                            new Document("_id", "$city")
+                                    .append("avgLat",
+                                            new Document("$avg",
+                                                    new Document("$arrayElemAt", Arrays.asList("$position", 0L))))
+                                    .append("avgLon",
+                                            new Document("$avg",
+                                                    new Document("$arrayElemAt", Arrays.asList("$position", 1L))))
+                                    .append("apartments",
+                                            new Document("$push", "$$ROOT"))),
+                    new Document("$unwind", "$apartments"),
+                    new Document("$set",
+                            new Document("apartments.lat2",
+                                    new Document("$degreesToRadians", "$avgLat"))
+                                    .append("apartments.lon2",
+                                            new Document("$degreesToRadians", "$avgLon"))
+                                    .append("apartments.lat1",
+                                            new Document("$degreesToRadians",
+                                                    new Document("$arrayElemAt", Arrays.asList("$apartments.position", 0L))))
+                                    .append("apartments.lon1",
+                                            new Document("$degreesToRadians",
+                                                    new Document("$arrayElemAt", Arrays.asList("$apartments.position", 1L))))),
+                    new Document("$set",
+                            new Document("apartments.distance",
+                                    new Document("$let",
+                                            new Document("vars",
+                                                    new Document("earthRadius", 6371L * 1000L)
+                                                            .append("deltaLat",
+                                                                    new Document("$subtract", Arrays.asList("$apartments.lat2", "$apartments.lat1")))
+                                                            .append("deltaLon",
+                                                                    new Document("$subtract", Arrays.asList("$apartments.lon2", "$apartments.lon1"))))
+                                                    .append("in",
+                                                            new Document("$multiply", Arrays.asList("$$earthRadius",
+                                                                    new Document("$atan2", Arrays.asList(new Document("$sqrt",
+                                                                                    new Document("$add", Arrays.asList(new Document("$pow", Arrays.asList("$$deltaLat", 2L)),
+                                                                                            new Document("$multiply", Arrays.asList(new Document("$cos",
+                                                                                                            new Document("$divide", Arrays.asList(new Document("$add", Arrays.asList("$apartments.lat1", "$apartments.lat2")), 2L))),
+                                                                                                    new Document("$pow", Arrays.asList("$$deltaLon", 2L))))))),
+                                                                            new Document("$sqrt",
+                                                                                    new Document("$add", Arrays.asList(new Document("$cos", "$apartments.lat1"),
+                                                                                            new Document("$cos", "$apartments.lat2"),
+                                                                                            new Document("$multiply", Arrays.asList(new Document("$cos", "$$deltaLon"),
+                                                                                                    new Document("$cos",
+                                                                                                            new Document("$divide", Arrays.asList(new Document("$add", Arrays.asList("$apartments.lat1", "$apartments.lat2")), 2L)))))))))))))))),
+                    new Document("$project",
+                            new Document("apartments.distance", 1L)
+                                    .append("apartments.price", 1L)
+                                    .append("apartments.position", 1L)
+                                    .append("apartments.name", 1L)
+                                    .append("apartments.city", 1L)),
+                    new Document("$match",
+                            new Document("apartments.distance",
+                                    new Document("$lte", maxDistance))),
+                    new Document("$group",
+                            new Document("_id", "$_id")
+                                    .append("avgPrice",
+                                            new Document("$avg", "$apartments.price"))),
+                    new Document("$project",
+                            new Document("_id", 1L)
+                                    .append("avgPrice",
+                                            new Document("$round", Arrays.asList("$avgPrice", 2L))))));
+
+
+            for (Document doc : result) {
+                System.out.println(doc.toJson());
+                return doc.getDouble("avgPrice");
+            }
+        }
+        return null;
+    }
+
+
+
+    public List<Map<String, Object>> averagePriceNearCityCenterForEachCity(int distance) {
+        try (MongoClient mongoClient = MongoClients.create("mongodb://" + super.getHost() + ":" + super.getPort())) {
+            MongoDatabase database = mongoClient.getDatabase("TEMP");
+            MongoCollection<Document> apartmentsCollection = database.getCollection("apartments");
+            AggregateIterable<Document> result = apartmentsCollection.aggregate(Arrays.asList(new Document("$group",
+                            new Document("_id", "$city")
+                                    .append("avgLat",
+                                            new Document("$avg",
+                                                    new Document("$arrayElemAt", Arrays.asList("$position", 0L))))
+                                    .append("avgLon",
+                                            new Document("$avg",
+                                                    new Document("$arrayElemAt", Arrays.asList("$position", 1L))))
+                                    .append("apartments",
+                                            new Document("$push", "$$ROOT"))),
+                    new Document("$unwind", "$apartments"),
+                    new Document("$set",
+                            new Document("apartments.lat2",
+                                    new Document("$degreesToRadians", "$avgLat"))
+                                    .append("apartments.lon2",
+                                            new Document("$degreesToRadians", "$avgLon"))
+                                    .append("apartments.lat1",
+                                            new Document("$degreesToRadians",
+                                                    new Document("$arrayElemAt", Arrays.asList("$apartments.position", 0L))))
+                                    .append("apartments.lon1",
+                                            new Document("$degreesToRadians",
+                                                    new Document("$arrayElemAt", Arrays.asList("$apartments.position", 1L))))),
+                    new Document("$set",
+                            new Document("apartments.distance",
+                                    new Document("$let",
+                                            new Document("vars",
+                                                    new Document("earthRadius", 6371L * 1000L)
+                                                            .append("deltaLat",
+                                                                    new Document("$subtract", Arrays.asList("$apartments.lat2", "$apartments.lat1")))
+                                                            .append("deltaLon",
+                                                                    new Document("$subtract", Arrays.asList("$apartments.lon2", "$apartments.lon1"))))
+                                                    .append("in",
+                                                            new Document("$multiply", Arrays.asList("$$earthRadius",
+                                                                    new Document("$atan2", Arrays.asList(new Document("$sqrt",
+                                                                                    new Document("$add", Arrays.asList(new Document("$pow", Arrays.asList("$$deltaLat", 2L)),
+                                                                                            new Document("$multiply", Arrays.asList(new Document("$cos",
+                                                                                                            new Document("$divide", Arrays.asList(new Document("$add", Arrays.asList("$apartments.lat1", "$apartments.lat2")), 2L))),
+                                                                                                    new Document("$pow", Arrays.asList("$$deltaLon", 2L))))))),
+                                                                            new Document("$sqrt",
+                                                                                    new Document("$add", Arrays.asList(new Document("$cos", "$apartments.lat1"),
+                                                                                            new Document("$cos", "$apartments.lat2"),
+                                                                                            new Document("$multiply", Arrays.asList(new Document("$cos", "$$deltaLon"),
+                                                                                                    new Document("$cos",
+                                                                                                            new Document("$divide", Arrays.asList(new Document("$add", Arrays.asList("$apartments.lat1", "$apartments.lat2")), 2L)))))))))))))))),
+                    new Document("$project",
+                            new Document("apartments.distance", 1L)
+                                    .append("apartments.price", 1L)
+                                    .append("apartments.position", 1L)
+                                    .append("apartments.name", 1L)
+                                    .append("apartments.city", 1L)),
+                    new Document("$match",
+                            new Document("apartments.distance",
+                                    new Document("$lte", distance))),
+                    new Document("$group",
+                            new Document("_id", "$_id")
+                                    .append("avgPrice",
+                                            new Document("$avg", "$apartments.price"))),
+                    new Document("$project",
+                            new Document("_id", 1L)
+                                    .append("avgPrice",
+                                            new Document("$round", Arrays.asList("$avgPrice", 2L)))))
+
+            );
+
+            List<Map<String, Object>> cityPrices = new ArrayList<>();
+            for (Document doc : result) {
+                System.out.println(doc.toJson());
+                String city = doc.getString("_id");
+                double avgPrice = doc.getDouble("avgPrice");
+                Map<String, Object> cityPriceMap = new HashMap<>();
+                cityPriceMap.put("city", city);
+                cityPriceMap.put("avgPrice", avgPrice);
+                cityPrices.add(cityPriceMap);
+            }
+            return cityPrices;
+        }catch (Exception e){
+            e.printStackTrace();
+            new AlertDialogGraphicManager("MongoDB connection failed").show();
+            System.out.println("Error in averagePriceNearCityCenterForEachCity: " + e.getMessage());
+            return null;
         }
     }
 

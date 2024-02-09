@@ -83,7 +83,7 @@
 
                     </VBox>
                     <Separator orientation="VERTICAL" />
-                    <VBox fx:id="vboxPositionOutput" prefHeight="129.0" prefWidth="499.0">
+                    <VBox fx:id="vboxPositionOutput">
                         <Label alignment="CENTER" style="-fx-font-weight: bold;" text="Output:" textFill="#093400">
                             <VBox.margin>
                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
