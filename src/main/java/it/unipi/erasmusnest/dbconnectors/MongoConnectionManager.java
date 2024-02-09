@@ -10,6 +10,7 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
+import java.awt.*;
 import java.util.*;
 import java.util.List;
 
@@ -123,7 +124,7 @@ public class MongoConnectionManager extends ConnectionManager{
 
     public Double averagePriceNearCityCenter(String cityName, int maxDistance) {
         try (MongoClient mongoClient = MongoClients.create("mongodb://" + super.getHost() + ":" + super.getPort())) {
-            MongoDatabase database = mongoClient.getDatabase("TEMP");
+            MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
             MongoCollection<Document> apartmentsCollection = database.getCollection("apartments");
             AggregateIterable<Document> result = apartmentsCollection.aggregate(Arrays.asList(new Document("$match",
                             new Document("city", cityName)),
@@ -202,7 +203,7 @@ public class MongoConnectionManager extends ConnectionManager{
 
     public List<Map<String, Object>> averagePriceNearCityCenterForEachCity(int distance) {
         try (MongoClient mongoClient = MongoClients.create("mongodb://" + super.getHost() + ":" + super.getPort())) {
-            MongoDatabase database = mongoClient.getDatabase("TEMP");
+            MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
             MongoCollection<Document> apartmentsCollection = database.getCollection("apartments");
             AggregateIterable<Document> result = apartmentsCollection.aggregate(Arrays.asList(new Document("$group",
                             new Document("_id", "$city")
@@ -305,7 +306,7 @@ public class MongoConnectionManager extends ConnectionManager{
                         .append("accommodates", apartment.getMaxAccommodates())
                         .append("bathrooms", apartment.getBathrooms())
                         .append("price", apartment.getDollarPriceMonth())
-                        .append("position", apartment.getLocation().getX() + ", " + apartment.getLocation().getY());
+                        .append("position", Arrays.asList(apartment.getLocation().getX(), apartment.getLocation().getY()));
                 // OPTIONAL: DESCRIPTION E PICTUREURL
                 String description = apartment.getDescription();
                 if(description!=null && !description.isEmpty() && !description.isBlank()) {
@@ -360,11 +361,10 @@ public class MongoConnectionManager extends ConnectionManager{
             ObjectId id = new ObjectId(apartmentId);
             Document apartment = collection.find(eq("_id", id)).first();
             if(apartment!=null) {
-                String coordinates = apartment.getString("position");
-                // remove space from coordinates
-                coordinates = coordinates.replaceAll("\\s","");
-                // split coordinates in latitude and longitude that are separated by ','
-                String[] latLong = coordinates.split(",");
+               // String coordinates = apartment.getString("position");
+                List<Double> coordinates = apartment.getList("position", Double.class);
+                Point2D coordinatesPoint = new Point2D(coordinates.get(0), coordinates.get(1));
+
                 ArrayList<String> picURLs = new ArrayList<>();
                 if(apartment.get("picture_url")!=null)
                     picURLs = apartment.get("picture_url",ArrayList.class);
@@ -375,7 +375,7 @@ public class MongoConnectionManager extends ConnectionManager{
                         apartment.getString("house_name"),
                         //description,
                         apartment.getString("description"),
-                        new Point2D(Double.parseDouble(latLong[0]), Double.parseDouble(latLong[1])),
+                        coordinatesPoint,
                         apartment.getInteger("price"),
                         apartment.getInteger("accommodates"),
                         apartment.getString("email"),
