@@ -710,4 +710,47 @@ public class MongoConnectionManager extends ConnectionManager{
         return resultString;
     }
 
+    public HashMap<Point2D, Double> getHeatmap(String city) {
+        try (MongoClient mongoClient = MongoClients.create("mongodb://" + super.getHost() + ":" + super.getPort())) {
+            MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
+            MongoCollection<Document> apartmentsCollection = database.getCollection("apartments");
+            AggregateIterable<Document> result = apartmentsCollection.aggregate(Arrays.asList(new Document("$match",
+                            new Document("city", city)),
+                    new Document("$project",
+                            new Document("position", 1L)),
+                    new Document("$addFields",
+                            new Document("cell",
+                                    new Document("$concat", Arrays.asList(new Document("$toString",
+                                                    new Document("$trunc",
+                                                            new Document("$multiply", Arrays.asList(10L,
+                                                                    new Document("$arrayElemAt", Arrays.asList("$position", 0L)))))), "_",
+                                            new Document("$toString",
+                                                    new Document("$trunc",
+                                                            new Document("$multiply", Arrays.asList(10L,
+                                                                    new Document("$arrayElemAt", Arrays.asList("$position", 1L)))))))))),
+                    new Document("$group",
+                            new Document("_id", "$cell")
+                                    .append("count",
+                                            new Document("$sum", 1L)))));
+
+
+            HashMap<Point2D, Double> heatmap = new HashMap<>();
+            for (Document doc : result) {
+                String cell = doc.getString("_id");
+                String[] coordinates = cell.split("_");
+                double lat = Double.parseDouble(coordinates[0]);
+                double lon = Double.parseDouble(coordinates[1]);
+                Point2D point = new Point2D(lat, lon);
+                double count = doc.getDouble("count");
+                heatmap.put(point, count);
+            }
+            return heatmap;
+        }catch (Exception e){
+            e.printStackTrace();
+            new AlertDialogGraphicManager("MongoDB connection failed").show();
+            System.out.println("Error in getHeatmap: " + e.getMessage());
+        }
+        return null;
+    }
+
 }
