@@ -56,6 +56,10 @@ public class LoginController extends Controller{
            super.setFirstWindow("login");
         }
 
+        if(getSession().getCities() == null || getSession().getCities().isEmpty()) {
+            getSession().setCities(getNeo4jConnectionManager().getAllCities());
+        }
+
         if(super.getActualWindowName().equals("login")) {
             loginButton.setDisable(true);
             emailField.emailAddressProperty().addListener((observable, oldValue, newValue) -> checkFields());

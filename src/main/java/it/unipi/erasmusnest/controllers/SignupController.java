@@ -49,9 +49,6 @@ public class SignupController extends Controller{
 
     @FXML
     private void initialize() {
-        if(getSession().getCities()==null || getSession().getCities().isEmpty()){
-            getSession().setCities(getNeo4jConnectionManager().getAllCities());
-        }
         signupButton.setDisable(true);
         emailField.emailAddressProperty().addListener((observable, oldValue, newValue) -> checkFields());
         passwordField.textProperty().addListener((observable, oldValue, newValue) -> checkFields());

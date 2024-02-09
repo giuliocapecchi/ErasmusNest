@@ -54,8 +54,6 @@ public class HomepageController extends Controller{
     @FXML
     VBox resultsBox;
 
-    private List<String> cities = new ArrayList<>();
-
     public HomepageController() {
         System.out.println("HomepageController constructor");
         getSession().setCurrent_filter(0);
@@ -70,23 +68,10 @@ public class HomepageController extends Controller{
         resultsBox.maxWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.3));
         title.maxWidthProperty().bind(super.getRootPane().widthProperty());
         logoImageView.fitWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.2));
-        if(getSession().getCities() == null || getSession().getCities().isEmpty()) {
-            cities = getNeo4jConnectionManager().getAllCities();
-            if(cities == null){
-                setFirstWindow("login");
-                getSession().reset();
-                getSession().setConnectionError(true);
-                super.changeWindow("login");
-            }
-        }else{
-            cities = getSession().getCities();
-        }
-
         radioButtonLookForCities.setToggleGroup(toggleGroup);
         radioButtonLookForUsers.setToggleGroup(toggleGroup);
         radioButtonLookForCities.setSelected(true);
         searchUserButton.setVisible(false);
-        getSession().setCities(cities);
 
         if(getSession().isLogged()) {
             System.out.println("User logged");
@@ -119,7 +104,7 @@ public class HomepageController extends Controller{
     private void updateSearchResults(String searchText) {
         resultsBox.getChildren().clear();
 
-        for (String city : cities) {
+        for (String city : getSession().getCities()) {
             if (city.toLowerCase().contains(searchText)) {
                 Hyperlink cityLink = new Hyperlink(city);
                 cityLink.setOnAction(e -> handleCitySelection(city));
