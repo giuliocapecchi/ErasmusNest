@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<StackPane fx:id="rootPane" prefHeight="200" prefWidth="200" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.erasmusnest.controllers.AnalyticsController">
+<StackPane fx:id="rootPane" prefHeight="516.0" prefWidth="722.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.erasmusnest.controllers.AnalyticsController">
     <BorderPane prefHeight="266.0" prefWidth="306.0">
         <top>
             <Label fx:id="title" alignment="CENTER" contentDisplay="CENTER" prefHeight="29.0" prefWidth="121.0" style="-fx-background-color: #ff4700; -fx-font-weight: bold;" text="Admin analytics page" textAlignment="CENTER" textFill="#ffffff" BorderPane.alignment="CENTER" />
@@ -58,7 +58,10 @@
                     </VBox>
                     <Separator orientation="VERTICAL" />
                     <HBox fx:id="hboxPriceButton" alignment="CENTER">
-                        <Button fx:id="priceAnalyticButton" mnemonicParsing="false" onAction="#onPriceAnalyticButton" text="Submit" />
+                        <Button fx:id="priceAnalyticButton" mnemonicParsing="false" onAction="#onPriceAnalyticButton" text="Submit">
+                     <HBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </HBox.margin></Button>
                     </HBox>
                 </HBox>
                 <!--- hbox analytic 2 -->
@@ -66,11 +69,34 @@
                     <VBox.margin>
                         <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
                     </VBox.margin>
-                    <VBox fx:id="vboxQueryPosition">
-                        <Label alignment="CENTER" style="-fx-font-weight: bold;" text="Query: find position" textFill="#093400">
+                    <VBox fx:id="vboxQueryPosition" alignment="CENTER" prefHeight="129.0" prefWidth="154.0">
+                        <Label alignment="CENTER" style="-fx-font-weight: bold;" text="Calculate average price, with a given distance from the city center" textFill="#093400" wrapText="true">
                             <VBox.margin>
                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                            </VBox.margin></Label>
+                            </VBox.margin>
+                            <tooltip>
+                                <Tooltip text="This will calculate the average price of apartments, within a given distance from the city center. City center is given by Neo4j, since it doesn't change it's a constant parameter." />
+                            </tooltip>
+                        </Label>
+                  <ComboBox fx:id="citySplitComboBox" promptText="Choose a city">
+                    <items>
+                      <!-- SplitMenuButton items, dynamically added -->
+                    </items>
+                     <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </VBox.margin>
+                  </ComboBox>
+                        <Slider fx:id="distanceSlider" blockIncrement="0.1" majorTickUnit="10" max="80" minorTickCount="4" showTickLabels="true" showTickMarks="true" value="40">
+                            <VBox.margin>
+                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                            </VBox.margin>
+                        </Slider>
+                        <Label fx:id="valueLabel">
+                        <VBox.margin>
+                            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                        </VBox.margin>
+                        </Label>
+
                     </VBox>
                     <Separator orientation="VERTICAL" />
                     <VBox fx:id="vboxPositionOutput">
@@ -78,14 +104,17 @@
                             <VBox.margin>
                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                             </VBox.margin></Label>
-                        <TextArea fx:id="outputPositionTextArea" editable="false" prefWidth="71.0">
+                        <TextArea fx:id="outputPositionTextArea" editable="false">
                             <VBox.margin>
                                 <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
                             </VBox.margin></TextArea>
                     </VBox>
                     <Separator orientation="VERTICAL" />
                     <HBox fx:id="hboxPositionButton" alignment="CENTER">
-                        <Button fx:id="PositionAnalyticButton" mnemonicParsing="false" onAction="#onPositionAnalyticButton" text="Submit" />
+                        <Button fx:id="PositionAnalyticButton" mnemonicParsing="false" onAction="#onPositionAnalyticButton" text="Submit">
+                     <HBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </HBox.margin></Button>
                     </HBox>
                 </HBox>
 

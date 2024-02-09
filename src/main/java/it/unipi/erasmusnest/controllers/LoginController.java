@@ -1,16 +1,13 @@
 package it.unipi.erasmusnest.controllers;
 
 import com.dlsc.gemsfx.EmailField;
-import it.unipi.erasmusnest.model.Session;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.image.ImageView;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
-import org.mindrot.jbcrypt.BCrypt;
 
-import java.io.IOException;
 import java.util.Objects;
 
 public class LoginController extends Controller{

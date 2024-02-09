@@ -2,17 +2,20 @@ package it.unipi.erasmusnest.controllers;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.json.JSONException;
 import org.json.JSONObject;
+import java.util.List;
+import java.util.Map;
 
 public class AnalyticsController extends Controller {
 
+    @FXML
+    Label valueLabel;
+    @FXML
+    TextArea outputPriceTextArea;
     @FXML
     TextArea outputPositionTextArea;
     @FXML
@@ -49,6 +52,10 @@ public class AnalyticsController extends Controller {
     Label cityHighestPrice;
     @FXML
     Label cityLowestPrice;
+    @FXML
+    Slider distanceSlider;
+    @FXML
+    ComboBox<String> citySplitComboBox;
 
     @FXML
     private void initialize() {
@@ -59,6 +66,10 @@ public class AnalyticsController extends Controller {
         vboxPriceOutput.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.4));
         vboxPositionOutput.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.4));
         hboxPriceButton.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.1));
+        citySplitComboBox.getItems().addAll(getNeo4jConnectionManager().getAllCities());
+        citySplitComboBox.getItems().add("None");
+        distanceSlider.valueProperty().addListener((observable, oldValue, newValue) ->
+                valueLabel.setText("Chosen distance from center: "+String.format("%.2f", newValue.doubleValue())+" km"));
 
     }
 
@@ -104,9 +115,20 @@ public class AnalyticsController extends Controller {
     }
 
     @FXML
-    void onPositionAnalyticButton(ActionEvent actionEvent) {
-        System.out.println("\n>>>Position analytics button pressed\n");
+    void onPositionAnalyticButton() {
+        System.out.println("\n>>>Distance from center average price analytics button pressed\n");
+        int distance = (int)(distanceSlider.getValue()*1000);
+        String city = citySplitComboBox.getValue();
+        if(city != null && !city.equals("None")){
+            System.out.println("City selected: " + city);
+            double result = getMongoConnectionManager().averagePriceNearCityCenter(city, distance);
+            outputPositionTextArea.setText("City: "+city +"\nDistance from center: "+String.format("%.2f", distanceSlider.getValue())+" km\nAverage price: "+ result);
+        }else{
+            System.out.println(" Distance: " + distance);
+            List<Map<String, Object>> result =  getMongoConnectionManager().averagePriceNearCityCenterForEachCity(distance);
+            for (Map<String, Object> map : result) {
+                outputPositionTextArea.appendText(map.get("city") + ": \t" + map.get("avgPrice") + "\n");
+            }
+        }
     }
-
-
 }
