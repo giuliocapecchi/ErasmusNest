@@ -46,9 +46,6 @@ public class SignupController extends Controller{
 
     private final ArrayList<String> selectedCities = new ArrayList<>();
 
-    @FXML
-    private VBox cityVBox;
-
 
     @FXML
     private void initialize() {
@@ -62,11 +59,6 @@ public class SignupController extends Controller{
         nameField.textProperty().addListener((observable, oldValue, newValue) -> checkFields());
         surnameField.textProperty().addListener((observable, oldValue, newValue) -> checkFields());
         studiesComboBox.valueProperty().addListener((observable, oldValue, newValue) -> checkFields());
-
-        TitledPane preferredCitiesPane = createTitledPane();
-
-        cityVBox.getChildren().add(preferredCitiesPane);
-
         for(String studyField : getSession().getStudyFields()){
             studiesComboBox.getItems().add(studyField);
         }
@@ -79,34 +71,7 @@ public class SignupController extends Controller{
         backButton.maxWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.3));
         errorTextFlow.maxWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.5));
         studiesComboBox.maxWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.3));
-        preferredCitiesPane.maxWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.3));
-        preferredCitiesPane.setPadding(new Insets(10, 10, 10, 10));
     }
-
-    public TitledPane createTitledPane() {
-        GridPane gridPane = new GridPane();
-        List<String> cities = getSession().getCities();
-
-        for(String city : cities)
-        {
-            CheckBox mainCheckBox = new CheckBox(city);
-            mainCheckBox.setText(city);
-            mainCheckBox.setOnAction(e -> {
-                if (mainCheckBox.isSelected()) {
-                    selectedCities.add(mainCheckBox.getText());
-                } else {
-                    selectedCities.remove(mainCheckBox.getText());
-                }
-            });
-            gridPane.add(mainCheckBox, 0, cities.indexOf(city));
-        }
-
-        TitledPane titledPane = new TitledPane("Cities interested in", gridPane);
-        titledPane.setExpanded(false);
-
-        return titledPane;
-    }
-
 
     @FXML
     protected void checkFields() {

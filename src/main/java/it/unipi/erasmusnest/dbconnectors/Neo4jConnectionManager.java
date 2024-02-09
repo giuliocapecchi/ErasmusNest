@@ -576,7 +576,7 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
 
     public boolean likeApartment(String id, String email) {
         boolean result = false;
-        if (!getFavourites(email).containsKey(id)) {
+        if (!likeExists(id, email)) {
             try (Session session = driver.session()) {
                 session.writeTransaction((TransactionWork<Void>) tx -> {
                     tx.run(
@@ -595,6 +595,23 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
             }
         }
         return result;
+    }
+
+    private boolean likeExists(String id, String email) {
+        try (Session session = driver.session()) {
+            return session.readTransaction(tx -> {
+                HashMap<String, Object> parameters = new HashMap<>();
+                parameters.put("email", email);
+                parameters.put("id", id);
+                Result result = tx.run("MATCH (u:User {email: $email})-[l:LIKES]->(a:Apartment {apartmentId: $id}) RETURN l",
+                        parameters);
+                return result.hasNext();
+            });
+        } catch (Exception e) {
+            System.out.println("Exception: " + e);
+            new AlertDialogGraphicManager("Neo4j connection failed").show();
+            return false;
+        }
     }
 
     public Map<String, String> getFavourites(String email) {
