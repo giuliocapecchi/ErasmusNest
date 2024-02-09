@@ -29,9 +29,6 @@
             <ComboBox fx:id="studiesComboBox" promptText="select one" GridPane.columnIndex="1" GridPane.rowIndex="6" />
 
         </GridPane>
-        <VBox fx:id="cityVBox" alignment="CENTER" >
-            <!-- Qui verranno inserite le checkbox -->
-        </VBox>
         <VBox alignment="CENTER">
             <TextFlow fx:id="errorTextFlow" textAlignment="CENTER"/>
             <VBox.margin>
