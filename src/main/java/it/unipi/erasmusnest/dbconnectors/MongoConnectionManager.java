@@ -97,7 +97,7 @@ public class MongoConnectionManager extends ConnectionManager{
 //TODO: da LASCIARE, PER CAPE
     /*public void averagePriceNearCityCenter(String cityName, Point2D cityPosition, int maxDistance) {
         try (MongoClient mongoClient = MongoClients.create("mongodb://" + super.getHost() + ":" + super.getPort())) {
-            MongoDatabase database = mongoClient.getDatabase("TEMP");
+            MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
             MongoCollection<Document> apartmentsCollection = database.getCollection("apartments");
             AggregateIterable<Document> result = apartmentsCollection.aggregate(
                     Arrays.asList(
