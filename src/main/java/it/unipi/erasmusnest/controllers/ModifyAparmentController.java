@@ -104,15 +104,15 @@ public class ModifyAparmentController extends Controller{
 
     }
 
-    public void onUpdateHouseButtonClick(ActionEvent actionEvent)
+    public void onUpdateHouseButtonClick()
     {
         //Qua deve sparare la query su MONGO per aggiornare i dati dell'appartamento
         String apartmentId = getSession().getApartmentId();
-        Apartment apartment = getMongoConnectionManager().getApartment(apartmentId);
-        apartment.setMaxAccommodates(inputAccommodates.getValue());
-        apartment.setBathrooms(inputBathrooms.getValue());
-        apartment.setDollarPriceMonth(inputPrice.getValue());
-        apartment.setDescription(descriptionTextArea.getText());
+        Apartment updatedApartment = getMongoConnectionManager().getApartment(apartmentId);
+        updatedApartment.setMaxAccommodates(inputAccommodates.getValue());
+        updatedApartment.setBathrooms(inputBathrooms.getValue());
+        updatedApartment.setDollarPriceMonth(inputPrice.getValue());
+        updatedApartment.setDescription(descriptionTextArea.getText());
         // String imageUrl = textField.getText()==null || textField.getText().isBlank() || textField.getText().isEmpty() ? "" : textField.getText();
         ArrayList<String> pictureUrls = new ArrayList<>();
         for (TextField pictureUrlTextField : pictureUrlsTextField) {
@@ -122,17 +122,17 @@ public class ModifyAparmentController extends Controller{
         //boolean change = false;
         //if(!pictureUrls.get(0).equals(apartment.getImageURLs().get(0)) || apartment.getImageURLs()==null || apartment.getImageURLs().isEmpty())
         //    change = true;
-        apartment.setImageURL(pictureUrls);
+        updatedApartment.setImageURL(pictureUrls);
         System.out.println("\n\n\nIMMAGINI DENTRO ALL'APPARTAMENTO:");
-        for (String s : apartment.getImageURLs()) {
+        for (String s : updatedApartment.getImageURLs()) {
             System.out.println(s);
         }
-        apartment.setId(getSession().getApartmentId());
+        updatedApartment.setId(getSession().getApartmentId());
 
-        if(getMongoConnectionManager().updateApartment(apartment))
+        if(getMongoConnectionManager().updateApartment(apartment,updatedApartment))
         {
 
-            new NeoConsistencyManager(getNeo4jConnectionManager()).updateApartmentImageOnNeo4J(apartment.getId(), apartment.getImageURLs().get(0));
+            new NeoConsistencyManager(getNeo4jConnectionManager()).updateApartmentImageOnNeo4J(updatedApartment.getId(), updatedApartment.getImageURLs().get(0));
 
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Information Dialog");

@@ -525,20 +525,27 @@ public class MongoConnectionManager extends ConnectionManager{
         return availableEmail;
     }
 
-    public boolean updateApartment(Apartment updatedHouse) {
+    public boolean updateApartment(Apartment oldHouse, Apartment updatedHouse) {
         boolean updated = false;
         try (MongoClient mongoClient = MongoClients.create("mongodb://" + super.getHost() + ":" + super.getPort())) {
             MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
             MongoCollection<Document> apartmentsCollection = database.getCollection("apartments");
             MongoCollection<Document> usersCollection = database.getCollection("users");
             // Preparing document for $set operation
-            Document setDocument = new Document()
-                    .append("house_name", updatedHouse.getName())
-                    .append("price", updatedHouse.getDollarPriceMonth())
-                    .append("accommodates", updatedHouse.getMaxAccommodates())
-                    .append("picture_url", updatedHouse.getImageURLs())
-                    .append("bathrooms", updatedHouse.getBathrooms());
-            if (updatedHouse.getDescription() != null && !updatedHouse.getDescription().isBlank()) {
+            Document setDocument = new Document();
+            if (!Objects.equals(updatedHouse.getDollarPriceMonth(), oldHouse.getDollarPriceMonth())) {
+                setDocument.append("price", updatedHouse.getDollarPriceMonth());
+            }
+            if (!Objects.equals(updatedHouse.getMaxAccommodates(), oldHouse.getMaxAccommodates())) {
+                setDocument.append("accommodates", updatedHouse.getMaxAccommodates());
+            }
+            if(updatedHouse.getImageURLs()!=null && !updatedHouse.getImageURLs().isEmpty() && !updatedHouse.getImageURLs().equals(oldHouse.getImageURLs())) {
+                setDocument.append("picture_url", updatedHouse.getImageURLs());
+            }
+            if (!Objects.equals(updatedHouse.getBathrooms(), oldHouse.getBathrooms())) {
+                setDocument.append("bathrooms", updatedHouse.getBathrooms());
+            }
+            if ((!Objects.equals(updatedHouse.getDescription(), oldHouse.getDescription())) && updatedHouse.getDescription() != null && !updatedHouse.getDescription().isBlank()) {
                 setDocument.append("description", updatedHouse.getDescription());
             }
 
@@ -556,6 +563,8 @@ public class MongoConnectionManager extends ConnectionManager{
             if (!unsetDocument.isEmpty()) {
                 updatedHouseDocument.append("$unset", unsetDocument);
             }
+
+            System.out.println("UpdatedHouseDocument: " + updatedHouseDocument.toJson());
 
             // Applica l'operazione di aggiornamento per l'appartamento
             apartmentsCollection.updateOne(Filters.eq("_id", new ObjectId(updatedHouse.getId())), updatedHouseDocument);
