@@ -102,6 +102,7 @@ public class MyProfileController extends Controller {
         // Set the password field with asterisks, one for each character
         passwordField.setText("*".repeat(getSession().getUser().getPassword().length()));
 
+
         // Nascondi il banner/pop-up per la modifica della password all'inizio
         passwordChangeBox.setVisible(false);
         passwordChangeOuterBox.setVisible(false);
@@ -179,6 +180,7 @@ public class MyProfileController extends Controller {
         if (utente.isAdmin()){
             adminButton.setVisible(true);
         }
+        utente.setPassword(getSession().getUser().getPassword());
         getSession().setUser(utente);
     }
 
