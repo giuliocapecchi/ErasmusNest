@@ -99,9 +99,8 @@ public class MyProfileController extends Controller {
         String userEmail = getSession().getUser().getEmail();
 
         User utente = getMongoConnectionManager().findUser(userEmail);
-        System.out.println("USER DELLA MYPROFILE: "+utente.toString());
         // Set the password field with asterisks, one for each character
-        passwordField.setText("*".repeat(utente.getPassword().length()));
+        passwordField.setText("*".repeat(getSession().getUser().getPassword().length()));
 
         // Nascondi il banner/pop-up per la modifica della password all'inizio
         passwordChangeBox.setVisible(false);

@@ -50,12 +50,6 @@ public class MapGraphicManager {
         String content = location.getX()+","+location.getY();
 
         try {
-
-            /*harset charset = StandardCharsets.UTF_8;
-            String actualContent = Files.readString(filePath, charset);
-            actualContent = actualContent.replaceAll(content);
-            Files.write(filePath, actualContent.getBytes(charset));*/
-
             // Create a list with a single line (the new content)
             List<String> lines = Collections.singletonList(content);
 
@@ -70,7 +64,6 @@ public class MapGraphicManager {
     public void prepareHeatmap() {
         // Get the resource URL
         Path filePath = new File(getClass().getResource("/heatmap/locations.txt").getFile()).toPath();
-        System.out.println("ciadopfefjkwfbjkv");
         // Rimuovi il file se esiste già
         if (Files.exists(filePath)) {
             try {

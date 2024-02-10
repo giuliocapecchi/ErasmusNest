@@ -40,7 +40,7 @@ public class WriteReviewController extends Controller{
         submitButton.maxWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.2));
         goToHomepageButton.maxWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.2));
         submitButton.setDisable(true);
-        pageTitle.setText("Write a review for the apartment in "+getSession().getCity()+"."); //TODO change the city with the name of the city
+        pageTitle.setText("Write a review for the apartment in "+getSession().getCity()+".");
 
         int maxCharacters = 999;
         textArea.textProperty().addListener((observable, oldValue, newValue) -> {

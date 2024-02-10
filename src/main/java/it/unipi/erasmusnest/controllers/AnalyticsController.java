@@ -75,10 +75,6 @@ public class AnalyticsController extends Controller {
 
     @FXML
     private void initialize() {
-        //todo rimuovi
-        getSession().setCities(getNeo4jConnectionManager().getAllCities());
-
-
         System.out.println("Analytics controller initialize");
         title.prefWidthProperty().bind(super.getRootPane().widthProperty());
         vboxQueryPrice.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.3));
@@ -169,15 +165,9 @@ public class AnalyticsController extends Controller {
 
     public void onHeatmapButton() throws InterruptedException {
         System.out.println("\n>>>Heatmap button pressed\n");
-      //todo implementare
         String city = citySplitComboBox2.getValue();
         HashMap<Point2D, Integer> heatmapTiles =  getMongoConnectionManager().getHeatmap(city);
-        System.out.println("Heatmap tiles: "+heatmapTiles.size());
-
-        for (Map.Entry<Point2D, Integer> entry : heatmapTiles.entrySet()) {
-            System.out.println("Key: " + entry.getKey() + " Value: " + entry.getValue());
-        }
-
+        //System.out.println("Heatmap tiles: "+heatmapTiles.size());
         MapGraphicManager mapGraphicManager = new MapGraphicManager(heatmapWebView, heatmapTiles);
         mapGraphicManager.prepareHeatmap();
         mapGraphicManager.loadMap("heatmap");
