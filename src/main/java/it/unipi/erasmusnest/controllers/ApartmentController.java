@@ -160,7 +160,7 @@ public class ApartmentController extends Controller{
 
             MapGraphicManager mapGraphicManager = new MapGraphicManager(webView, apartment.getLocation());
             mapGraphicManager.setLocationOnMap();
-            mapGraphicManager.loadMap();
+            mapGraphicManager.loadMap("map");
             double ratio = 0.5; // 50% of the width
             firstHBox.prefHeightProperty().bind(centerVBox.heightProperty().multiply(ratio));
             secondHBox.prefHeightProperty().bind(centerVBox.heightProperty().multiply(ratio));

@@ -20,10 +20,14 @@
                             <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
                         </VBox.margin>
                         <VBox fx:id="vboxQueryPrice">
-                            <Label alignment="CENTER" style="-fx-font-weight: bold;" text="Query: find price with filters" textFill="#093400">
+                            <Label alignment="CENTER" style="-fx-font-weight: bold;" text="Find cities with maximum and minimum average price" textFill="#093400" wrapText="true">
                                 <VBox.margin>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                </VBox.margin></Label>
+                                </VBox.margin>
+                                <tooltip>
+                                    <Tooltip text="The query finds the average prices for each city in the database, then returns the minimum and the maximum; it's possible to perform it with additional filters, that can be specified with the commands below.  " />
+                                </tooltip>
+                            </Label>
                             <Label text="Accommodates:" />
                             <Spinner fx:id="inputAccommodates" amountToStepBy="1" max="20" min="0" />
                             <Label text="Bathrooms:" />
@@ -32,6 +36,9 @@
                             <Spinner fx:id="minInputPrice" amountToStepBy="50" initialValue="0" max="9999" min="0" />
                             <Label text="Max Price:" />
                             <Spinner fx:id="maxInputPrice" amountToStepBy="50" initialValue="0" max="9999" min="0" />
+                     <HBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </HBox.margin>
                         </VBox>
                         <Separator orientation="VERTICAL" />
                         <VBox fx:id="vboxPriceOutput">
@@ -98,6 +105,9 @@
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                 </VBox.margin>
                             </Label>
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
 
                         </VBox>
                         <Separator orientation="VERTICAL" />
@@ -131,8 +141,7 @@
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                 </VBox.margin>
                                 <tooltip>
-                                    <!-- TODO: Add tooltip -->
-                                    <Tooltip text="ADD!!!" />
+                                    <Tooltip text="The query will return an Heatmap for the selected city; in red are represented the areas with the highest count of apartments, in green the opposite. The generated circles can be clicked for additional information" />
                                 </tooltip>
                             </Label>
                             <ComboBox fx:id="citySplitComboBox2" promptText="Choose a city">
@@ -146,6 +155,10 @@
                         </VBox>
                         <Separator orientation="VERTICAL" />
                         <VBox fx:id="vboxMapOutput">
+                            <Label alignment="CENTER" style="-fx-font-weight: bold;" text="Output:" textFill="#093400">
+                                <VBox.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                </VBox.margin></Label>
                             <WebView fx:id="heatmapWebView" prefHeight="219.0" prefWidth="221.0">
                                 <VBox.margin>
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

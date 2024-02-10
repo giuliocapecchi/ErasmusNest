@@ -81,13 +81,17 @@ public class AnalyticsController extends Controller {
 
         System.out.println("Analytics controller initialize");
         title.prefWidthProperty().bind(super.getRootPane().widthProperty());
-        vboxQueryPrice.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.5));
-        vboxQueryPosition.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.5));
-        vboxQueryHeatmap.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.5));
-        vboxPriceOutput.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.4));
-        vboxPositionOutput.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.4));
-        vboxMapOutput.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.4));
-        hboxPriceButton.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.1));
+        vboxQueryPrice.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.3));
+        vboxQueryPosition.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.3));
+        vboxQueryHeatmap.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.3));
+
+        vboxPriceOutput.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.5));
+        vboxPositionOutput.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.5));
+        vboxMapOutput.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.5));
+
+        hboxPriceButton.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.2));
+        hboxPositionButton.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.2));
+        hboxHeatmapButton.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.2));
         citySplitComboBox.getItems().addAll(getSession().getCities());
         citySplitComboBox.getItems().add("None");
         distanceSlider.valueProperty().addListener((observable, oldValue, newValue) ->
@@ -165,7 +169,7 @@ public class AnalyticsController extends Controller {
 
     public void onHeatmapButton() throws InterruptedException {
         System.out.println("\n>>>Heatmap button pressed\n");
-        //todo implementare
+      //todo implementare
         String city = citySplitComboBox2.getValue();
         HashMap<Point2D, Integer> heatmapTiles =  getMongoConnectionManager().getHeatmap(city);
         System.out.println("Heatmap tiles: "+heatmapTiles.size());
@@ -176,7 +180,6 @@ public class AnalyticsController extends Controller {
 
         MapGraphicManager mapGraphicManager = new MapGraphicManager(heatmapWebView, heatmapTiles);
         mapGraphicManager.prepareHeatmap();
-        mapGraphicManager.loadHeatmap();
-
+        mapGraphicManager.loadMap("heatmap");
     }
 }

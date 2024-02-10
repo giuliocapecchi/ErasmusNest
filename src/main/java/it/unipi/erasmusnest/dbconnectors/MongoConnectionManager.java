@@ -711,6 +711,8 @@ public class MongoConnectionManager extends ConnectionManager{
     }
 
     public HashMap<Point2D, Integer> getHeatmap(String city) {
+
+        long multiplier = 80L;
         try (MongoClient mongoClient = MongoClients.create("mongodb://" + super.getHost() + ":" + super.getPort())) {
             MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
             MongoCollection<Document> apartmentsCollection = database.getCollection("apartments");
@@ -722,11 +724,11 @@ public class MongoConnectionManager extends ConnectionManager{
                             new Document("cell",
                                     new Document("$concat", Arrays.asList(new Document("$toString",
                                                     new Document("$trunc",
-                                                            new Document("$multiply", Arrays.asList(10L,
+                                                            new Document("$multiply", Arrays.asList(multiplier,
                                                                     new Document("$arrayElemAt", Arrays.asList("$position", 0L)))))), "_",
                                             new Document("$toString",
                                                     new Document("$trunc",
-                                                            new Document("$multiply", Arrays.asList(10L,
+                                                            new Document("$multiply", Arrays.asList(multiplier,
                                                                     new Document("$arrayElemAt", Arrays.asList("$position", 1L)))))))))),
                     new Document("$group",
                             new Document("_id", "$cell")
@@ -740,7 +742,7 @@ public class MongoConnectionManager extends ConnectionManager{
                 String[] coordinates = cell.split("_");
                 double lat = Double.parseDouble(coordinates[0]);
                 double lon = Double.parseDouble(coordinates[1]);
-                Point2D point = new Point2D(lat, lon);
+                Point2D point = new Point2D(lat/multiplier, lon/multiplier);
                 Integer count = doc.getLong("count").intValue();
                 heatmap.put(point, count);
             }

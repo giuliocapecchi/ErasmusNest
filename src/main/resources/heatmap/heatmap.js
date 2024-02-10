@@ -1,17 +1,36 @@
+fetch("locations.txt")
+    .then((res) => res.text())
+    .then((text) => {
+        // Dividi il testo in righe utilizzando il carattere di nuova riga come separatore
+        const lines = text.split('\n');
+        // Rimuovi eventuali spazi bianchi in eccesso da ciascuna riga
+        const cleanLines = lines.map(line => line.trim());
+        // Passa l'array di righe alla funzione buildMap
+        buildMap(cleanLines);
+    }).catch((e) => console.error(e));
 
-buildMap([51.508, -0.11]);
+// Funzione per costruire la mappa
+function buildMap(rows) {
+    let max = 0;
+    let maxCoordinates = [];
 
-
-
-function buildMap(coordinates) {
-
-    let centerCoordinates = coordinates;
+    // leggo le coordinate per trovare il centro (sarà quello col max counter)
+    for(let i = 0; i < rows.length; i++) {
+        let readValue = rows[i].split(";");
+        // splitto la prima parte in due stringhe
+        let centerCoordinates = readValue[0].split(",");
+        let counter = parseInt(readValue[1]); // Converte counter in un numero
+        if(counter > max) {
+            max = counter;
+            maxCoordinates = centerCoordinates;
+        }
+    }
 
     let mapOptions = {
-        center:centerCoordinates,
-        zoom:12,
-        //minZoom:20,
-        //maxZoom:5,
+        center:maxCoordinates,
+        zoom:10,
+        minZoom:10,
+        maxZoom:15
     }
 
     let map = new L.map('map' , mapOptions);
@@ -19,57 +38,53 @@ function buildMap(coordinates) {
     let layer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
     map.addLayer(layer);
 
+    // aggiungo i cerchi alla map con colori diversi in base al counter
+    for(let i = 0; i < rows.length; i++) {
 
-    var circle = L.circleMarker([51.508, -0.11], {
-        color: 'red',
-        fillColor: '#f03',
-        fillOpacity: 0.5,
-        radius: 100
-    }).addTo(map);
+        let readValue = rows[i].split(";");
+        // splitto la prima parte in due stringhe
+        let centerCoordinates = readValue[0].split(",");
+        let counter = readValue[1];
 
-    var circle1 = L.circleMarker([51.508, -0.09], {
-        color: 'blue',
-        fillColor: '#019fe1',
-        fillOpacity: 0.5,
-        radius: 100
-    }).addTo(map);
+        let color = '';
+        if(counter < max/3)
+             color = 'green';
+        else if(counter >= max/3 && counter < max/3*2)
+             color = 'yellow';
+        else if(counter >= max/3*2)
+             color = 'red';
 
-    // .bindPopup("I am a circle.");
+        let opacity = counter * 1/max + 0.2;
+        if(opacity >= 0.5)
+            opacity = 0.5;
+
+        let circle = L.circleMarker(centerCoordinates, {
+            color: "transparent",
+            fillColor: color,
+            fillOpacity: opacity,
+            radius : 10
+        }).addTo(map).bindPopup("Number of apartments in this area : " + counter);
+
+        var myZoom = {
+            start:  map.getZoom(),
+            end: map.getZoom()
+        };
+
+        map.on('zoomstart', function(e) {
+            myZoom.start = map.getZoom();
+        });
 
 
-    //var circle = L.circle([51.508, -0.11]).addTo(map);
+        map.on('zoomend', function(e) {
+            myZoom.end = map.getZoom();
+            var diff = myZoom.start - myZoom.end;
+            var scale = 2;
+            if (diff < 0) {
+                circle.setRadius(circle.getRadius() * scale);
+            } else if (diff > 0) {
+                circle.setRadius(circle.getRadius() / scale);
+            }
+        });
 
-    var polygon = L.polygon([
-        [51.509, -0.08],
-        [51.503, -0.06],
-        [51.51, -0.047]
-    ]);
-
-    polygon.setStyle({fillColor: '#019fe1', color: '#000ce8', fillOpacity: 0.7});
-
-    polygon.addTo(map);
-
-
-    //let marker = new L.Marker(centerCoordinates, iconOptions);
-    //marker.addTo(map);
-
-    var myZoom = {
-        start:  map.getZoom(),
-        end: map.getZoom()
-    };
-
-    map.on('zoomstart', function(e) {
-        myZoom.start = map.getZoom();
-    });
-
-    map.on('zoomend', function(e) {
-        myZoom.end = map.getZoom();
-        var diff = myZoom.start - myZoom.end;
-        var scale = 1.5;
-        if (diff > 0) {
-            circle.setRadius(circle.getRadius() * scale); //2);
-        } else if (diff < 0) {
-            circle.setRadius(circle.getRadius() / scale); //2);
-        }
-    });
+    }
 }
