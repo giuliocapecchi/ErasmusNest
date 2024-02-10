@@ -1,5 +1,7 @@
 package it.unipi.erasmusnest.controllers;
 
+import it.unipi.erasmusnest.consistency.ConsistencyManager;
+import it.unipi.erasmusnest.consistency.RedisMongoConsistencyManager;
 import it.unipi.erasmusnest.model.Apartment;
 import it.unipi.erasmusnest.model.User;
 import javafx.fxml.FXML;
@@ -271,6 +273,10 @@ public class MyProfileController extends Controller {
                 passwordField.setText("*".repeat(newPassword.length()));
                 showConfirmationMessage("Password aggiornata con successo!", modifyPasswordButton);
                 onModifyPasswordButtonClick();
+
+                new RedisMongoConsistencyManager(getRedisConnectionManager(), getMongoConnectionManager()).updateUserPasswordOnMongo(getSession().getUser().getEmail(), newPassword);
+                // TODO jacopo here we should update the password on MongoDB too starting the thread
+
             }else{ // aggiorno su Mongo e basta / TODO : eventual consistency da gestire qui! La password rimane solo su Redis per ora
                 System.out.println("Password non aggiornata su Redis perchè non trovata la chiave. La aggiorno su MongoDB");
                 // per come è ora il codice, su mongo la password viene aggiornata a priori (errore???)

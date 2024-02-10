@@ -1,11 +1,15 @@
 package it.unipi.erasmusnest.controllers;
 
-import it.unipi.erasmusnest.dbconnectors.ConsistencyManager;
+import it.unipi.erasmusnest.consistency.ConsistencyManager;
+import it.unipi.erasmusnest.consistency.MongoNeoConsistencyManager;
+import it.unipi.erasmusnest.consistency.NeoConsistencyManager;
 import it.unipi.erasmusnest.graphicmanagers.AlertDialogGraphicManager;
 import it.unipi.erasmusnest.model.Apartment;
 import it.unipi.erasmusnest.graphicmanagers.MapGraphicManager;
 import it.unipi.erasmusnest.graphicmanagers.RatingGraphicManager;
 import it.unipi.erasmusnest.graphicmanagers.ReservationGraphicManager;
+import it.unipi.erasmusnest.model.Reservation;
+import it.unipi.erasmusnest.model.User;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -122,7 +126,7 @@ public class ApartmentController extends Controller{
             // If apartment is null seems that the apartment has been removed from Mongo
             // and so need to be removed also from Neo4j
 
-            new ConsistencyManager(getMongoConnectionManager(), getNeo4jConnectionManager()).removeApartmentFromNeo4J(getSession().getApartmentId());
+            new NeoConsistencyManager(getNeo4jConnectionManager()).removeApartmentFromNeo4J(getSession().getApartmentId());
 
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Information Dialog");
@@ -368,7 +372,15 @@ public class ApartmentController extends Controller{
             String userEmail = getSession().getUser().getEmail();
             String houseId = String.valueOf(getSession().getApartmentId());
 
-            getRedisConnectionManager().addReservation(userEmail, houseId, String.valueOf(startYear), String.valueOf(startMonth), String.valueOf(numberOfMonths), getSession().getCity(), apartment.getImageURLs().get(0));
+            User student = new User();
+            student.setEmail(userEmail);
+            student.setPassword(getSession().getUser().getPassword());
+
+            Reservation reservation = new Reservation(userEmail, houseId, startYear, startMonth, numberOfMonths);
+            reservation.setCity(getSession().getCity());
+            reservation.setApartmentImage(apartment.getImageURLs().get(0));
+
+            getRedisConnectionManager().addReservation(student, reservation);
 
             cleanAverageRatingInSession();
             super.changeWindow("myreservations");
