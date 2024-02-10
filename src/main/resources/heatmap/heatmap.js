@@ -29,7 +29,7 @@ function buildMap(rows) {
     let mapOptions = {
         center:maxCoordinates,
         zoom:10,
-        minZoom:10,
+        minZoom:9,
         maxZoom:15
     }
 

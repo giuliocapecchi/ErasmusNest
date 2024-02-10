@@ -15,7 +15,7 @@
             <ScrollPane fitToWidth="true">
                 <VBox alignment="TOP_CENTER" BorderPane.alignment="TOP_CENTER">
                     <!--- hbox analytic 1 -->
-                    <HBox alignment="CENTER_LEFT" style="-fx-border-color: red; -fx-border-width: 3;">
+                    <HBox alignment="CENTER_LEFT" prefHeight="300.0" prefWidth="675.0" style="-fx-border-color: red; -fx-border-width: 3;">
                         <VBox.margin>
                             <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
                         </VBox.margin>
@@ -74,7 +74,7 @@
                         </HBox>
                     </HBox>
                     <!--- hbox analytic 2 -->
-                    <HBox alignment="CENTER_LEFT" style="-fx-border-color: red; -fx-border-width: 3;">
+                    <HBox alignment="CENTER_LEFT" prefHeight="300.0" prefWidth="675.0" style="-fx-border-color: red; -fx-border-width: 3;">
                         <VBox.margin>
                             <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
                         </VBox.margin>
@@ -131,7 +131,7 @@
                     </HBox>
 
                     <!-- HBox Analytics 3 -->
-                    <HBox alignment="CENTER_LEFT" style="-fx-border-color: red; -fx-border-width: 3;">
+                    <HBox alignment="CENTER_LEFT" prefHeight="300.0" prefWidth="675.0" style="-fx-border-color: red; -fx-border-width: 3;">
                         <VBox.margin>
                             <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
                         </VBox.margin>
@@ -159,7 +159,7 @@
                                 <VBox.margin>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                 </VBox.margin></Label>
-                            <WebView fx:id="heatmapWebView" prefHeight="219.0" prefWidth="221.0">
+                            <WebView fx:id="heatmapWebView" prefHeight="260.0" prefWidth="221.0">
                                 <VBox.margin>
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                 </VBox.margin></WebView>
