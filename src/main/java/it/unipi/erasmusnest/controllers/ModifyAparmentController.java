@@ -129,8 +129,7 @@ public class ModifyAparmentController extends Controller{
         }
         updatedApartment.setId(getSession().getApartmentId());
 
-        if(getMongoConnectionManager().updateApartment(apartment,updatedApartment))
-        {
+        if(getMongoConnectionManager().updateApartment(apartment,updatedApartment)){
 
             new NeoConsistencyManager(getNeo4jConnectionManager()).updateApartmentImageOnNeo4J(updatedApartment.getId(), updatedApartment.getImageURLs().get(0));
 
