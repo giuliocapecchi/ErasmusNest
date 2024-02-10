@@ -3,6 +3,7 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.web.*?>
 
 <StackPane fx:id="rootPane" prefHeight="516.0" prefWidth="722.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.erasmusnest.controllers.AnalyticsController">
     <BorderPane prefHeight="266.0" prefWidth="306.0">
@@ -11,118 +12,159 @@
         </top>
 
         <center>
-            <VBox alignment="TOP_CENTER" BorderPane.alignment="TOP_CENTER">
-                <!--- hbox analytic 1 -->
-                <HBox alignment="CENTER_LEFT" style="-fx-border-color: red; -fx-border-width: 3;">
-                    <VBox.margin>
-                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
-                    </VBox.margin>
-                    <VBox fx:id="vboxQueryPrice">
-                        <Label alignment="CENTER" style="-fx-font-weight: bold;" text="Query: find price with filters" textFill="#093400">
-                     <VBox.margin>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                     </VBox.margin></Label>
-                        <Label text="Accommodates:" />
-                        <Spinner fx:id="inputAccommodates" amountToStepBy="1" max="20" min="0" />
-                        <Label text="Bathrooms:" />
-                        <Spinner fx:id="inputBathrooms" amountToStepBy="1" max="20" min="0" />
-                        <Label text="Min Price:" />
-                        <Spinner fx:id="minInputPrice" amountToStepBy="50" initialValue="0" max="9999" min="0" />
-                        <Label text="Max Price:" />
-                        <Spinner fx:id="maxInputPrice" amountToStepBy="50" initialValue="0" max="9999" min="0" />
-                    </VBox>
-                    <Separator orientation="VERTICAL" />
-                    <VBox fx:id="vboxPriceOutput">
-                        <Label alignment="CENTER" style="-fx-font-weight: bold;" text="Output:" textFill="#093400">
-                     <VBox.margin>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                     </VBox.margin></Label>
-                        <Label alignment="CENTER" style="-fx-font-weight: bold;" text="City with highest average price per apartment:">
-                            <VBox.margin>
-                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                            </VBox.margin></Label>
-                        <Label fx:id="cityHighestPrice" alignment="CENTER" style="-fx-font-weight: bold;" textFill="#093400" visible="false">
-                            <VBox.margin>
-                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                            </VBox.margin></Label>
-                        <Label />
-                        <Label alignment="CENTER" style="-fx-font-weight: bold;" text="City with lowest average price per apartment:" textFill="#093400">
-                            <VBox.margin>
-                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                            </VBox.margin></Label>
-                        <Label fx:id="cityLowestPrice" alignment="CENTER" style="-fx-font-weight: bold;" textFill="#093400" visible="false">
-                            <VBox.margin>
-                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                            </VBox.margin></Label>
-                        <Label />
-                    </VBox>
-                    <Separator orientation="VERTICAL" />
-                    <HBox fx:id="hboxPriceButton" alignment="CENTER">
-                        <Button fx:id="priceAnalyticButton" mnemonicParsing="false" onAction="#onPriceAnalyticButton" text="Submit">
-                     <HBox.margin>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                     </HBox.margin></Button>
-                    </HBox>
-                </HBox>
-                <!--- hbox analytic 2 -->
-                <HBox alignment="CENTER_LEFT" style="-fx-border-color: red; -fx-border-width: 3;">
-                    <VBox.margin>
-                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
-                    </VBox.margin>
-                    <VBox fx:id="vboxQueryPosition" alignment="CENTER" prefHeight="129.0" prefWidth="154.0">
-                        <Label alignment="CENTER" style="-fx-font-weight: bold;" text="Calculate average price, with a given distance from the city center" textFill="#093400" wrapText="true">
-                            <VBox.margin>
-                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                            </VBox.margin>
-                            <tooltip>
-                                <Tooltip text="This will calculate the average price of apartments, within a given distance from the city center. City center is given by Neo4j, since it doesn't change it's a constant parameter." />
-                            </tooltip>
-                        </Label>
-                  <ComboBox fx:id="citySplitComboBox" promptText="Choose a city">
-                    <items>
-                      <!-- SplitMenuButton items, dynamically added -->
-                    </items>
-                     <VBox.margin>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                     </VBox.margin>
-                  </ComboBox>
-                        <Slider fx:id="distanceSlider" blockIncrement="0.1" majorTickUnit="10" min="1" max="80" minorTickCount="4" showTickLabels="true" showTickMarks="true" value="40">
-                            <VBox.margin>
-                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                            </VBox.margin>
-                        </Slider>
-                        <Label fx:id="valueLabel">
+            <ScrollPane fitToWidth="true">
+                <VBox alignment="TOP_CENTER" BorderPane.alignment="TOP_CENTER">
+                    <!--- hbox analytic 1 -->
+                    <HBox alignment="CENTER_LEFT" style="-fx-border-color: red; -fx-border-width: 3;">
                         <VBox.margin>
-                            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
                         </VBox.margin>
-                        </Label>
-
-                    </VBox>
-                    <Separator orientation="VERTICAL" />
-                    <VBox fx:id="vboxPositionOutput">
-                        <Label alignment="CENTER" style="-fx-font-weight: bold;" text="Output:" textFill="#093400">
-                            <VBox.margin>
-                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                            </VBox.margin></Label>
-                        <TextArea fx:id="outputPositionTextArea" editable="false">
-                            <VBox.margin>
-                                <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
-                            </VBox.margin></TextArea>
-                    </VBox>
-                    <Separator orientation="VERTICAL" />
-                    <HBox fx:id="hboxPositionButton" alignment="CENTER">
-                        <Button fx:id="PositionAnalyticButton" mnemonicParsing="false" onAction="#onPositionAnalyticButton" text="Submit">
-                     <HBox.margin>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                     </HBox.margin></Button>
+                        <VBox fx:id="vboxQueryPrice">
+                            <Label alignment="CENTER" style="-fx-font-weight: bold;" text="Query: find price with filters" textFill="#093400">
+                                <VBox.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                </VBox.margin></Label>
+                            <Label text="Accommodates:" />
+                            <Spinner fx:id="inputAccommodates" amountToStepBy="1" max="20" min="0" />
+                            <Label text="Bathrooms:" />
+                            <Spinner fx:id="inputBathrooms" amountToStepBy="1" max="20" min="0" />
+                            <Label text="Min Price:" />
+                            <Spinner fx:id="minInputPrice" amountToStepBy="50" initialValue="0" max="9999" min="0" />
+                            <Label text="Max Price:" />
+                            <Spinner fx:id="maxInputPrice" amountToStepBy="50" initialValue="0" max="9999" min="0" />
+                        </VBox>
+                        <Separator orientation="VERTICAL" />
+                        <VBox fx:id="vboxPriceOutput">
+                            <Label alignment="CENTER" style="-fx-font-weight: bold;" text="Output:" textFill="#093400">
+                                <VBox.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                </VBox.margin></Label>
+                            <Label alignment="CENTER" style="-fx-font-weight: bold;" text="City with highest average price per apartment:">
+                                <VBox.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                </VBox.margin></Label>
+                            <Label fx:id="cityHighestPrice" alignment="CENTER" style="-fx-font-weight: bold;" textFill="#093400" visible="false">
+                                <VBox.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                </VBox.margin></Label>
+                            <Label />
+                            <Label alignment="CENTER" style="-fx-font-weight: bold;" text="City with lowest average price per apartment:" textFill="#093400">
+                                <VBox.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                </VBox.margin></Label>
+                            <Label fx:id="cityLowestPrice" alignment="CENTER" style="-fx-font-weight: bold;" textFill="#093400" visible="false">
+                                <VBox.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                </VBox.margin></Label>
+                            <Label />
+                        </VBox>
+                        <Separator orientation="VERTICAL" />
+                        <HBox fx:id="hboxPriceButton" alignment="CENTER">
+                            <Button fx:id="priceAnalyticButton" mnemonicParsing="false" onAction="#onPriceAnalyticButton" text="Submit">
+                                <HBox.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                </HBox.margin></Button>
+                        </HBox>
                     </HBox>
-                </HBox>
+                    <!--- hbox analytic 2 -->
+                    <HBox alignment="CENTER_LEFT" style="-fx-border-color: red; -fx-border-width: 3;">
+                        <VBox.margin>
+                            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                        </VBox.margin>
+                        <VBox fx:id="vboxQueryPosition" alignment="CENTER" prefHeight="129.0" prefWidth="154.0">
+                            <Label alignment="CENTER" style="-fx-font-weight: bold;" text="Calculate average price, with a given distance from the city center" textFill="#093400" wrapText="true">
+                                <VBox.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                </VBox.margin>
+                                <tooltip>
+                                    <Tooltip text="This will calculate the average price of apartments, within a given distance from the city center. City center is given by Neo4j, since it doesn't change it's a constant parameter." />
+                                </tooltip>
+                            </Label>
+                            <ComboBox fx:id="citySplitComboBox" promptText="Choose a city">
+                                <items>
+                                    <!-- SplitMenuButton items, dynamically added -->
+                                </items>
+                                <VBox.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                </VBox.margin>
+                            </ComboBox>
+                            <Slider fx:id="distanceSlider" blockIncrement="0.1" majorTickUnit="10" max="80" min="1" minorTickCount="4" showTickLabels="true" showTickMarks="true" value="40">
+                                <VBox.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                </VBox.margin>
+                            </Slider>
+                            <Label fx:id="valueLabel">
+                                <VBox.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                </VBox.margin>
+                            </Label>
 
-                <VBox.margin>
-                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                </VBox.margin>
-            </VBox>
+                        </VBox>
+                        <Separator orientation="VERTICAL" />
+                        <VBox fx:id="vboxPositionOutput">
+                            <Label alignment="CENTER" style="-fx-font-weight: bold;" text="Output:" textFill="#093400">
+                                <VBox.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                </VBox.margin></Label>
+                            <TextArea fx:id="outputPositionTextArea" editable="false">
+                                <VBox.margin>
+                                    <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+                                </VBox.margin></TextArea>
+                        </VBox>
+                        <Separator orientation="VERTICAL" />
+                        <HBox fx:id="hboxPositionButton" alignment="CENTER">
+                            <Button fx:id="PositionAnalyticButton" mnemonicParsing="false" onAction="#onPositionAnalyticButton" text="Submit">
+                                <HBox.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                </HBox.margin></Button>
+                        </HBox>
+                    </HBox>
 
+                    <!-- HBox Analytics 3 -->
+                    <HBox alignment="CENTER_LEFT" style="-fx-border-color: red; -fx-border-width: 3;">
+                        <VBox.margin>
+                            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                        </VBox.margin>
+                        <VBox fx:id="vboxQueryHeatmap" alignment="CENTER" prefHeight="129.0" prefWidth="154.0">
+                            <Label alignment="CENTER" style="-fx-font-weight: bold;" text="Calculate average price, with a given distance from the city center" textFill="#093400" wrapText="true">
+                                <VBox.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                </VBox.margin>
+                                <tooltip>
+                                    <!-- TODO: Add tooltip -->
+                                    <Tooltip text="ADD!!!" />
+                                </tooltip>
+                            </Label>
+                            <ComboBox fx:id="citySplitComboBox2" promptText="Choose a city">
+                                <items>
+                                    <!-- SplitMenuButton items, dynamically added -->
+                                </items>
+                                <VBox.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                </VBox.margin>
+                            </ComboBox>
+                        </VBox>
+                        <Separator orientation="VERTICAL" />
+                        <VBox fx:id="vboxMapOutput">
+                            <WebView fx:id="heatmapWebView" prefHeight="219.0" prefWidth="221.0">
+                                <VBox.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                </VBox.margin></WebView>
+                        </VBox>
+                        <Separator orientation="VERTICAL" />
+                        <HBox fx:id="hboxHeatmapButton" alignment="CENTER">
+                            <Button fx:id="HeatmapAnalyticButton" mnemonicParsing="false" onAction="#onHeatmapButton" text="Submit">
+                                <HBox.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                </HBox.margin></Button>
+                        </HBox>
+                    </HBox>
+
+                    <VBox.margin>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                    </VBox.margin>
+                </VBox>
+            </ScrollPane>
         </center>
 
         <bottom>

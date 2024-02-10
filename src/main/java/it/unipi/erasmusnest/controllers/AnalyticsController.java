@@ -1,21 +1,25 @@
 package it.unipi.erasmusnest.controllers;
 
+import it.unipi.erasmusnest.graphicmanagers.MapGraphicManager;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Point2D;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class AnalyticsController extends Controller {
-
     @FXML
     Label valueLabel;
-    @FXML
-    TextArea outputPriceTextArea;
     @FXML
     TextArea outputPositionTextArea;
     @FXML
@@ -56,20 +60,45 @@ public class AnalyticsController extends Controller {
     Slider distanceSlider;
     @FXML
     ComboBox<String> citySplitComboBox;
+    @FXML
+    VBox vboxQueryHeatmap;
+    @FXML
+    VBox vboxMapOutput;
+    @FXML
+    ComboBox<String> citySplitComboBox2;
+    @FXML
+    WebView heatmapWebView;
+    @FXML
+    HBox hboxHeatmapButton;
+    @FXML
+    Button HeatmapAnalyticButton;
 
     @FXML
     private void initialize() {
+        //todo rimuovi
+        getSession().setCities(getNeo4jConnectionManager().getAllCities());
+
+
         System.out.println("Analytics controller initialize");
         title.prefWidthProperty().bind(super.getRootPane().widthProperty());
         vboxQueryPrice.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.5));
         vboxQueryPosition.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.5));
+        vboxQueryHeatmap.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.5));
         vboxPriceOutput.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.4));
         vboxPositionOutput.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.4));
+        vboxMapOutput.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.4));
         hboxPriceButton.prefWidthProperty().bind(super.getRootPane().widthProperty().multiply(0.1));
         citySplitComboBox.getItems().addAll(getSession().getCities());
         citySplitComboBox.getItems().add("None");
         distanceSlider.valueProperty().addListener((observable, oldValue, newValue) ->
                 valueLabel.setText("Chosen distance from center: "+String.format("%.2f", newValue.doubleValue())+" km"));
+        citySplitComboBox2.getItems().addAll(getSession().getCities());
+        citySplitComboBox2.getItems().add("None");
+        citySplitComboBox2.setOnAction(event -> {
+            String selectedItem = citySplitComboBox2.getValue();
+            HeatmapAnalyticButton.setDisable(selectedItem == null || selectedItem.equals("None"));
+        });
+        HeatmapAnalyticButton.setDisable(true);
 
     }
 
@@ -132,5 +161,22 @@ public class AnalyticsController extends Controller {
                     outputPositionTextArea.appendText(map.get("city") + ": \t" + map.get("avgPrice") + "\n");
             }
         }
+    }
+
+    public void onHeatmapButton() throws InterruptedException {
+        System.out.println("\n>>>Heatmap button pressed\n");
+        //todo implementare
+        String city = citySplitComboBox2.getValue();
+        HashMap<Point2D, Integer> heatmapTiles =  getMongoConnectionManager().getHeatmap(city);
+        System.out.println("Heatmap tiles: "+heatmapTiles.size());
+
+        for (Map.Entry<Point2D, Integer> entry : heatmapTiles.entrySet()) {
+            System.out.println("Key: " + entry.getKey() + " Value: " + entry.getValue());
+        }
+
+        MapGraphicManager mapGraphicManager = new MapGraphicManager(heatmapWebView, heatmapTiles);
+        mapGraphicManager.prepareHeatmap();
+        mapGraphicManager.loadHeatmap();
+
     }
 }

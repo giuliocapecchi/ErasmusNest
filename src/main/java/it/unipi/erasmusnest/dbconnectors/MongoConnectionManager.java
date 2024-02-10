@@ -710,7 +710,7 @@ public class MongoConnectionManager extends ConnectionManager{
         return resultString;
     }
 
-    public HashMap<Point2D, Double> getHeatmap(String city) {
+    public HashMap<Point2D, Integer> getHeatmap(String city) {
         try (MongoClient mongoClient = MongoClients.create("mongodb://" + super.getHost() + ":" + super.getPort())) {
             MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
             MongoCollection<Document> apartmentsCollection = database.getCollection("apartments");
@@ -734,14 +734,14 @@ public class MongoConnectionManager extends ConnectionManager{
                                             new Document("$sum", 1L)))));
 
 
-            HashMap<Point2D, Double> heatmap = new HashMap<>();
+            HashMap<Point2D, Integer> heatmap = new HashMap<>();
             for (Document doc : result) {
                 String cell = doc.getString("_id");
                 String[] coordinates = cell.split("_");
                 double lat = Double.parseDouble(coordinates[0]);
                 double lon = Double.parseDouble(coordinates[1]);
                 Point2D point = new Point2D(lat, lon);
-                double count = doc.getDouble("count");
+                Integer count = doc.getLong("count").intValue();
                 heatmap.put(point, count);
             }
             return heatmap;
