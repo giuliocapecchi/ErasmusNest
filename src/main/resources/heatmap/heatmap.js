@@ -9,7 +9,9 @@ function buildMap(coordinates) {
 
     let mapOptions = {
         center:centerCoordinates,
-        zoom:12
+        zoom:12,
+        //minZoom:20,
+        //maxZoom:5,
     }
 
     let map = new L.map('map' , mapOptions);
@@ -17,27 +19,6 @@ function buildMap(coordinates) {
     let layer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
     map.addLayer(layer);
 
-    let customIcon = {
-        iconUrl:"../media/placeholder.png",
-        iconSize:[40,40]
-    }
-    let myIcon = L.icon(customIcon);
-
-    let iconOptions = {
-        title:"apartment",
-        draggable:false,
-        icon:myIcon
-    }
-
-    /*const marker = L.marker([51.5, -0.09]).addTo(map)
-        .bindPopup('<b>Hello world!</b><br />I am a popup.').openPopup();
-
-    /*const circle = L.circle([51.508, -0.11], {
-        color: 'red',
-        fillColor: '#f03',
-        fillOpacity: 0.5,
-        radius: 500
-    }).addTo(map).bindPopup('I am a circle.');*/
 
     var circle = L.circleMarker([51.508, -0.11], {
         color: 'red',
@@ -46,15 +27,8 @@ function buildMap(coordinates) {
         radius: 100
     }).addTo(map);
 
-    /*let circle0 = L.circle([51.508, -0.09], {
-        color: 'red',
-        fillColor: '#63d27f',
-        fillOpacity: 0.5,
-        radius: 100
-    }).addTo(map);*/
-
     var circle1 = L.circleMarker([51.508, -0.09], {
-        color: 'red',
+        color: 'blue',
         fillColor: '#019fe1',
         fillOpacity: 0.5,
         radius: 100
@@ -91,10 +65,11 @@ function buildMap(coordinates) {
     map.on('zoomend', function(e) {
         myZoom.end = map.getZoom();
         var diff = myZoom.start - myZoom.end;
+        var scale = 1.5;
         if (diff > 0) {
-            circle.setRadius(circle.getRadius() * 1.1); //2);
+            circle.setRadius(circle.getRadius() * scale); //2);
         } else if (diff < 0) {
-            circle.setRadius(circle.getRadius() / 1.1); //2);
+            circle.setRadius(circle.getRadius() / scale); //2);
         }
     });
 }
