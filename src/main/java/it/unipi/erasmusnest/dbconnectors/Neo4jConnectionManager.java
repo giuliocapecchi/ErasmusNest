@@ -614,24 +614,27 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         }
     }
 
-    public Map<String, String> getFavourites(String email) {
+    public ArrayList<Apartment> getFavourites(String email) {
+
         try (Session session = driver.session()) {
             return session.readTransaction(tx -> {
-                Result result = tx.run("MATCH (u:User {email: $email})-[l:LIKES]->(a:Apartment) RETURN a.apartmentId, a.name", parameters("email", email));
-                Map<String, String> favourites = new HashMap<>();
+                Result result = tx.run("MATCH (u:User {email: $email})-[l:LIKES]->(a:Apartment) RETURN a", parameters("email", email));
+                ArrayList<Apartment> favourites = new ArrayList<>();
                 while (result.hasNext()) {
                     Record record = result.next();
-                    String apartmentId = record.get("a.apartmentId").asString();
-                    String name = record.get("a.name").asString();
-                    favourites.put(apartmentId, name);
+                    Node apartmentNode = record.get("a").asNode();
+                    String apartmentId = apartmentNode.get("apartmentId").asString();
+                    String name = apartmentNode.get("name").asString();
+                    String url = apartmentNode.get("pictureUrl").asString();
+                    double averageReviewScore = apartmentNode.get("averageReviewScore").asDouble();
+                    favourites.add(new Apartment(apartmentId, name, url, averageReviewScore));
                 }
                 return favourites;
             });
         } catch (Exception e) {
             System.out.println("Exception: " + e);
             new AlertDialogGraphicManager("Neo4j connection failed").show();
-            // Gestisci l'errore come preferisci o ritorna una mappa vuota
-            return Collections.emptyMap();
+            return null;
         }
     }
 
