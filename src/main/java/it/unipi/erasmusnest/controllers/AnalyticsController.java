@@ -167,7 +167,6 @@ public class AnalyticsController extends Controller {
         System.out.println("\n>>>Heatmap button pressed\n");
         String city = citySplitComboBox2.getValue();
         HashMap<Point2D, Integer> heatmapTiles =  getMongoConnectionManager().getHeatmap(city);
-        //System.out.println("Heatmap tiles: "+heatmapTiles.size());
         MapGraphicManager mapGraphicManager = new MapGraphicManager(heatmapWebView, heatmapTiles);
         mapGraphicManager.prepareHeatmap();
         mapGraphicManager.loadMap("heatmap");
