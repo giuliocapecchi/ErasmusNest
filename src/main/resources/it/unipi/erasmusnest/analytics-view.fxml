@@ -136,7 +136,7 @@
                             <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
                         </VBox.margin>
                         <VBox fx:id="vboxQueryHeatmap" alignment="CENTER" prefHeight="129.0" prefWidth="154.0">
-                            <Label alignment="CENTER" style="-fx-font-weight: bold;" text="Calculate average price, with a given distance from the city center" textFill="#093400" wrapText="true">
+                            <Label alignment="CENTER" style="-fx-font-weight: bold;" text="Compute an Heatmap for the apartments of the selected city" textFill="#093400" wrapText="true">
                                 <VBox.margin>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                 </VBox.margin>
@@ -187,7 +187,7 @@
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                     </HBox.margin>
                 </Button>
-                <Region prefHeight="57.0" prefWidth="215.0" HBox.hgrow="ALWAYS" /> <!-- Spacer per spingere il bottone successivo a destra -->
+                <Region prefHeight="57.0" prefWidth="215.0" HBox.hgrow="ALWAYS" />
                 <Button fx:id="goToHomepageButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#goToTheHomePage" prefHeight="25.0" prefWidth="155.0" text="Go to the homepage">
                     <HBox.margin>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
