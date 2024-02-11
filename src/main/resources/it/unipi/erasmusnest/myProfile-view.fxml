@@ -126,14 +126,13 @@
                             </VBox>
                         </TitledPane>
 
-                        <TitledPane fx:id="favouriteAptsPane" text="My favourite ones" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ff6200;" onMouseClicked="#onFavouritesButtonClick">
-                            <ScrollPane fitToWidth="true" fitToHeight="true" hbarPolicy="NEVER">
-                                <VBox fx:id="favouritesContainerVBox" spacing="10">
+                        <TitledPane fx:id="favouriteAptsPane" text="My favourite ones" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ff6200;" >
+                            <ScrollPane fitToWidth="true" fitToHeight="true" hbarPolicy="NEVER" >
+                                <VBox fx:id="favouritesContainerVBox" spacing="10" >
                                     <padding>
                                         <Insets bottom="20" left="20" right="20" top="20" />
                                     </padding>
-                                    <Label fx:id="favouritesLabel" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ff6200;" visible="false" />
-                                </VBox>
+                                    </VBox>
                             </ScrollPane>
                         </TitledPane>
                     </panes>

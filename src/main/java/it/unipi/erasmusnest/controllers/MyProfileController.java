@@ -64,8 +64,6 @@ public class MyProfileController extends Controller {
     @FXML
     private Button buttonPwdUpdate;
     @FXML
-    private Label favouritesLabel;
-    @FXML
     private Button adminButton;
     @FXML
     private TitledPane incomingReservationPane;
@@ -125,9 +123,6 @@ public class MyProfileController extends Controller {
         lastNameLabel.setText(utente.getSurname());
         emailLabel.setText(utente.getEmail());
 
-        favouritesLabel = new Label();
-        favouritesContainerVBox.getChildren().add(favouritesLabel);
-
         if(utente.getHouses() != null  && !utente.getHouses().isEmpty()){
             // Recupera gli appartamenti dell'utente e li aggiunge al VBox apartmentsContainer
             for (Apartment apartment : utente.getHouses())
@@ -181,6 +176,12 @@ public class MyProfileController extends Controller {
         if (utente.isAdmin()){
             adminButton.setVisible(true);
         }
+
+        favouriteAptsPane.expandedProperty().addListener((observable, oldValue, newValue) -> {
+            if(newValue){
+                onFavouritesButtonClick();
+            }
+        });
 
         utente.setPassword(getSession().getUser().getPassword());
         getSession().setUser(utente);
@@ -374,14 +375,19 @@ public class MyProfileController extends Controller {
     public void onFavouritesButtonClick() {
         if(favouriteAptsPane.isExpanded()) {
             // TODO JACO PARTI DA QUI
-            //favouritesContainerVBox.getChildren().clear();
+            favouritesContainerVBox.getChildren().clear();
             System.out.println("Favourites button clicked");
             ArrayList<Apartment> favourites = getNeo4jConnectionManager().getFavourites(getSession().getUser().getEmail());
-            favouritesLabel.setVisible(true);
+            //favouritesLabel.setVisible(true);
+
+
+
             if (favourites == null || favourites.isEmpty()) {
-                favouritesLabel.setText("No favourites apartment found");
+                Label favouritesLabel = new Label();
+                favouritesLabel.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #000000;");
+                favouritesContainerVBox.getChildren().add(favouritesLabel);
+                favouritesLabel.setText("No favourites apartment found.");
             } else {
-                favouritesLabel.setText("Favourites apartments:");
                 for (Apartment apartment : favourites) {
                     Button button = new Button();
                     button.setText(apartment.getName());
