@@ -23,8 +23,6 @@ import java.util.Objects;
 public class MyProfileController extends Controller {
 
     @FXML
-    ScrollPane scrollPane;
-    @FXML
     Button updateCitiesOfInterestButton;
     @FXML
     private VBox personalInfoVbox;
@@ -66,13 +64,15 @@ public class MyProfileController extends Controller {
     @FXML
     private Button buttonPwdUpdate;
     @FXML
-    private Label favouritesLabel;
-    @FXML
     private Button adminButton;
     @FXML
-    private Button reservationsMyApartmentsButton;
+    private TitledPane incomingReservationPane;
     @FXML
-    private Label reservationsMyApartmentsLabel;
+    private TitledPane favouriteAptsPane;
+    @FXML
+    private TitledPane infoPane;
+    @FXML
+    private Accordion accordion;
 
     private String selectedStudyField;
     private ArrayList<String> citiesOfInterestInNeo4j = new ArrayList<>();
@@ -123,9 +123,6 @@ public class MyProfileController extends Controller {
         lastNameLabel.setText(utente.getSurname());
         emailLabel.setText(utente.getEmail());
 
-        favouritesLabel = new Label();
-        favouritesContainerVBox.getChildren().add(favouritesLabel);
-
         if(utente.getHouses() != null  && !utente.getHouses().isEmpty()){
             // Recupera gli appartamenti dell'utente e li aggiunge al VBox apartmentsContainer
             for (Apartment apartment : utente.getHouses())
@@ -172,14 +169,20 @@ public class MyProfileController extends Controller {
                 apartmentsContainer.getChildren().add(apartmentBox); // This should add the apartment to the UI
             }
         }else{
-            reservationsMyApartmentsLabel.setText("No reservations for your apartments");
-            reservationsMyApartmentsButton.setVisible(false);
+            accordion.getPanes().remove(incomingReservationPane);
         }
         // Parte riservata all'ADMIN
         // Se sono admin, allora appare un bottone per accedere alla vista analitiche
         if (utente.isAdmin()){
             adminButton.setVisible(true);
         }
+
+        favouriteAptsPane.expandedProperty().addListener((observable, oldValue, newValue) -> {
+            if(newValue){
+                onFavouritesButtonClick();
+            }
+        });
+
         utente.setPassword(getSession().getUser().getPassword());
         getSession().setUser(utente);
     }
@@ -301,7 +304,6 @@ public class MyProfileController extends Controller {
 
     // Metodo per mostrare un messaggio di conferma
     private void showConfirmationMessage(String message, Node node) {
-        scrollPane.setVvalue(0.05);
         PopOver popOver = new PopOver();
         Label label = new Label(message);
         label.setStyle("-fx-padding: 10px;");
@@ -371,27 +373,63 @@ public class MyProfileController extends Controller {
     }
 
     public void onFavouritesButtonClick() {
-        System.out.println("Favourites button clicked");
-        Map<String,String> favourites = getNeo4jConnectionManager().getFavourites(getSession().getUser().getEmail());
-        favouritesLabel.setVisible(true);
-        if(favourites==null || favourites.isEmpty()){
-            favouritesLabel.setText("No favourites apartment found");
-        }
-        else {
-            favouritesLabel.setText("Favourites apartments:");
-            for(String favourite : favourites.keySet()) {
-                Button button = new Button();
-                button.setText(favourites.get(favourite));
-                button.setOnAction(event -> {
-                    getSession().setApartmentId(favourite);
-                    super.changeWindow("apartment");
-                });
-                Button dislike = new Button("dislike");
-                dislike.setOnAction(event -> {
-                    getNeo4jConnectionManager().removeFavourite(getSession().getUser().getEmail(),favourite);
-                    super.changeWindow("myprofile");
-                });
-                favouritesContainerVBox.getChildren().addAll(button,dislike);
+        if(favouriteAptsPane.isExpanded()) {
+            // TODO JACO PARTI DA QUI
+            favouritesContainerVBox.getChildren().clear();
+            System.out.println("Favourites button clicked");
+            ArrayList<Apartment> favourites = getNeo4jConnectionManager().getFavourites(getSession().getUser().getEmail());
+            //favouritesLabel.setVisible(true);
+
+
+
+            if (favourites == null || favourites.isEmpty()) {
+                Label favouritesLabel = new Label();
+                favouritesLabel.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #000000;");
+                favouritesContainerVBox.getChildren().add(favouritesLabel);
+                favouritesLabel.setText("No favourites apartment found.");
+            } else {
+                for (Apartment apartment : favourites) {
+                    Button button = new Button();
+                    button.setText(apartment.getName());
+                    button.setOnAction(event -> {
+                        getSession().setApartmentId(apartment.getId());
+                        super.changeWindow("apartment");
+                    });
+                    Button dislike = new Button("dislike");
+                    dislike.setOnAction(event -> {
+                        getNeo4jConnectionManager().removeFavourite(getSession().getUser().getEmail(), apartment.getId());
+                        super.changeWindow("myprofile");
+                    });
+
+                    ImageView apartmentImage = new ImageView();
+                    apartmentImage.setPreserveRatio(true);
+
+                    String imageUrl = null;
+                    if(apartment.getImageURLs()!=null && !apartment.getImageURLs().isEmpty()){
+                        imageUrl = apartment.getImageURLs().get(0);
+                    }
+                    String noImageAvaialblePath = "/media/no_photo_available.png";
+                    if(imageUrl==null || imageUrl.isEmpty()){
+                        apartmentImage.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvaialblePath))));
+                    }else{
+                        Image image;
+                        try{
+                            image = new Image(imageUrl,true); // può fallire se il link è non valido
+                        }catch (Exception e) {
+                            System.out.println("not valid URL for the image");
+                            image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvaialblePath)));
+                        }
+                        apartmentImage.setImage(image);
+                    }
+
+                    apartmentImage.setSmooth(true);
+
+                    HBox hBox = new HBox(10);
+                    hBox.setAlignment(Pos.CENTER_LEFT);
+                    apartmentImage.fitWidthProperty().bind(hBox.widthProperty().multiply(0.4));
+                    hBox.getChildren().addAll(apartmentImage, button, dislike);
+                    favouritesContainerVBox.getChildren().addAll(hBox);
+                }
             }
         }
     }
