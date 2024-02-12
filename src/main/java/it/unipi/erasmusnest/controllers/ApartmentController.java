@@ -377,7 +377,7 @@ public class ApartmentController extends Controller{
             student.setPassword(getSession().getUser().getPassword());
 
             Reservation reservation = new Reservation(userEmail, houseId, startYear, startMonth, numberOfMonths);
-            reservation.setCity(getSession().getCity());
+            reservation.setCity(apartment.getCity());
             reservation.setApartmentImage(apartment.getImageURLs().get(0));
 
             getRedisConnectionManager().addReservation(student, reservation);
