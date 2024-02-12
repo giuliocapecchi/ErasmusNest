@@ -168,10 +168,10 @@ public class MongoConnectionManager extends ConnectionManager{
                                             new Document("$round", Arrays.asList("$avgPrice", 2L))))));
 
 
-            for (Document doc : result) {
+            /*for (Document doc : result) {
                 System.out.println(doc.toJson());
                 return doc.getDouble("avgPrice");
-            }
+            }*/
         }
         return null;
     }
@@ -360,6 +360,7 @@ public class MongoConnectionManager extends ConnectionManager{
                         picURLs,
                         apartment.getInteger("bathrooms")
                 );
+                resultApartment.setCity(apartment.getString("city"));
             }
             else {
                 new AlertDialogGraphicManager("Apartment not found in MongoDB").show();
