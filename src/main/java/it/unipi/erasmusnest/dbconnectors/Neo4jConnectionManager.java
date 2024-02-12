@@ -551,15 +551,16 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
     public List<String> seeSuggestedUsers(String emailA, String emailB) {
         try (Session session = driver.session()) {
             return session.readTransaction((TransactionWork<List<String>>) tx -> {
-                Result result = tx.run("MATCH (a:User {email: $emailA}) " +
-                                "MATCH (b:User {email: $emailB}) " +
-                                "MATCH (b)-[:FOLLOWS]->(suggested:User) " +
-                                "WHERE NOT (a)-[:FOLLOWS]->(suggested) " +
-                                "AND suggested.email <> $emailA " + // Aggiunta clausola WHERE per escludere l'utente attuale
-                                "MATCH (a)-[:INTERESTS]->(city:City) " +
-                                "MATCH (suggested)-[:INTERESTS]->(city) " +
-                                "RETURN DISTINCT suggested.email AS suggestedEmail",
-                        parameters("emailA", emailA, "emailB", emailB));
+                HashMap<String, Object> parameters = new HashMap<>();
+                parameters.put("emailA", emailA);
+                parameters.put("emailB", emailB);
+
+                Result result = tx.run("MATCH (a:User {email: $emailA})-[:INTERESTS]->(city:City)<-[:INTERESTS]-(suggested:User), " +
+                                    "(b:User {email: $emailB})-[:FOLLOWS]->(suggested) "+
+                                    "WHERE NOT (a)-[:FOLLOWS]->(suggested) "+
+                                    "AND suggested.email <> $emailA "+
+                                    "RETURN DISTINCT suggested.email AS suggestedEmail",
+                                    parameters);
                 List<String> suggestedEmails = new ArrayList<>();
                 while (result.hasNext()) {
                     suggestedEmails.add(result.next().get("suggestedEmail").asString());
