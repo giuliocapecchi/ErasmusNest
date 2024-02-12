@@ -3,8 +3,6 @@ package it.unipi.erasmusnest.dbconnectors;
 import it.unipi.erasmusnest.graphicmanagers.AlertDialogGraphicManager;
 import it.unipi.erasmusnest.model.Reservation;
 import it.unipi.erasmusnest.model.User;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPooled;
 import redis.clients.jedis.args.ExpiryOption;
 
@@ -52,7 +50,7 @@ public class RedisConnectionManager extends ConnectionManager{
         return exists;
     }
 
-    // TODO
+
     public String getPassword(String email) {
 
         if(!existsUser(email)) {
@@ -200,7 +198,6 @@ public class RedisConnectionManager extends ConnectionManager{
 
     // CREATE
 
-    // TODO
     public boolean addUser(String email, String password) {
 
         boolean added = false;
@@ -233,7 +230,7 @@ public class RedisConnectionManager extends ConnectionManager{
     }
 
 
-    // OKAY
+    //
     public void addReservation(User student, Reservation reservation) {
 
         if(!existsUser(student.getEmail())) {
@@ -288,7 +285,6 @@ public class RedisConnectionManager extends ConnectionManager{
     }
     // UPDATE
 
-    // TODO
     public boolean updateUserPassword(String email, String password) {
         try(JedisPooled jedis = new JedisPooled(super.getHost(), super.getPort())) {
             // key design: <entity>:<email>:<attribute>
@@ -313,7 +309,6 @@ public class RedisConnectionManager extends ConnectionManager{
 
     // DELETE
 
-    // TODO
     public void deleteUser(String email) {
         try(JedisPooled jedis = new JedisPooled(super.getHost(), super.getPort())) {
             // key design: <entity>:<email>:<attribute>

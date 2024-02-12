@@ -38,6 +38,10 @@ function buildMap(rows) {
     let layer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
     map.addLayer(layer);
 
+    // disable the mouse scroll wheel zoom
+    map.scrollWheelZoom.disable();
+
+
     // aggiungo i cerchi alla map con colori diversi in base al counter
     for(let i = 0; i < rows.length; i++) {
 
