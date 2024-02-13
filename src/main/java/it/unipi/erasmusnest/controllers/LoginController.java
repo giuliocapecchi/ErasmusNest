@@ -180,6 +180,7 @@ public class LoginController extends Controller{
 
     @FXML
     protected void onContinueButtonClick(){
+        //broCancellami();
         getSession().setLogged(false);
         if(Objects.equals(getPreviousWindowName(), "apartment")) {
             super.backToPreviousWindow();
@@ -235,6 +236,29 @@ public class LoginController extends Controller{
         }
     }
 
+    /*private void broCancellami() {
+        long totalTime = 0;
+        int iterations = 100;
+        for (int i = 0; i < iterations; i++) {
 
+            String email = "a@b.cc";
+            String password = "abcd";
+
+            long startTime = System.nanoTime();
+            //User user = getMongoConnectionManager().findUser(randomString);
+            // prendo un numero randomico tra 1 e 10000
+            //getMongoConnectionManager().averagePriceNearCityCenter(randomCity, random.nextInt(10000));
+            String redisPwd = getRedisConnectionManager().getPassword(email);
+
+            long endTime = System.nanoTime();
+            totalTime += (endTime - startTime);
+        }
+
+        double averageTime = totalTime / (double) iterations;
+        // Converti in millisecondi
+        double averageTimeInMs = averageTime / 1_000_000.0;
+        System.out.println("Tempo medio per chiamata: " + averageTimeInMs + " ms");
+
+    }*/
 
 }

@@ -40,7 +40,6 @@ public class RedisConnectionManager extends ConnectionManager{
     // READ
     public long getUserTTL(String email){
         long ttl = -1;
-      //  try(JedisPooled jedis = new JedisPooled(super.getHost(), super.getPort())) {
         try (JedisCluster jedis = createJedisCluster()) {
 
             String key = "user:" + email + ":password";
@@ -152,8 +151,6 @@ public class RedisConnectionManager extends ConnectionManager{
     public ArrayList<Reservation> getReservationsForUser(String  userEmail, ArrayList<String> apartmentsIds) {
         ArrayList<Reservation> reservations = new ArrayList<>();
 
-       // try(JedisPooled jedis = new JedisPooled(super.getHost(), super.getPort())) {
-
         try (JedisCluster jedis = createJedisCluster()) {
             System.out.println("sei qui");
             // key design: <entity>:<userEmail>:<houseId>:<startYear>:<startMonth>:<numberOfMonths>:<dateTime>
@@ -183,7 +180,6 @@ public class RedisConnectionManager extends ConnectionManager{
     private ArrayList<String> getReservationAttributesValues(String subKey) {
 
         ArrayList<String> attributesValues = new ArrayList<>();
-       // try (JedisPooled jedis = new JedisPooled(super.getHost(), super.getPort())) {
         try (JedisCluster jedis = createJedisCluster()) {
 
             Map<String, String>hash = jedis.hgetAll(subKey);
@@ -206,7 +202,7 @@ public class RedisConnectionManager extends ConnectionManager{
 
         boolean added = false;
 
-        
+
         try (JedisCluster jedis = createJedisCluster()) {
 
             // key design: <entity>:<email>
@@ -236,7 +232,7 @@ public class RedisConnectionManager extends ConnectionManager{
 
     public void addReservationsToUser(String email, ArrayList<String> apartmentsIds) {
 
-        
+
         try (JedisCluster jedis = createJedisCluster()) {
 
             // key design: <entity>:<email>
@@ -262,7 +258,7 @@ public class RedisConnectionManager extends ConnectionManager{
     // OKAY
     public void addReservation(User student, Reservation reservation, ArrayList<String> apartmentsIds) {
 
-        
+
         try (JedisCluster jedis = createJedisCluster()) {
 
             String dateTime = LocalDateTime.now().toString();
@@ -320,7 +316,7 @@ public class RedisConnectionManager extends ConnectionManager{
     // UPDATE
 
     public boolean updateUserPassword(String email, String password) {
-        
+
         try (JedisCluster jedis = createJedisCluster()) {
 
             // key design: <entity>:<email>:<attribute>
@@ -346,7 +342,7 @@ public class RedisConnectionManager extends ConnectionManager{
     // DELETE
 
     public void deleteUser(String email) {
-        
+
         try (JedisCluster jedis = createJedisCluster()) {
 
             // key design: <entity>:<email>:<attribute>
@@ -365,7 +361,7 @@ public class RedisConnectionManager extends ConnectionManager{
 
     // OKAY
     public void deleteReservation(Reservation reservation, ArrayList<String> apartmentsIds) {
-        
+
         try (JedisCluster jedis = createJedisCluster()) {
 
             String subKey = getSubKey(reservation);
@@ -412,7 +408,6 @@ public class RedisConnectionManager extends ConnectionManager{
     }
 
     public void approveReservation(Reservation reservation) {
-       // try(JedisPooled jedis = new JedisPooled(super.getHost(), super.getPort())) {
         try (JedisCluster jedis = createJedisCluster()) {
 
             String subKey = getSubKey(reservation);
@@ -430,7 +425,6 @@ public class RedisConnectionManager extends ConnectionManager{
     }
 
     public void rejectReservation(Reservation reservation) {
-      //  try(JedisPooled jedis = new JedisPooled(super.getHost(), super.getPort())) {
         try (JedisCluster jedis = createJedisCluster()) {
 
             String subKey = "reservation:" + reservation.getStudentEmail()
@@ -473,7 +467,7 @@ public class RedisConnectionManager extends ConnectionManager{
 
     private boolean isReservationInTrashPeriod(String reservationKey){
         boolean isInTrash = false;
-        
+
         try (JedisCluster jedis = createJedisCluster()) {
 
             long ttl = jedis.ttl(reservationKey);
