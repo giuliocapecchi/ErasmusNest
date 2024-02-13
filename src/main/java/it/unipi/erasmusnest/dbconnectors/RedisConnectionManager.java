@@ -3,16 +3,10 @@ package it.unipi.erasmusnest.dbconnectors;
 import it.unipi.erasmusnest.graphicmanagers.AlertDialogGraphicManager;
 import it.unipi.erasmusnest.model.Reservation;
 import it.unipi.erasmusnest.model.User;
-import redis.clients.jedis.Jedis;
-
 import redis.clients.jedis.args.ExpiryOption;
 import redis.clients.jedis.*;
-
-import java.lang.reflect.Array;
 import java.util.HashSet;
 import java.util.Set;
-
-
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -298,7 +292,6 @@ public class RedisConnectionManager extends ConnectionManager{
 
     private void setExpirationTimeOnUser(String email, long seconds, ExpiryOption option) {
 
-       // try (JedisPooled jedis = new JedisPooled(super.getHost(), super.getPort())) {
         try (JedisCluster jedis = createJedisCluster()) {
 
             String key = "user:" + email + ":password";
