@@ -15,8 +15,8 @@ public class Apartment {
     private Integer dollarPriceMonth;
     private Integer maxAccommodates;
     private String hostEmail;
-    private ArrayList<String> imageUrls;        // embedded in User (host)
-    private Double averageRating;    // embedded in User (host)
+    private ArrayList<String> imageUrls;        // the first is also embedded in User (host)
+    private Double averageRating;    // in Neo4j
     private int numberOfReviews = 0; // in neo4j
     private Integer bathrooms; // in MONGO
     private String hostName;
