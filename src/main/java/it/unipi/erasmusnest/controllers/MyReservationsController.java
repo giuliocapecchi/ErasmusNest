@@ -13,7 +13,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +34,8 @@ public class MyReservationsController extends Controller {
 
         System.out.println("MyReservations initialize");
 
-        if(getSession().getApartmentsId() == null){
-            reservations = getRedisConnectionManager().getReservationsForUser(getSession().getUser().getEmail());
+        if(getSession().getMyApartmentsIds() == null){ // student
+            reservations = getRedisConnectionManager().getReservationsForUser(getSession().getUser().getEmail(), getSession().getReservationsApartmentIds());
             if(!reservations.isEmpty()){
                 for (Reservation reservation : reservations) {
                     add(reservation, "student");
@@ -44,10 +43,10 @@ public class MyReservationsController extends Controller {
             } else {
                 noReservation();
             }
-        } else {
+        } else { // host
             // get the reservations for the apartments
-            List<String> apartmentsId = getSession().getApartmentsId();
-            reservations = getRedisConnectionManager().getReservationsForApartments(apartmentsId);
+            List<String> apartmentsIds = getSession().getMyApartmentsIds();
+            reservations = getRedisConnectionManager().getReservationsForApartments(apartmentsIds);
 
             // ordering the reservations by timestamp
             sortReservationsByTimestampAsc();
@@ -184,7 +183,7 @@ public class MyReservationsController extends Controller {
         imageView.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
             @Override
             public void handle(javafx.scene.input.MouseEvent event) {
-                getSession().setApartmentId(reservation.getApartmentId());
+                getSession().getApartment().setId(reservation.getApartmentId());
                 MyReservationsController.super.changeWindow("apartment");
             }
         });
@@ -220,7 +219,7 @@ public class MyReservationsController extends Controller {
                     Button deleteButton = new Button("Write a review");
                     deleteButton.setStyle("-fx-background-color: #019fe1; -fx-text-fill: #ffffff; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 5px;");
                     deleteButton.setOnAction(event -> {
-                        getSession().setApartmentId(reservation.getApartmentId());
+                        getSession().getApartment().setId(reservation.getApartmentId());
                         changeWindow("writeReview");
                     });
                     buttonsVBox.getChildren().add(deleteButton);
@@ -232,7 +231,13 @@ public class MyReservationsController extends Controller {
                                 + msgPeriod + " in " + reservation.getCity()
                                 + "?", "You will not be able to recover it", "confirmation").showAndGetConfirmation();
                         if (remove) {
-                            getRedisConnectionManager().deleteReservation(reservation);
+                            System.out.println("apartment id list prima della remove : " + getSession().getReservationsApartmentIds());
+                            System.out.println("apartment id da rimuovere : " + reservation.getApartmentId());
+                            getSession().getReservationsApartmentIds().remove(reservation.getApartmentId());
+                            System.out.println("apartment id list dopo la remove : " + getSession().getReservationsApartmentIds());
+
+                            getRedisConnectionManager().deleteReservation(reservation, getSession().getReservationsApartmentIds());
+
                             super.refreshWindow();
                         }
                     });

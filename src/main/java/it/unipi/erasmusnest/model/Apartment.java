@@ -90,6 +90,9 @@ public class Apartment {
         this.averageRating = averageReviewScore;
     }
 
+    public Apartment() {
+    }
+
     public String getHostName() {
         return hostName;
     }

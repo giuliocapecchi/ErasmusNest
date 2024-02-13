@@ -141,9 +141,9 @@ public class ApartmentsController extends Controller{
             Button apartmentPageButton = new Button("View apartment page");
             apartmentPageButton.setOnAction(event -> {
                 cancelImageLoading();
-                getSession().setApartmentId(apartment.getId());
+                getSession().getApartment().setId(apartment.getId());
                 System.out.println("Apartment id: "+apartment.getId());
-                getSession().setApartmentAverageRating(apartment.getAverageRating());
+                getSession().getApartment().setAverageRating(apartment.getAverageRating());
                 getSession().setCurrent_filter(selectedFilter);
                 getSession().setCurrent_page(page);
                 changeWindow("apartment");

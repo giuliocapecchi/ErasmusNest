@@ -3,14 +3,11 @@ package it.unipi.erasmusnest.controllers;
 import com.dlsc.gemsfx.EmailField;
 import it.unipi.erasmusnest.model.User;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.TextFlow;
-import org.mindrot.jbcrypt.BCrypt;
+
 import java.util.ArrayList;
-import java.util.List;
 
 public class SignupController extends Controller{
 
@@ -56,7 +53,7 @@ public class SignupController extends Controller{
         nameField.textProperty().addListener((observable, oldValue, newValue) -> checkFields());
         surnameField.textProperty().addListener((observable, oldValue, newValue) -> checkFields());
         studiesComboBox.valueProperty().addListener((observable, oldValue, newValue) -> checkFields());
-        for(String studyField : getSession().getStudyFields()){
+        for(String studyField : getSession().getStudyFieldsOptions()){
             studiesComboBox.getItems().add(studyField);
         }
 

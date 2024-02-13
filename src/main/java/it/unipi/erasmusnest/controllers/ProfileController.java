@@ -133,7 +133,7 @@ public class ProfileController extends Controller{
                         // Handle the apartment button click
                         System.out.println("Apartment button clicked");
                         // Setto l'id dell'appartamento nella sessione
-                        getSession().setApartmentId(apartment.getId());
+                        getSession().getApartment().setId(apartment.getId());
                         super.changeWindow("apartment");
                     });
 

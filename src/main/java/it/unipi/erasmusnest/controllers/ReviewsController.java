@@ -72,7 +72,7 @@ public class ReviewsController extends Controller{
             title.setText("Reviews for the selected User");
             hboxTitle.getChildren().remove(changeFiltersButton);
         }else{
-            System.out.println("Session:apartment = " + getSession().getApartmentId());
+            System.out.println("Session:apartment = " + getSession().getApartment().getId());
             title.setText("Reviews for the apartment selected");
         }
         previousPageButton.setVisible(false);
@@ -90,8 +90,8 @@ public class ReviewsController extends Controller{
             reviews = getNeo4jConnectionManager().getReviewsForUser(getSession().getOtherProfileMail(),page, elementsPerPage);
             averageReviewScoreHBox.getChildren().clear();
         }else{ // prendo le recensioni di un appartamento
-            reviews = getNeo4jConnectionManager().getReviewsForApartment(getSession().getApartmentId(),page, elementsPerPage,selectedFilter);
-            Double averageRating = getNeo4jConnectionManager().getAverageReviewScore(getSession().getApartmentId());
+            reviews = getNeo4jConnectionManager().getReviewsForApartment(getSession().getApartment().getId(),page, elementsPerPage,selectedFilter);
+            Double averageRating = getNeo4jConnectionManager().getAverageReviewScore(getSession().getApartment().getId());
             if(averageRating != null){
                 ArrayList<ImageView> ratingImages = new ArrayList<>();
                 ratingImages.add(ratingImage1);
@@ -101,7 +101,7 @@ public class ReviewsController extends Controller{
                 ratingImages.add(ratingImage5);
                 RatingGraphicManager ratingGraphicManager = new RatingGraphicManager(ratingImages, ratingImages.size());
                 ratingGraphicManager.showRating(averageRating);
-                getSession().setApartmentAverageRating(averageRating);
+                getSession().getApartment().setAverageRating(averageRating);
             }
         }
 
@@ -172,7 +172,7 @@ public class ReviewsController extends Controller{
             viewHouseButton.prefWidthProperty().bind(viewHouseVBox.widthProperty().multiply(0.9));
             viewHouseButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 12px;");
             viewHouseButton.setOnAction(e -> {
-                getSession().setApartmentId(review.getApartmentId());
+                getSession().getApartment().setId(review.getApartmentId());
                 super.changeWindow("apartment");
             });
             Label timestampLabel = new Label(review.getTimestamp().toString());

@@ -1,6 +1,5 @@
 package it.unipi.erasmusnest.controllers;
 
-import it.unipi.erasmusnest.consistency.ConsistencyManager;
 import it.unipi.erasmusnest.consistency.RedisMongoConsistencyManager;
 import it.unipi.erasmusnest.model.Apartment;
 import it.unipi.erasmusnest.model.User;
@@ -17,7 +16,6 @@ import org.controlsfx.control.PopOver;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class MyProfileController extends Controller {
@@ -110,7 +108,7 @@ public class MyProfileController extends Controller {
 
         // Inizializza il ComboBox per il campo "Study Field" (SF)
 
-        studyFieldComboBox.getItems().addAll(getSession().getStudyFields());
+        studyFieldComboBox.getItems().addAll(getSession().getStudyFieldsOptions());
         // Inizializza il ComboBox per il campo "Cities of Interest" (CoI)
         // Estrai il campo "Study Field" (SF) e "Cities of Interest" (CoI) dal documento dell'utente
         //selectedStudyField = userDocument.getString("SF");
@@ -188,7 +186,7 @@ public class MyProfileController extends Controller {
     }
 
     private void onChangeView(String apartmentId){
-        getSession().setApartmentId(apartmentId);
+        getSession().getApartment().setId(apartmentId);
         super.changeWindow("apartment");
     }
 
@@ -278,7 +276,7 @@ public class MyProfileController extends Controller {
                 showConfirmationMessage("Password aggiornata con successo!", modifyPasswordButton);
                 onModifyPasswordButtonClick();
 
-                new RedisMongoConsistencyManager(getRedisConnectionManager(), getMongoConnectionManager()).updateUserPasswordOnMongo(getSession().getUser().getEmail(), newPassword);
+                new RedisMongoConsistencyManager(getRedisConnectionManager(), getMongoConnectionManager()).updateUserPasswordOnMongo(getSession().getUser().getEmail(), newPassword, getSession().getReservationsApartmentIds());
                 // TODO jacopo here we should update the password on MongoDB too starting the thread
 
             }else{ // aggiorno su Mongo e basta / TODO : eventual consistency da gestire qui! La password rimane solo su Redis per ora
@@ -343,7 +341,7 @@ public class MyProfileController extends Controller {
     }
 
     public void onApartmentView(String apartmentId) {
-        getSession().setApartmentId(apartmentId);
+        getSession().getApartment().setId(apartmentId);
         super.changeWindow("modifyApartment");
     }
 
@@ -353,7 +351,7 @@ public class MyProfileController extends Controller {
 
     @FXML
     protected void onReservationsButtonClick() {
-        getSession().setApartmentsId(null);
+        getSession().setMyApartmentsIds(null);
         super.changeWindow("myreservations");
     }
 
@@ -364,7 +362,7 @@ public class MyProfileController extends Controller {
         for(Apartment apartment : getSession().getUser().getHouses()){
             ids.add(apartment.getId());
         }
-        getSession().setApartmentsId(ids);
+        getSession().setMyApartmentsIds(ids);
         super.changeWindow("myreservations");
     }
 
@@ -392,7 +390,7 @@ public class MyProfileController extends Controller {
                     Button button = new Button();
                     button.setText(apartment.getName());
                     button.setOnAction(event -> {
-                        getSession().setApartmentId(apartment.getId());
+                        getSession().getApartment().setId(apartment.getId());
                         super.changeWindow("apartment");
                     });
                     Button dislike = new Button("dislike");

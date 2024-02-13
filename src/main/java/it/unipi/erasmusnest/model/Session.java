@@ -9,9 +9,8 @@ public class Session {
     private User user;
     private String city;
     private boolean logged;
-    private String apartmentId;
 
-    private Double apartmentAverageRating;
+    private Apartment apartment; // appartamento visualizzato
 
     private boolean connectionError;
 
@@ -21,19 +20,24 @@ public class Session {
 
     private String otherProfileMail;
 
-    private List<String> studyFields;
+    private List<String> studyFieldsOptions; // list of possible study fields
 
     private List<String> cities; // sono tutte le città presenti nel db, non quelle di interesse!
 
-    private List<String> apartmentsId;
+    private List<String> myApartmentsIds; // contengono gli id degli appartamenti posseduti dall'utente
+
+    private ArrayList <String> reservationsApartmentIds; // lista degli appartamenti su cui ho una prenotazione attiva
 
     public Session() {
         this.user = new User();
         this.logged = false;
         this.connectionError = false;
-        studyFields = new ArrayList<>();
-        studyFields = StudyFieldsLoader.getStudyFields();
+        studyFieldsOptions = new ArrayList<>();
+        studyFieldsOptions = StudyFieldsLoader.getStudyFields();
         cities = new ArrayList<>();
+        myApartmentsIds = new ArrayList<>();
+        reservationsApartmentIds = new ArrayList<>();
+        apartment = new Apartment();
     }
 
     public void reset() {
@@ -74,20 +78,12 @@ public class Session {
         this.city = city;
     }
 
-    public String getApartmentId() {
-        return apartmentId;
+    public Apartment getApartment() {
+        return apartment;
     }
 
-    public void setApartmentId(String apartmentId) {
-        this.apartmentId = apartmentId;
-    }
-
-    public Double getApartmentAverageRating() {
-        return apartmentAverageRating;
-    }
-
-    public void setApartmentAverageRating(Double apartmentAverageRating) {
-        this.apartmentAverageRating = apartmentAverageRating;
+    public void setApartment(Apartment apartment) {
+        this.apartment = apartment;
     }
 
     public boolean getConnectionError() {
@@ -96,10 +92,6 @@ public class Session {
 
     public void setConnectionError(boolean connectionError) {
         this.connectionError = connectionError;
-    }
-
-    public boolean isConnectionError() {
-        return connectionError;
     }
 
     public Integer getCurrent_page() {
@@ -118,12 +110,8 @@ public class Session {
         this.current_filter = current_filter;
     }
 
-    public List<String> getStudyFields() {
-        return studyFields;
-    }
-
-    public void setStudyFields(List<String> studyFields) {
-        this.studyFields = studyFields;
+    public List<String> getStudyFieldsOptions() {
+        return studyFieldsOptions;
     }
 
     public List<String> getCities() {
@@ -134,12 +122,21 @@ public class Session {
         this.cities = cities;
     }
 
-    public List<String> getApartmentsId() {
-        return apartmentsId;
+    public List<String> getMyApartmentsIds() {
+        return myApartmentsIds;
     }
 
-    public void setApartmentsId(List<String> apartmentsId) {
-        this.apartmentsId = apartmentsId;
+    public void setMyApartmentsIds(List<String> myApartmentsIds) {
+        this.myApartmentsIds = myApartmentsIds;
     }
+
+    public ArrayList<String> getReservationsApartmentIds() {
+        return reservationsApartmentIds;
+    }
+
+    public void setReservationsApartmentIds(ArrayList<String> reservationsApartmentIds) {
+        this.reservationsApartmentIds = reservationsApartmentIds;
+    }
+
 
 }

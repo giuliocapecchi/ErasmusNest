@@ -54,7 +54,7 @@ public class WriteReviewController extends Controller{
         });
 
 
-        Review review = getNeo4jConnectionManager().getReview(getSession().getUser().getEmail(),getSession().getApartmentId());
+        Review review = getNeo4jConnectionManager().getReview(getSession().getUser().getEmail(),getSession().getApartment().getId());
         if(review != null){
             textArea.setText(review.getComments());
             textArea.positionCaret(textArea.getText().length());
@@ -77,7 +77,7 @@ public class WriteReviewController extends Controller{
     @FXML
     void submit() {
         System.out.println("submit action");
-        Review review = new Review(getSession().getApartmentId(),getSession().getUser().getEmail(),textArea.getText(), (int)ratingSlider.getValue());
+        Review review = new Review(getSession().getApartment().getId(),getSession().getUser().getEmail(),textArea.getText(), (int)ratingSlider.getValue());
         getNeo4jConnectionManager().addReview(review);
         super.changeWindow("myProfile");
 

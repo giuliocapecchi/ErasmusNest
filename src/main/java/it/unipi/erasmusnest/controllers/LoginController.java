@@ -3,6 +3,7 @@ package it.unipi.erasmusnest.controllers;
 import com.dlsc.gemsfx.EmailField;
 import it.unipi.erasmusnest.consistency.RedisConsistencyManager;
 import it.unipi.erasmusnest.consistency.RedisMongoConsistencyManager;
+import it.unipi.erasmusnest.model.User;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -10,7 +11,9 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 public class LoginController extends Controller{
 
@@ -137,7 +140,7 @@ public class LoginController extends Controller{
                 long ttl = getRedisConnectionManager().getUserTTL(emailField.getEmailAddress());
                 if(ttl == -1)
                     new RedisMongoConsistencyManager(getRedisConnectionManager(), getMongoConnectionManager())
-                            .updateUserPasswordOnMongo(emailField.getEmailAddress(), passwordField.getText());
+                            .updateUserPasswordOnMongo(emailField.getEmailAddress(), passwordField.getText(), getSession().getReservationsApartmentIds());
 
             } else if(password != null && !password.equals(passwordField.getText())) {
                 // Password taken different from real pw
@@ -162,7 +165,6 @@ public class LoginController extends Controller{
                 }
             }
             if(getSession().isLogged()){
-                System.out.println("ducangio");
                 getSession().getUser().setPassword(passwordField.getText());
                 if(getPreviousWindowName() != null && !getPreviousWindowName().equals("signup")) {
                     super.backToPreviousWindow();
@@ -184,6 +186,41 @@ public class LoginController extends Controller{
         } else {
             super.changeWindow("homepage");
         }
+
+        //TODO :  rimuovi , scriptino per valutare le performance delle chiamate con/senza indici
+        /*long totalTime = 0;
+        int iterations = 100;
+        for (int i = 0; i < iterations; i++) {
+            int stringLength = 10;
+            String allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            Random random = new Random();
+            StringBuilder sb = new StringBuilder(stringLength);
+            for (int j = 0; j < stringLength; j++) {
+                // Genera un indice casuale per selezionare un carattere
+                int randomIndex = random.nextInt(allowedChars.length());
+                // Aggiungi il carattere selezionato al StringBuilder
+                sb.append(allowedChars.charAt(randomIndex));
+            }
+            String randomString = sb.toString();
+
+            String randomCity = getSession().getCities().get(random.nextInt(getSession().getCities().size()));
+
+            long startTime = System.nanoTime();
+            //User user = getMongoConnectionManager().findUser(randomString);
+            // prendo un numero randomico tra 1 e 10000
+            //getMongoConnectionManager().averagePriceNearCityCenter(randomCity, random.nextInt(10000));
+            List<String> answer = getNeo4jConnectionManager().seeSuggestedUsers("adriana33@gmail.com","kwest@gmail.com");
+
+
+            long endTime = System.nanoTime();
+            totalTime += (endTime - startTime);
+
+        }
+        double averageTime = totalTime / (double) iterations;
+        // Converti in millisecondi
+        double averageTimeInMs = averageTime / 1_000_000.0;
+        System.out.println("Tempo medio per chiamata: " + averageTimeInMs + " ms");*/
+
     }
 
     @FXML
