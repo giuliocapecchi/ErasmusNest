@@ -41,9 +41,13 @@ public class Session {
     }
 
     public void reset() {
+        // svuoto la sessione
         this.user = new User();
         this.logged = false;
         this.connectionError = false;
+        myApartmentsIds = new ArrayList<>();
+        reservationsApartmentIds = new ArrayList<>();
+        apartment = new Apartment();
     }
 
     public String getOtherProfileMail() {
