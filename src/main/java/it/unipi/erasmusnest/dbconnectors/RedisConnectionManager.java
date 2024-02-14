@@ -18,14 +18,17 @@ public class RedisConnectionManager extends ConnectionManager{
 
 
     public RedisConnectionManager() {
-        super("10.1.1.14", 7000);
+        super("localhost", 7000);
     }
 
     public JedisCluster createJedisCluster(){
         Set<HostAndPort> jedisClusterNodes = new HashSet<>();
-        jedisClusterNodes.add(new HostAndPort("10.1.1.14", 7000));
-        jedisClusterNodes.add(new HostAndPort("10.1.1.15", 7000));
-        jedisClusterNodes.add(new HostAndPort("10.1.1.16", 7000));
+        //jedisClusterNodes.add(new HostAndPort("10.1.1.14", 7000));
+        //jedisClusterNodes.add(new HostAndPort("10.1.1.15", 7000));
+        //jedisClusterNodes.add(new HostAndPort("10.1.1.14", 7001));
+        jedisClusterNodes.add(new HostAndPort("localhost", 7000));
+        jedisClusterNodes.add(new HostAndPort("localhost", 7001));
+        jedisClusterNodes.add(new HostAndPort("localhost", 7002));
         return new JedisCluster(jedisClusterNodes);
     }
 
@@ -51,20 +54,43 @@ public class RedisConnectionManager extends ConnectionManager{
 
         try (JedisCluster jedis = createJedisCluster()) {
 
-            // key design: <entity>:<email>:<attribute>
+            // key design: <entity>:<email>
             // entity: user
             // attribute: password
-            String attribute = "password";
 
-            String key = "user:" + email + ":" + attribute;
-            value = jedis.get(key);
-            // jedis.close(); // not needed with try-with-resources
+            String key = "user:" + email;
+            value = jedis.hget(key, "password");
+            //jedis.close(); // not needed with try-with-resources
+            return value;
 
         } catch (Exception e) {
             System.out.println("Connection problem: " + e.getMessage());
             new AlertDialogGraphicManager("Redis connection failed").show();
         }
         return value;
+    }
+
+    public ArrayList<String> getReservedApartments(String email) {
+
+        try (JedisCluster jedis = createJedisCluster()) {
+
+            // key design: <entity>:<email>
+            // entity: user
+            // attribute: reservedApartments
+
+            String key = "user:" + email;
+            String value = jedis.hget(key, "reservedApartments");
+            if(value == null)
+                return new ArrayList<>();
+            else
+                return new ArrayList<>(Arrays.asList(value.split(",")));
+            //jedis.close(); // not needed with try-with-resources
+
+        } catch (Exception e) {
+            System.out.println("REDIS connection problem in looking for the reserved Apartments: " + e.getMessage());
+            new AlertDialogGraphicManager("Redis connection failed").show();
+        }
+        return null;
     }
 
     // DID: get only the reservations that are not in the trash period
@@ -146,7 +172,6 @@ public class RedisConnectionManager extends ConnectionManager{
         ArrayList<Reservation> reservations = new ArrayList<>();
 
         try (JedisCluster jedis = createJedisCluster()) {
-            System.out.println("sei qui");
             // key design: <entity>:<userEmail>:<houseId>:<startYear>:<startMonth>:<numberOfMonths>:<dateTime>
             for(String apartmentId : apartmentsIds){
                 String subKey = "reservation:" + userEmail + ":{" + apartmentId + "}:*";
@@ -380,15 +405,12 @@ public class RedisConnectionManager extends ConnectionManager{
         try (JedisCluster jedis = createJedisCluster()) {
 
             long maxSeconds = LocalDateTime.now().until(LocalDateTime.now().plusWeeks(trashWeeksInterval), ChronoUnit.SECONDS);
-            System.out.println("MAX SECONDS: " + maxSeconds);
 
             for(Reservation reservation : reservations) {
                 String subKey = getSubKey(reservation);
                 long seconds = jedis.ttl(subKey);
                 if (seconds > maxSeconds) {
                     maxSeconds = seconds;
-                    System.out.println("MAX SECONDS: " + maxSeconds);
-                    System.out.println("SECONDS: " + seconds);
                 }
             }
 

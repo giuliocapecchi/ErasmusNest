@@ -26,7 +26,7 @@ public class MyReservationsController extends Controller {
     @FXML
     private ScrollPane scrollPane;
 
-    ArrayList<Reservation> reservations;
+    private ArrayList<Reservation> reservations;
 
 
     @FXML
@@ -35,14 +35,19 @@ public class MyReservationsController extends Controller {
         System.out.println("MyReservations initialize");
 
         if(getSession().getMyApartmentsIds() == null){ // student
-            reservations = getRedisConnectionManager().getReservationsForUser(getSession().getUser().getEmail(), getSession().getReservationsApartmentIds());
-            if(!reservations.isEmpty()){
-                for (Reservation reservation : reservations) {
-                    add(reservation, "student");
+            if(!getSession().getReservationsApartmentIds().isEmpty()){
+                reservations = getRedisConnectionManager().getReservationsForUser(getSession().getUser().getEmail(), getSession().getReservationsApartmentIds());
+                if(!reservations.isEmpty()){ // teoricamente non dovrebbe mai essere vuoto; per sicurezza controllo
+                    for (Reservation reservation : reservations) {
+                        add(reservation, "student");
+                    }
+                } else {
+                    noReservation();
                 }
-            } else {
+            }else {
                 noReservation();
             }
+
         } else { // host
             // get the reservations for the apartments
             List<String> apartmentsIds = getSession().getMyApartmentsIds();
@@ -231,13 +236,9 @@ public class MyReservationsController extends Controller {
                                 + msgPeriod + " in " + reservation.getCity()
                                 + "?", "You will not be able to recover it", "confirmation").showAndGetConfirmation();
                         if (remove) {
-                            System.out.println("apartment id list prima della remove : " + getSession().getReservationsApartmentIds());
-                            System.out.println("apartment id da rimuovere : " + reservation.getApartmentId());
-                            getSession().getReservationsApartmentIds().remove(reservation.getApartmentId());
-                            System.out.println("apartment id list dopo la remove : " + getSession().getReservationsApartmentIds());
-
+                            if(!hasDuplicateApartmentReservation(reservations,reservation.getApartmentId()))
+                                getSession().getReservationsApartmentIds().remove(reservation.getApartmentId());
                             getRedisConnectionManager().deleteReservation(reservation, getSession().getReservationsApartmentIds());
-
                             super.refreshWindow();
                         }
                     });
@@ -291,4 +292,17 @@ public class MyReservationsController extends Controller {
     protected void profileButtonClick(){
         super.changeWindow("myProfile");
     }
+
+    private boolean hasDuplicateApartmentReservation(ArrayList<Reservation> reservations, String apartmentId){
+        int count = 0;
+        for(Reservation reservation : reservations){
+            if(reservation.getApartmentId().equals(apartmentId)){
+                count ++;
+                if (count==2)
+                    return true;
+            }
+        }
+        return false;
+    }
+
 }
