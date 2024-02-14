@@ -405,7 +405,6 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
     //UPDATE
     public void updateApartmentAverageReviewScore(String apartmentId) {
         try (Session session = driver.session()) {
-            System.out.println("sei qui con apartmentId: " + apartmentId);
             session.writeTransaction((TransactionWork<Void>) tx -> {
                 tx.run("MATCH ()-[r:REVIEW]->(a:Apartment {apartmentId:$apartmentId}) " +
                                 "WITH a, AVG(r.score) AS averageScore " +
