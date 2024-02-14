@@ -132,10 +132,10 @@ public class LoginController extends Controller{
         if(isEmailFieldValid(emailField) && isTextFieldValid(passwordField)) {
             String password = getRedisConnectionManager().getPassword(emailField.getEmailAddress());
             System.out.println("REDIS Password: " + password);
-            if(password != null && password.equals(passwordField.getText())) {
+            if(password != null && password.equals(passwordField.getText())) { // user found in Redis
                 getSession().setLogged(true);
                 getSession().getUser().setEmail(emailField.getEmailAddress());
-                getSession().setLogged(true);
+                getSession().setReservationsApartmentIds(getRedisConnectionManager().getReservedApartments(emailField.getEmailAddress()));
 
                 long ttl = getRedisConnectionManager().getUserTTL(emailField.getEmailAddress());
                 if(ttl == -1)
@@ -145,7 +145,7 @@ public class LoginController extends Controller{
             } else if(password != null && !password.equals(passwordField.getText())) {
                 // Password taken different from real pw
                 showErrorMessage("Invalid email or password", errorTextFlow);
-            } else {
+            } else { // check credentials in MongoDB
                 System.out.println("Credentials not found in Redis. Let's check in MongoDB");
                 String mongoPassword = getMongoConnectionManager().getPassword(emailField.getEmailAddress());
                 System.out.println("MongoDB Password: " + mongoPassword);
@@ -187,41 +187,6 @@ public class LoginController extends Controller{
         } else {
             super.changeWindow("homepage");
         }
-
-        //TODO :  rimuovi , scriptino per valutare le performance delle chiamate con/senza indici
-        /*long totalTime = 0;
-        int iterations = 100;
-        for (int i = 0; i < iterations; i++) {
-            int stringLength = 10;
-            String allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            Random random = new Random();
-            StringBuilder sb = new StringBuilder(stringLength);
-            for (int j = 0; j < stringLength; j++) {
-                // Genera un indice casuale per selezionare un carattere
-                int randomIndex = random.nextInt(allowedChars.length());
-                // Aggiungi il carattere selezionato al StringBuilder
-                sb.append(allowedChars.charAt(randomIndex));
-            }
-            String randomString = sb.toString();
-
-            String randomCity = getSession().getCities().get(random.nextInt(getSession().getCities().size()));
-
-            long startTime = System.nanoTime();
-            //User user = getMongoConnectionManager().findUser(randomString);
-            // prendo un numero randomico tra 1 e 10000
-            //getMongoConnectionManager().averagePriceNearCityCenter(randomCity, random.nextInt(10000));
-            List<String> answer = getNeo4jConnectionManager().seeSuggestedUsers("adriana33@gmail.com","kwest@gmail.com");
-
-
-            long endTime = System.nanoTime();
-            totalTime += (endTime - startTime);
-
-        }
-        double averageTime = totalTime / (double) iterations;
-        // Converti in millisecondi
-        double averageTimeInMs = averageTime / 1_000_000.0;
-        System.out.println("Tempo medio per chiamata: " + averageTimeInMs + " ms");*/
-
     }
 
     @FXML
@@ -236,19 +201,20 @@ public class LoginController extends Controller{
         }
     }
 
-    /*private void broCancellami() {
+    private void broCancellami() {
         long totalTime = 0;
         int iterations = 100;
         for (int i = 0; i < iterations; i++) {
 
-            String email = "a@b.cc";
-            String password = "abcd";
+            String email = "";
 
             long startTime = System.nanoTime();
             //User user = getMongoConnectionManager().findUser(randomString);
             // prendo un numero randomico tra 1 e 10000
             //getMongoConnectionManager().averagePriceNearCityCenter(randomCity, random.nextInt(10000));
-            String redisPwd = getRedisConnectionManager().getPassword(email);
+            //String redisPwd = getRedisConnectionManager().getPassword(email);
+           // getRedisConnectionManager().getReservedApartments(email);
+            String mongoPassword = getMongoConnectionManager().getPassword(email);
 
             long endTime = System.nanoTime();
             totalTime += (endTime - startTime);
@@ -259,6 +225,6 @@ public class LoginController extends Controller{
         double averageTimeInMs = averageTime / 1_000_000.0;
         System.out.println("Tempo medio per chiamata: " + averageTimeInMs + " ms");
 
-    }*/
+    }
 
 }
