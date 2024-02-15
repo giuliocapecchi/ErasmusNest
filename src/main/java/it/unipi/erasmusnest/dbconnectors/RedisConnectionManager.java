@@ -501,7 +501,7 @@ public class RedisConnectionManager extends ConnectionManager{
 
         String value = null;
 
-        try (JedisPooled jedis = new JedisPooled("localhost", 6379)) {
+        try (JedisPooled jedis = new JedisPooled("10.1.1.16", 6379)) {
 
             // key design: <entity>:<email>
             // entity: user
