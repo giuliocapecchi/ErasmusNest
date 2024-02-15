@@ -142,6 +142,7 @@ public class ApartmentController extends Controller{
                 super.changeWindow("apartments");
             });
 
+            getSession().setApartment(new Apartment());
             // Mostra la finestra di dialogo
             alert.showAndWait();
 

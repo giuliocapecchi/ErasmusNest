@@ -20,10 +20,10 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
 
     ////////////////////////////////////// CONNECTION URI //////////////////////////////////////
     private static final String PROTOCOL = "bolt://";
-    private static final String NEO4J_HOST = "localhost";
+    private static final String NEO4J_HOST = "10.1.1.14";
     private static final String NEO4J_PORT = "7687";
     private static final String NEO4J_USER = "neo4j";
-    private static final String NEO4J_PSW = "adminadmin";
+    private static final String NEO4J_PSW = "password";
 
     ////////////////////////////////////// CONSTRUCTOR //////////////////////////////////////
     public Neo4jConnectionManager()
