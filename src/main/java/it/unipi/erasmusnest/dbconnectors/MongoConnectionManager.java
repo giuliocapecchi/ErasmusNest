@@ -728,20 +728,19 @@ public class MongoConnectionManager extends ConnectionManager{
                 new Document("$sort",
                         new Document("averagePrice", 1L)),
                 new Document("$group",
-                        new Document("_id",
-                                new BsonNull())
-                                .append("lowestAveragePrice",
-                                        new Document("$first", "$$ROOT"))
-                                .append("highestAveragePrice",
-                                        new Document("$last", "$$ROOT"))),
-                new Document("$project",
                         new Document("_id", 0L)
-                                .append("lowestAveragePriceCity", "$lowestAveragePrice._id")
-                                .append("lowestAveragePrice", "$lowestAveragePrice.averagePrice")
-                                .append("lowestAveragePriceCount", "$lowestAveragePrice.count")
-                                .append("highestAveragePriceCity", "$highestAveragePrice._id")
-                                .append("highestAveragePrice", "$highestAveragePrice.averagePrice")
-                                .append("highestAveragePriceCount", "$highestAveragePrice.count"))));
+                                .append("lowestName",
+                                        new Document("$first", "$_id"))
+                                .append("lowestCount",
+                                        new Document("$first", "$count"))
+                                .append("lowestPrice",
+                                        new Document("$first", "$averagePrice"))
+                                .append("highestName",
+                                        new Document("$last", "$_id"))
+                                .append("highestCount",
+                                        new Document("$last", "$count"))
+                                .append("highestPrice",
+                                        new Document("$last", "$averagePrice")))));
         StringBuilder resultString = new StringBuilder();
         for (Document doc : result) {
             resultString.append(doc.toJson()).append("\n");

@@ -125,12 +125,12 @@ public class AnalyticsController extends Controller {
         String result = getMongoConnectionManager().getPriceAnalytics(accommodates, bathrooms, priceMin, priceMax);
         try {
             JSONObject jsonObject = new JSONObject(result);
-            lowestAveragePriceCity = jsonObject.getString("lowestAveragePriceCity");
-            lowestAveragePrice = Math.round(jsonObject.getDouble("lowestAveragePrice") * 100.0) / 100.0;
-            lowestAverageApartmensNumber = jsonObject.getInt("lowestAveragePriceCount");
-            highestAveragePriceCity = jsonObject.getString("highestAveragePriceCity");
-            highestAveragePrice = Math.round(jsonObject.getDouble("highestAveragePrice") * 100.0) / 100.0;
-            highestAverageApartmensNumber = jsonObject.getInt("highestAveragePriceCount");
+            lowestAveragePriceCity = jsonObject.getString("lowestName");
+            lowestAveragePrice = Math.round(jsonObject.getDouble("lowestPrice") * 100.0) / 100.0;
+            lowestAverageApartmensNumber = jsonObject.getInt("lowestCount");
+            highestAveragePriceCity = jsonObject.getString("highestName");
+            highestAveragePrice = Math.round(jsonObject.getDouble("highestPrice") * 100.0) / 100.0;
+            highestAverageApartmensNumber = jsonObject.getInt("highestCount");
         } catch (JSONException e) {
             e.printStackTrace();
         }
