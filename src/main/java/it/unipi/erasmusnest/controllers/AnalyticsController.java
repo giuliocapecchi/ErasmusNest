@@ -119,26 +119,30 @@ public class AnalyticsController extends Controller {
         Integer priceMin = minInputPrice.getValue();
         Integer priceMax = maxInputPrice.getValue();
         String lowestAveragePriceCity = ""; String highestAveragePriceCity = "";
+        Integer lowestAverageApartmensNumber = -1;
+        Integer highestAverageApartmensNumber = -1;
         double lowestAveragePrice =-1; double highestAveragePrice =-1;
         String result = getMongoConnectionManager().getPriceAnalytics(accommodates, bathrooms, priceMin, priceMax);
         try {
             JSONObject jsonObject = new JSONObject(result);
             lowestAveragePriceCity = jsonObject.getString("lowestAveragePriceCity");
             lowestAveragePrice = Math.round(jsonObject.getDouble("lowestAveragePrice") * 100.0) / 100.0;
+            lowestAverageApartmensNumber = jsonObject.getInt("lowestAveragePriceCount");
             highestAveragePriceCity = jsonObject.getString("highestAveragePriceCity");
-            highestAveragePrice = Math.round(jsonObject.getDouble("highestAveragePrice"));
+            highestAveragePrice = Math.round(jsonObject.getDouble("highestAveragePrice") * 100.0) / 100.0;
+            highestAverageApartmensNumber = jsonObject.getInt("highestAveragePriceCount");
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        if(highestAveragePrice==-1 && highestAveragePriceCity.isEmpty()){
+        if(highestAveragePrice==-1 || highestAveragePriceCity.isEmpty() || highestAverageApartmensNumber==-1){
             cityHighestPrice.setText("No data available");
         } else {
-            cityHighestPrice.setText(highestAveragePriceCity + " with " + highestAveragePrice + "$");
+            cityHighestPrice.setText(highestAveragePriceCity + " with " + highestAveragePrice + "$ for " + highestAverageApartmensNumber + " apartments");
         }
-        if(lowestAveragePrice==-1 && lowestAveragePriceCity.isEmpty()){
+        if(lowestAveragePrice==-1 && lowestAveragePriceCity.isEmpty() || highestAverageApartmensNumber==-1){
             cityLowestPrice.setText("No data available");
         } else {
-            cityLowestPrice.setText(lowestAveragePriceCity + " with " + lowestAveragePrice + "$");
+            cityLowestPrice.setText(lowestAveragePriceCity + " with " + lowestAveragePrice + "$ for " + lowestAverageApartmensNumber + " apartments");
         }
         cityHighestPrice.setVisible(true); cityLowestPrice.setVisible(true);
     }
