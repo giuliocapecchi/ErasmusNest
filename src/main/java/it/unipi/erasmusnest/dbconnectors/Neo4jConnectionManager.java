@@ -20,10 +20,10 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
 
     ////////////////////////////////////// CONNECTION URI //////////////////////////////////////
     private static final String PROTOCOL = "bolt://";
-    private static final String NEO4J_HOST = "localhost";
+    private static final String NEO4J_HOST = "10.1.1.14";
     private static final String NEO4J_PORT = "7687";
     private static final String NEO4J_USER = "neo4j";
-    private static final String NEO4J_PSW = "adminadmin";
+    private static final String NEO4J_PSW = "password";
 
     ////////////////////////////////////// CONSTRUCTOR //////////////////////////////////////
     public Neo4jConnectionManager()
@@ -405,7 +405,6 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
     //UPDATE
     public void updateApartmentAverageReviewScore(String apartmentId) {
         try (Session session = driver.session()) {
-            System.out.println("sei qui con apartmentId: " + apartmentId);
             session.writeTransaction((TransactionWork<Void>) tx -> {
                 tx.run("MATCH ()-[r:REVIEW]->(a:Apartment {apartmentId:$apartmentId}) " +
                                 "WITH a, AVG(r.score) AS averageScore " +
@@ -551,15 +550,16 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
     public List<String> seeSuggestedUsers(String emailA, String emailB) {
         try (Session session = driver.session()) {
             return session.readTransaction((TransactionWork<List<String>>) tx -> {
-                Result result = tx.run("MATCH (a:User {email: $emailA}) " +
-                                "MATCH (b:User {email: $emailB}) " +
-                                "MATCH (b)-[:FOLLOWS]->(suggested:User) " +
-                                "WHERE NOT (a)-[:FOLLOWS]->(suggested) " +
-                                "AND suggested.email <> $emailA " + // Aggiunta clausola WHERE per escludere l'utente attuale
-                                "MATCH (a)-[:INTERESTS]->(city:City) " +
-                                "MATCH (suggested)-[:INTERESTS]->(city) " +
-                                "RETURN DISTINCT suggested.email AS suggestedEmail",
-                        parameters("emailA", emailA, "emailB", emailB));
+                HashMap<String, Object> parameters = new HashMap<>();
+                parameters.put("emailA", emailA);
+                parameters.put("emailB", emailB);
+
+                Result result = tx.run("MATCH (a:User {email: $emailA})-[:INTERESTS]->(city:City)<-[:INTERESTS]-(suggested:User), " +
+                                    "(b:User {email: $emailB})-[:FOLLOWS]->(suggested) "+
+                                    "WHERE NOT (a)-[:FOLLOWS]->(suggested) "+
+                                    "AND suggested.email <> $emailA "+
+                                    "RETURN DISTINCT suggested.email AS suggestedEmail",
+                                    parameters);
                 List<String> suggestedEmails = new ArrayList<>();
                 while (result.hasNext()) {
                     suggestedEmails.add(result.next().get("suggestedEmail").asString());
@@ -614,24 +614,27 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         }
     }
 
-    public Map<String, String> getFavourites(String email) {
+    public ArrayList<Apartment> getFavourites(String email) {
+
         try (Session session = driver.session()) {
             return session.readTransaction(tx -> {
-                Result result = tx.run("MATCH (u:User {email: $email})-[l:LIKES]->(a:Apartment) RETURN a.apartmentId, a.name", parameters("email", email));
-                Map<String, String> favourites = new HashMap<>();
+                Result result = tx.run("MATCH (u:User {email: $email})-[l:LIKES]->(a:Apartment) RETURN a", parameters("email", email));
+                ArrayList<Apartment> favourites = new ArrayList<>();
                 while (result.hasNext()) {
                     Record record = result.next();
-                    String apartmentId = record.get("a.apartmentId").asString();
-                    String name = record.get("a.name").asString();
-                    favourites.put(apartmentId, name);
+                    Node apartmentNode = record.get("a").asNode();
+                    String apartmentId = apartmentNode.get("apartmentId").asString();
+                    String name = apartmentNode.get("name").asString();
+                    String url = apartmentNode.get("pictureUrl").asString();
+                    double averageReviewScore = apartmentNode.get("averageReviewScore").asDouble();
+                    favourites.add(new Apartment(apartmentId, name, url, averageReviewScore));
                 }
                 return favourites;
             });
         } catch (Exception e) {
             System.out.println("Exception: " + e);
             new AlertDialogGraphicManager("Neo4j connection failed").show();
-            // Gestisci l'errore come preferisci o ritorna una mappa vuota
-            return Collections.emptyMap();
+            return null;
         }
     }
 

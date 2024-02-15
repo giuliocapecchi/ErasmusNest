@@ -45,7 +45,7 @@ public class ModifyAparmentController extends Controller{
 
     @FXML
     private void initialize() {
-        String apartmentId = getSession().getApartmentId();
+        String apartmentId = getSession().getApartment().getId();
         System.out.println("\n\n\nL'ID dell'appartamento è: " + apartmentId);
         apartment = getMongoConnectionManager().getApartment(apartmentId);
         System.out.println("\n\n\n" + apartment.toString());
@@ -107,7 +107,7 @@ public class ModifyAparmentController extends Controller{
     public void onUpdateHouseButtonClick()
     {
         //Qua deve sparare la query su MONGO per aggiornare i dati dell'appartamento
-        String apartmentId = getSession().getApartmentId();
+        String apartmentId = getSession().getApartment().getId();
         Apartment updatedApartment = getMongoConnectionManager().getApartment(apartmentId);
         updatedApartment.setMaxAccommodates(inputAccommodates.getValue());
         updatedApartment.setBathrooms(inputBathrooms.getValue());
@@ -127,7 +127,7 @@ public class ModifyAparmentController extends Controller{
         for (String s : updatedApartment.getImageURLs()) {
             System.out.println(s);
         }
-        updatedApartment.setId(getSession().getApartmentId());
+        updatedApartment.setId(getSession().getApartment().getId());
 
         if(getMongoConnectionManager().updateApartment(apartment,updatedApartment)){
 
@@ -193,7 +193,7 @@ public class ModifyAparmentController extends Controller{
     @FXML
     private void onRemoveHouseButtonClick(ActionEvent actionEvent)
     {
-        String apartmentId = getSession().getApartmentId();
+        String apartmentId = getSession().getApartment().getId();
         boolean remove = new AlertDialogGraphicManager("Delete confirmation","Are you sure you want to remove this apartment?\n",
                 "You will not be able to recover it","confirmation").showAndGetConfirmation();
         if(remove)

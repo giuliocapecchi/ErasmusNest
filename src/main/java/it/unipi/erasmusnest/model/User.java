@@ -11,7 +11,6 @@ public class User {
     private ArrayList<String> preferredCities;  // GRAPH
     private String studyField;  // MONGO, GRAPH
     private List<Apartment> houses;
-
     private String password;
 
 

@@ -3,6 +3,7 @@ package it.unipi.erasmusnest.controllers;
 import com.dlsc.gemsfx.EmailField;
 import it.unipi.erasmusnest.consistency.RedisConsistencyManager;
 import it.unipi.erasmusnest.consistency.RedisMongoConsistencyManager;
+import it.unipi.erasmusnest.model.User;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -10,7 +11,9 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 public class LoginController extends Controller{
 
@@ -129,20 +132,20 @@ public class LoginController extends Controller{
         if(isEmailFieldValid(emailField) && isTextFieldValid(passwordField)) {
             String password = getRedisConnectionManager().getPassword(emailField.getEmailAddress());
             System.out.println("REDIS Password: " + password);
-            if(password != null && password.equals(passwordField.getText())) {
+            if(password != null && password.equals(passwordField.getText())) { // user found in Redis
                 getSession().setLogged(true);
                 getSession().getUser().setEmail(emailField.getEmailAddress());
-                getSession().setLogged(true);
+                getSession().setReservationsApartmentIds(getRedisConnectionManager().getReservedApartments(emailField.getEmailAddress()));
 
                 long ttl = getRedisConnectionManager().getUserTTL(emailField.getEmailAddress());
                 if(ttl == -1)
                     new RedisMongoConsistencyManager(getRedisConnectionManager(), getMongoConnectionManager())
-                            .updateUserPasswordOnMongo(emailField.getEmailAddress(), passwordField.getText());
+                            .updateUserPasswordOnMongo(emailField.getEmailAddress(), passwordField.getText(), getSession().getReservationsApartmentIds());
 
             } else if(password != null && !password.equals(passwordField.getText())) {
                 // Password taken different from real pw
                 showErrorMessage("Invalid email or password", errorTextFlow);
-            } else {
+            } else { // check credentials in MongoDB
                 System.out.println("Credentials not found in Redis. Let's check in MongoDB");
                 String mongoPassword = getMongoConnectionManager().getPassword(emailField.getEmailAddress());
                 System.out.println("MongoDB Password: " + mongoPassword);
@@ -162,7 +165,6 @@ public class LoginController extends Controller{
                 }
             }
             if(getSession().isLogged()){
-                System.out.println("ducangio");
                 getSession().getUser().setPassword(passwordField.getText());
                 if(getPreviousWindowName() != null && !getPreviousWindowName().equals("signup")) {
                     super.backToPreviousWindow();
@@ -171,8 +173,6 @@ public class LoginController extends Controller{
                 }
             }
         }
-
-
 
     }
 
@@ -197,7 +197,5 @@ public class LoginController extends Controller{
             errorTextFlow.getChildren().clear();
         }
     }
-
-
 
 }

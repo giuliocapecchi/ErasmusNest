@@ -11,7 +11,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-<junit.version>5.9.2</junit.version>  </properties>
+    <junit.version>5.9.2</junit.version>
+  </properties>
 
   <dependencies>
     <dependency>
@@ -50,13 +51,11 @@
       <version>4.11.1</version>
     </dependency>
 
-
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
       <version>1.2.11</version>
     </dependency>
-
 
     <dependency>
       <groupId>org.junit.jupiter</groupId>
@@ -64,29 +63,31 @@
       <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
+
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
       <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
-      <dependency>
-          <groupId>org.openjfx</groupId>
-          <artifactId>javafx-graphics</artifactId>
-          <version>17.0.6</version>
-      </dependency>
+
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-graphics</artifactId>
+      <version>17.0.6</version>
+    </dependency>
+
     <dependency>
       <groupId>org.mongodb</groupId>
       <artifactId>mongodb-driver-core</artifactId>
       <version>4.11.1</version>
     </dependency>
-      <dependency>
 
-
-          <groupId>org.controlsfx</groupId>
-          <artifactId>controlsfx</artifactId>
-          <version>11.1.2</version>
-      </dependency>
+    <dependency>
+      <groupId>org.controlsfx</groupId>
+      <artifactId>controlsfx</artifactId>
+      <version>11.1.2</version>
+    </dependency>
 
     <dependency>
       <groupId>org.neo4j.driver</groupId>
@@ -99,23 +100,24 @@
       <artifactId>javafx-web</artifactId>
       <version>17.0.2</version>
     </dependency>
-      <dependency>
-          <groupId>org.openjfx</groupId>
-          <artifactId>javafx-base</artifactId>
-          <version>17.0.6</version>
-      </dependency>
+
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-base</artifactId>
+      <version>17.0.6</version>
+    </dependency>
 
     <dependency>
       <groupId>org.mindrot</groupId>
       <artifactId>jbcrypt</artifactId>
       <version>0.4</version>
     </dependency>
-      <dependency>
-          <groupId>org.apache.xbean</groupId>
-          <artifactId>xbean-reflect</artifactId>
-          <version>3.7</version>
-      </dependency>
 
+    <dependency>
+      <groupId>org.apache.xbean</groupId>
+      <artifactId>xbean-reflect</artifactId>
+      <version>3.7</version>
+    </dependency>
 
   </dependencies>
 

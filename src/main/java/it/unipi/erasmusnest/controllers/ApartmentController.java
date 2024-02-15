@@ -93,8 +93,6 @@ public class ApartmentController extends Controller{
     private Button removeButton;
     @FXML
     private Label suggestionsLabel;
-
-    private Apartment apartment;
     private ReservationGraphicManager reservationGraphicManager;
     private boolean reservationsLoaded;
 
@@ -113,7 +111,7 @@ public class ApartmentController extends Controller{
                 backPressed = false;
             }
             if (backPressed) {
-                getSession().setApartmentId(apartmentsStack.pop());
+                getSession().getApartment().setId(apartmentsStack.pop());
             }
         } else {
             apartmentsStack.clear();
@@ -121,12 +119,12 @@ public class ApartmentController extends Controller{
         }
 
         likeButton.setDisable(!getSession().isLogged());
-        apartment = getMongoConnectionManager().getApartment(getSession().getApartmentId());
-        if(apartment==null){
+        getSession().setApartment(getMongoConnectionManager().getApartment(getSession().getApartment().getId()));
+        if(getSession().getApartment()==null){
             // If apartment is null seems that the apartment has been removed from Mongo
             // and so need to be removed also from Neo4j
 
-            new NeoConsistencyManager(getNeo4jConnectionManager()).removeApartmentFromNeo4J(getSession().getApartmentId());
+            new NeoConsistencyManager(getNeo4jConnectionManager()).removeApartmentFromNeo4J(getSession().getApartment().getId());
 
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Information Dialog");
@@ -144,6 +142,7 @@ public class ApartmentController extends Controller{
                 super.changeWindow("apartments");
             });
 
+            getSession().setApartment(new Apartment());
             // Mostra la finestra di dialogo
             alert.showAndWait();
 
@@ -156,9 +155,9 @@ public class ApartmentController extends Controller{
                 System.out.println("Logged user: "+getSession().getUser().getEmail());
                 removeButton.setVisible(getSession().getUser().isAdmin());
             }
-            apartment.setAverageRating(getSession().getApartmentAverageRating());
+            getSession().getApartment().setAverageRating(getSession().getApartment().getAverageRating());
 
-            MapGraphicManager mapGraphicManager = new MapGraphicManager(webView, apartment.getLocation());
+            MapGraphicManager mapGraphicManager = new MapGraphicManager(webView, getSession().getApartment().getLocation());
             mapGraphicManager.setLocationOnMap();
             mapGraphicManager.loadMap("map");
             double ratio = 0.5; // 50% of the width
@@ -171,30 +170,30 @@ public class ApartmentController extends Controller{
             leftFirstBorderPane.maxHeightProperty().bind(super.getRootPane().heightProperty().multiply(ratio));
             rightVBox.prefWidthProperty().bind(secondHBox.widthProperty().multiply(ratio));
             leftVBox.prefWidthProperty().bind(secondHBox.widthProperty().multiply(ratio));
-            nameLabel.setText(apartment.getName());
+            nameLabel.setText(getSession().getApartment().getName());
             buildImage();
             imageView.fitWidthProperty().bind(leftFirstBorderPane.widthProperty().multiply(0.8));
             String information;
-            if(apartment.getDescription()==null || apartment.getDescription().isEmpty()) {
-                information = "Accommodates: " + apartment.getMaxAccommodates() + "\n" +
-                        "Price per month: " + apartment.getDollarPriceMonth() + "$\n";
+            if(getSession().getApartment().getDescription()==null || getSession().getApartment().getDescription().isEmpty()) {
+                information = "Accommodates: " + getSession().getApartment().getMaxAccommodates() + "\n" +
+                        "Price per month: " + getSession().getApartment().getDollarPriceMonth() + "$\n";
             } else {
-                information = apartment.getDescription() + "\n" +
-                        "Accommodates: " + apartment.getMaxAccommodates() + "\n" +
-                        "Price per month: " + apartment.getDollarPriceMonth() + "$\n";
+                information = getSession().getApartment().getDescription() + "\n" +
+                        "Accommodates: " + getSession().getApartment().getMaxAccommodates() + "\n" +
+                        "Price per month: " + getSession().getApartment().getDollarPriceMonth() + "$\n";
             }
 
             infoText.setText(information);
-            if(apartment.getDescription()!=null && apartment.getDescription().length() > 100){
+            if(getSession().getApartment().getDescription()!=null && getSession().getApartment().getDescription().length() > 100){
                 infoText.setTextAlignment(TextAlignment.JUSTIFY);
                 infoText.wrappingWidthProperty().bind(leftFirstBorderPane.widthProperty().multiply(0.8));
             }else{
                 infoText.setTextAlignment(TextAlignment.CENTER);
             }
 
-            hostEmail.setText(apartment.getHostEmail());
+            hostEmail.setText(getSession().getApartment().getHostEmail());
 
-            if(apartment.getAverageRating() != null) {
+            if(getSession().getApartment().getAverageRating() != null) {
                 ratingImage1.fitHeightProperty().bind(leftFirstBorderPane.heightProperty());
                 ratingImage2.fitHeightProperty().bind(leftFirstBorderPane.heightProperty());
                 ratingImage3.fitHeightProperty().bind(leftFirstBorderPane.heightProperty());
@@ -209,14 +208,14 @@ public class ApartmentController extends Controller{
                 ratingImages.add(ratingImage5);
 
                 RatingGraphicManager ratingGraphicManager = new RatingGraphicManager(ratingImages, ratingImages.size());
-                ratingGraphicManager.showRating(apartment.getAverageRating());
+                ratingGraphicManager.showRating(getSession().getApartment().getAverageRating());
             }else{
                 reviewHBox.getChildren().clear();
                 reviewHBox.getChildren().add(reviewsButton);
             }
 
             reservationGraphicManager = new ReservationGraphicManager(startDatePicker, endDatePicker, confirmButton,
-                    getSession(), getRedisConnectionManager(), apartment.getMaxAccommodates());
+                    getSession(), getRedisConnectionManager(), getSession().getApartment().getMaxAccommodates());
             reservationsLoaded = false;
             startDatePicker.setOnMousePressed(event -> onStartDatePickerFirstClick());
 
@@ -240,7 +239,7 @@ public class ApartmentController extends Controller{
         imageView.fitHeightProperty().bind(leftFirstBorderPane.heightProperty().multiply(0.9));
 
         imageOverlay.setContent(imageView);
-        if(apartment.getImageURLs().size() > 1){
+        if(getSession().getApartment().getImageURLs().size() > 1){
             imageOverlay.setText("Click on the image\nto see more images");
             imageView.setOnMouseClicked(event -> {
                 slideImage();
@@ -252,7 +251,7 @@ public class ApartmentController extends Controller{
                     imageView.setStyle("-fx-cursor: default;");
                 }
             });
-        }else if(apartment.getImageURLs().size() == 1){
+        }else if(getSession().getApartment().getImageURLs().size() == 1){
             imageOverlay.setText("Only image available.\n There are no other images for this apartment");
         }else {
             imageOverlay.setText("No images available.\n There are no images for this apartment");
@@ -267,13 +266,13 @@ public class ApartmentController extends Controller{
         System.out.println("SLIDE IMAGE "+ imageIndex);
         String noImageAvailablePath = "/media/no_photo_available.png";
         Image image;
-        if(!apartment.getImageURLs().isEmpty()) {
+        if(!getSession().getApartment().getImageURLs().isEmpty()) {
             try {
-                image = new Image(apartment.getImageURLs().get(imageIndex), true);
+                image = new Image(getSession().getApartment().getImageURLs().get(imageIndex), true);
             }catch (IllegalArgumentException e){
                 image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvailablePath)));
             }
-            imageIndex = (imageIndex + 1) % apartment.getImageURLs().size();
+            imageIndex = (imageIndex + 1) % getSession().getApartment().getImageURLs().size();
         } else {
             image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(noImageAvailablePath)));
         }
@@ -282,7 +281,7 @@ public class ApartmentController extends Controller{
 
     @FXML
     private void onLikeButtonClicked(){
-        if (getNeo4jConnectionManager().likeApartment(getSession().getApartmentId(), getSession().getUser().getEmail())) {
+        if (getNeo4jConnectionManager().likeApartment(getSession().getApartment().getId(), getSession().getUser().getEmail())) {
             seeSuggestedApartments();
             showConfirmationMessage("Like added", likeButton);
         } else {
@@ -316,11 +315,11 @@ public class ApartmentController extends Controller{
                 button.setOnAction(event -> {
 
                     if(getSession().isLogged()){
-                        apartmentsStack.push(getSession().getApartmentId());
+                        apartmentsStack.push(getSession().getApartment().getId());
                         backPressed = false;
                     }
 
-                    getSession().setApartmentId(apartment.getId());
+                    getSession().getApartment().setId(apartment.getId());
                     cleanAverageRatingInSession();
                     super.changeWindow("apartment");
                 });
@@ -370,19 +369,23 @@ public class ApartmentController extends Controller{
             int numberOfMonths = (period.getMonths() + period.getYears() * 12) + 1;
 
             String userEmail = getSession().getUser().getEmail();
-            String houseId = String.valueOf(getSession().getApartmentId());
+            String houseId = String.valueOf(getSession().getApartment().getId());
 
             User student = new User();
             student.setEmail(userEmail);
             student.setPassword(getSession().getUser().getPassword());
 
-            Reservation reservation = new Reservation(userEmail, houseId, startYear, startMonth, numberOfMonths);
-            reservation.setCity(getSession().getCity());
-            reservation.setApartmentImage(apartment.getImageURLs().get(0));
+            Reservation reservation = new Reservation( getSession().getUser().getEmail(), getSession().getApartment().getId(), startYear, startMonth, numberOfMonths);
+            reservation.setCity(getSession().getApartment().getCity());
+            reservation.setApartmentImage(getSession().getApartment().getImageURLs().get(0));
 
-            getRedisConnectionManager().addReservation(student, reservation);
+            if(!getSession().getReservationsApartmentIds().contains(houseId)){
+                getSession().getReservationsApartmentIds().add(houseId);
+            }
 
+            getRedisConnectionManager().addReservation(student, reservation, getSession().getReservationsApartmentIds());
             cleanAverageRatingInSession();
+            getSession().setMyApartmentsIds(null);
             super.changeWindow("myreservations");
         }
     }
@@ -400,7 +403,7 @@ public class ApartmentController extends Controller{
     }
 
     private void cleanAverageRatingInSession(){
-        getSession().setApartmentAverageRating(null);
+        getSession().getApartment().setAverageRating(null);
     }
 
     private void showConfirmationMessage(String message, Button likeButton) {
@@ -419,10 +422,10 @@ public class ApartmentController extends Controller{
                 "You will not be able to recover it","confirmation").showAndGetConfirmation();
         if(remove)
         {
-            if(!getRedisConnectionManager().isApartmentReserved(apartment.getId()))
+            if(!getRedisConnectionManager().isApartmentReserved(getSession().getApartment().getId()))
             {
                 // non ci sono prenotazioni attive, si puo eliminare la casa
-                if(getMongoConnectionManager().removeApartment(apartment.getId(), getSession().getUser().getEmail()))
+                if(getMongoConnectionManager().removeApartment(getSession().getApartment().getId(), getSession().getUser().getEmail()))
                 {
                     // Apartment removed from MongoDB
                     // Apartment is still available on Neo4j, apartments view

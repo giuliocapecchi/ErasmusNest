@@ -1,5 +1,9 @@
 package it.unipi.erasmusnest.dbconnectors;
 
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.ReadPreference;
+import com.mongodb.WriteConcern;
 import com.mongodb.client.*;
 import com.mongodb.client.model.*;
 import it.unipi.erasmusnest.graphicmanagers.AlertDialogGraphicManager;
@@ -22,13 +26,15 @@ import static com.mongodb.client.model.Projections.*;
 public class MongoConnectionManager extends ConnectionManager{
 
     public MongoConnectionManager() {
-        super("localhost", 27017);
-    }
+        super("10.1.1.16", 27017);
 
+    }
+    
+    
     public User findUser(String email)
     {
         User user = new User();
-        try(MongoClient mongoClient = MongoClients.create("mongodb://"+super.getHost()+":"+super.getPort()))
+        try(MongoClient mongoClient = getMongoClient())
         {
 
             MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
@@ -69,6 +75,17 @@ public class MongoConnectionManager extends ConnectionManager{
             System.out.println("Error in findUser: " + e.getMessage());
         }
         return user;
+    }
+
+    private MongoClient getMongoClient(){
+        ConnectionString uri = new ConnectionString("mongodb://"+super.getHost()+":"+super.getPort());
+        MongoClientSettings settings = MongoClientSettings.builder()
+                .applyConnectionString(uri)
+                .readPreference(ReadPreference.nearest())
+                .retryWrites(true)
+                .writeConcern(WriteConcern.ACKNOWLEDGED )
+                .build();
+        return MongoClients.create(settings);
     }
 
 
@@ -169,10 +186,10 @@ public class MongoConnectionManager extends ConnectionManager{
                                             new Document("$round", Arrays.asList("$avgPrice", 2L))))));
 
 
-            for (Document doc : result) {
+            /*for (Document doc : result) {
                 System.out.println(doc.toJson());
                 return doc.getDouble("avgPrice");
-            }
+            }*/
         }
         return null;
     }
@@ -270,7 +287,7 @@ public class MongoConnectionManager extends ConnectionManager{
     public Apartment uploadApartment(Apartment apartment)
     {
         Apartment insertedApartment = null;
-        try(MongoClient mongoClient = MongoClients.create("mongodb://"+super.getHost()+":"+super.getPort()))
+        try(MongoClient mongoClient = getMongoClient())
         {
             MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
             MongoCollection<Document> userCollection = database.getCollection("users");
@@ -332,7 +349,7 @@ public class MongoConnectionManager extends ConnectionManager{
 
         Apartment resultApartment = null;
 
-        try (MongoClient mongoClient = MongoClients.create("mongodb://"+super.getHost()+":"+super.getPort())) {
+        try (MongoClient mongoClient = getMongoClient()) {
             MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
             MongoCollection<Document> collection = database.getCollection("apartments");
 
@@ -361,6 +378,7 @@ public class MongoConnectionManager extends ConnectionManager{
                         picURLs,
                         apartment.getInteger("bathrooms")
                 );
+                resultApartment.setCity(apartment.getString("city"));
             }
             else {
                 new AlertDialogGraphicManager("Apartment not found in MongoDB").show();
@@ -375,7 +393,7 @@ public class MongoConnectionManager extends ConnectionManager{
 
     public void queryApartmentsCollection(){
 
-        /*MongoClient mongoClient = MongoClients.create("mongodb://"+super.getHost()+":"+super.getPort());
+        /*MongoClient mongoClient = getMongoClient();
         MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
         MongoCollection<Document> collection = database.getCollection("apartments");
 
@@ -454,7 +472,7 @@ public class MongoConnectionManager extends ConnectionManager{
     public String getPassword(String emailAddress)
     {
         String password = "";
-        try(MongoClient mongoClient = MongoClients.create("mongodb://"+super.getHost()+":"+super.getPort()))
+        try(MongoClient mongoClient = getMongoClient())
         {
             MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
             MongoCollection<Document> collection = database.getCollection("users");
@@ -479,7 +497,7 @@ public class MongoConnectionManager extends ConnectionManager{
         {
             // Il nome è disponibile
             // Add user to mongodb
-            try(MongoClient mongoClient = MongoClients.create("mongodb://"+super.getHost()+":"+super.getPort()))
+            try(MongoClient mongoClient = getMongoClient())
             {
                 MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
                 MongoCollection<Document> collection = database.getCollection("users");
@@ -506,7 +524,7 @@ public class MongoConnectionManager extends ConnectionManager{
 
     public boolean availableEmail(String emailAddress){
         boolean availableEmail = true;
-        try(MongoClient mongoClient = MongoClients.create("mongodb://"+super.getHost()+":"+super.getPort()))
+        try(MongoClient mongoClient = getMongoClient())
         {
             MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
             MongoCollection<Document> collection = database.getCollection("users");

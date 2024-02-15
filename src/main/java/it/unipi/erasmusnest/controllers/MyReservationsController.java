@@ -13,7 +13,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +26,7 @@ public class MyReservationsController extends Controller {
     @FXML
     private ScrollPane scrollPane;
 
-    ArrayList<Reservation> reservations;
+    private ArrayList<Reservation> reservations;
 
 
     @FXML
@@ -35,19 +34,24 @@ public class MyReservationsController extends Controller {
 
         System.out.println("MyReservations initialize");
 
-        if(getSession().getApartmentsId() == null){
-            reservations = getRedisConnectionManager().getReservationsForUser(getSession().getUser().getEmail());
-            if(!reservations.isEmpty()){
-                for (Reservation reservation : reservations) {
-                    add(reservation, "student");
+        if(getSession().getMyApartmentsIds() == null){ // student
+            if(!getSession().getReservationsApartmentIds().isEmpty()){
+                reservations = getRedisConnectionManager().getReservationsForUser(getSession().getUser().getEmail(), getSession().getReservationsApartmentIds());
+                if(!reservations.isEmpty()){ // teoricamente non dovrebbe mai essere vuoto; per sicurezza controllo
+                    for (Reservation reservation : reservations) {
+                        add(reservation, "student");
+                    }
+                } else {
+                    noReservation();
                 }
-            } else {
+            }else {
                 noReservation();
             }
-        } else {
+
+        } else { // host
             // get the reservations for the apartments
-            List<String> apartmentsId = getSession().getApartmentsId();
-            reservations = getRedisConnectionManager().getReservationsForApartments(apartmentsId);
+            List<String> apartmentsIds = getSession().getMyApartmentsIds();
+            reservations = getRedisConnectionManager().getReservationsForApartments(apartmentsIds);
 
             // ordering the reservations by timestamp
             sortReservationsByTimestampAsc();
@@ -184,7 +188,7 @@ public class MyReservationsController extends Controller {
         imageView.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
             @Override
             public void handle(javafx.scene.input.MouseEvent event) {
-                getSession().setApartmentId(reservation.getApartmentId());
+                getSession().getApartment().setId(reservation.getApartmentId());
                 MyReservationsController.super.changeWindow("apartment");
             }
         });
@@ -220,7 +224,7 @@ public class MyReservationsController extends Controller {
                     Button deleteButton = new Button("Write a review");
                     deleteButton.setStyle("-fx-background-color: #019fe1; -fx-text-fill: #ffffff; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 5px;");
                     deleteButton.setOnAction(event -> {
-                        getSession().setApartmentId(reservation.getApartmentId());
+                        getSession().getApartment().setId(reservation.getApartmentId());
                         changeWindow("writeReview");
                     });
                     buttonsVBox.getChildren().add(deleteButton);
@@ -232,7 +236,9 @@ public class MyReservationsController extends Controller {
                                 + msgPeriod + " in " + reservation.getCity()
                                 + "?", "You will not be able to recover it", "confirmation").showAndGetConfirmation();
                         if (remove) {
-                            getRedisConnectionManager().deleteReservation(reservation);
+                            if(!hasDuplicateApartmentReservation(reservations,reservation.getApartmentId()))
+                                getSession().getReservationsApartmentIds().remove(reservation.getApartmentId());
+                            getRedisConnectionManager().deleteReservation(reservation, getSession().getReservationsApartmentIds());
                             super.refreshWindow();
                         }
                     });
@@ -286,4 +292,17 @@ public class MyReservationsController extends Controller {
     protected void profileButtonClick(){
         super.changeWindow("myProfile");
     }
+
+    private boolean hasDuplicateApartmentReservation(ArrayList<Reservation> reservations, String apartmentId){
+        int count = 0;
+        for(Reservation reservation : reservations){
+            if(reservation.getApartmentId().equals(apartmentId)){
+                count ++;
+                if (count==2)
+                    return true;
+            }
+        }
+        return false;
+    }
+
 }

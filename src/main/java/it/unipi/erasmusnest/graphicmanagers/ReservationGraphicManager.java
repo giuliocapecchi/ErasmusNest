@@ -47,7 +47,7 @@ public class ReservationGraphicManager {
     public void loadReservations(){
         if(session.isLogged()){
             enabledEndDates = new ArrayList<>();
-            reservations = redisConnectionManager.getReservationsForApartment(session.getApartmentId());
+            reservations = redisConnectionManager.getReservationsForApartment(session.getApartment().getId());
 
             computeNumberOfReservationsPerMonth();
             System.out.println(monthlyReservations);

@@ -8,7 +8,6 @@ public class Reservation {
     private int startYear;
     private int startMonth;
     private int numberOfMonths;
-
     private LocalDateTime timestamp;
     private String city;
     private String apartmentImage;
