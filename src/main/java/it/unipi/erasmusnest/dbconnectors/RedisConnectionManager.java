@@ -338,13 +338,10 @@ public class RedisConnectionManager extends ConnectionManager{
 
         try (JedisCluster jedis = createJedisCluster()) {
 
-            // key design: <entity>:<email>:<attribute>
-            // entity: user
-            // attribute: password
-            String attribute = "password";
-            String key = "user:" + email + ":" + attribute;
+
+            String key = "user:" + email;
             // set the key
-            jedis.set(key, password);
+            jedis.hset(key, "password", password);
 
             // set the ttl to -1 to remove the expiration time
             jedis.persist(key);
@@ -522,6 +519,27 @@ public class RedisConnectionManager extends ConnectionManager{
         }
         return value;
     }
+
+    public boolean updateUserPasswordForPerformanceEvaluation(String email, String password) {
+
+        try (JedisPooled jedis = new JedisPooled("localhost", 6379)) {
+
+            String key = "user:" + email;
+            // set the key
+            jedis.hset(key, "password", password);
+
+            // set the ttl to -1 to remove the expiration time
+            jedis.persist(key);
+
+            // jedis.close(); // not needed with try-with-resources
+            return true;
+        } catch (Exception e) {
+            System.out.println("Connection problem: " + e.getMessage());
+            new AlertDialogGraphicManager("Redis connection failed").show();
+        }
+        return false;
+    }
+
 
 
 }
