@@ -18,17 +18,14 @@ public class RedisConnectionManager extends ConnectionManager{
 
 
     public RedisConnectionManager() {
-        super("localhost", 7000);
+        super("10.1.1.14", 7000);
     }
 
     public JedisCluster createJedisCluster(){
         Set<HostAndPort> jedisClusterNodes = new HashSet<>();
-        //jedisClusterNodes.add(new HostAndPort("10.1.1.14", 7000));
-        //jedisClusterNodes.add(new HostAndPort("10.1.1.15", 7000));
-        //jedisClusterNodes.add(new HostAndPort("10.1.1.14", 7001));
-        jedisClusterNodes.add(new HostAndPort("localhost", 7000));
-        jedisClusterNodes.add(new HostAndPort("localhost", 7001));
-        jedisClusterNodes.add(new HostAndPort("localhost", 7002));
+        jedisClusterNodes.add(new HostAndPort("10.1.1.14", 7000));
+        jedisClusterNodes.add(new HostAndPort("10.1.1.15", 7000));
+        jedisClusterNodes.add(new HostAndPort("10.1.1.16", 7000));
         return new JedisCluster(jedisClusterNodes);
     }
 
@@ -501,7 +498,7 @@ public class RedisConnectionManager extends ConnectionManager{
 
         String value = null;
 
-        try (JedisPooled jedis = new JedisPooled("localhost", 6379)) {
+        try (JedisPooled jedis = new JedisPooled("10.1.1.16", 6379)) {
 
             // key design: <entity>:<email>
             // entity: user

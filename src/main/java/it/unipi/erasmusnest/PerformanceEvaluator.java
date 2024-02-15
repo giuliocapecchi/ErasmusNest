@@ -25,7 +25,7 @@ public class PerformanceEvaluator {
 
             for (int i = 0; i < iterations; i++) {
 
-                String email = "a@b.cd";
+                String email = "adriana33@gmail.com";
 
                 long startTime = System.nanoTime();
                 //User user = getMongoConnectionManager().findUser(randomString);
