@@ -57,6 +57,7 @@ public class RedisConnectionManager extends ConnectionManager{
 
             String key = "user:" + email;
             value = jedis.hget(key, "password");
+            System.out.println("Password: " + value);
             //jedis.close(); // not needed with try-with-resources
             return value;
 
@@ -494,6 +495,30 @@ public class RedisConnectionManager extends ConnectionManager{
         return isInTrash;
     }
 
+
+    // method used only for testing on localhost
+    public String getPasswordForPerformanceEvaluation(String email) {
+
+        String value = null;
+
+        try (JedisPooled jedis = new JedisPooled("localhost", 6379)) {
+
+            // key design: <entity>:<email>
+            // entity: user
+            // attribute: password
+
+            String key = "user:" + email;
+            value = jedis.hget(key, "password");
+            System.out.println("LocalPassword: " + value);
+            //jedis.close(); // not needed with try-with-resources
+            return value;
+
+        } catch (Exception e) {
+            System.out.println("Connection problem: " + e.getMessage());
+            new AlertDialogGraphicManager("Redis connection failed").show();
+        }
+        return value;
+    }
 
 
 }
