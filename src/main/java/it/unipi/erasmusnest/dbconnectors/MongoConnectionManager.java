@@ -733,14 +733,25 @@ public class MongoConnectionManager extends ConnectionManager{
                                         new Document("$first", "$_id"))
                                 .append("lowestCount",
                                         new Document("$first", "$count"))
-                                .append("lowestPrice",
+                                .append("lowestAveragePrice",
                                         new Document("$first", "$averagePrice"))
                                 .append("highestName",
                                         new Document("$last", "$_id"))
                                 .append("highestCount",
                                         new Document("$last", "$count"))
-                                .append("highestPrice",
-                                        new Document("$last", "$averagePrice")))));
+                                .append("highestAveragePrice",
+                                        new Document("$last", "$averagePrice"))),
+                new Document("$project",
+                        new Document("_id", 0L)
+                                .append("lower",
+                                        new Document("name", "$lowestName")
+                                                .append("count", "$lowestCount")
+                                                .append("price", "$lowestAveragePrice"))
+                                .append("higher",
+                                        new Document("name", "$highestName")
+                                                .append("count", "$highestCount")
+                                                .append("price", "$highestAveragePrice")))));
+        System.out.println("Price analytics result: ");
         StringBuilder resultString = new StringBuilder();
         for (Document doc : result) {
             resultString.append(doc.toJson()).append("\n");

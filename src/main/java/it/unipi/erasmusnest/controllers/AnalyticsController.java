@@ -119,30 +119,42 @@ public class AnalyticsController extends Controller {
         Integer priceMin = minInputPrice.getValue();
         Integer priceMax = maxInputPrice.getValue();
         String lowestAveragePriceCity = ""; String highestAveragePriceCity = "";
-        Integer lowestAverageApartmensNumber = -1;
-        Integer highestAverageApartmensNumber = -1;
+        Integer lowestAverageApartmentsNumber = -1;
+        Integer highestAverageApartmentsNumber = -1;
         double lowestAveragePrice =-1; double highestAveragePrice =-1;
         String result = getMongoConnectionManager().getPriceAnalytics(accommodates, bathrooms, priceMin, priceMax);
+        System.out.println("\n\n>>>Result: " + result+"\n\n\n");
         try {
             JSONObject jsonObject = new JSONObject(result);
-            lowestAveragePriceCity = jsonObject.getString("lowestName");
-            lowestAveragePrice = Math.round(jsonObject.getDouble("lowestPrice") * 100.0) / 100.0;
-            lowestAverageApartmensNumber = jsonObject.getInt("lowestCount");
-            highestAveragePriceCity = jsonObject.getString("highestName");
-            highestAveragePrice = Math.round(jsonObject.getDouble("highestPrice") * 100.0) / 100.0;
-            highestAverageApartmensNumber = jsonObject.getInt("highestCount");
+
+            // Ottieni i dati per la città con il prezzo medio più basso
+            JSONObject lower = jsonObject.getJSONObject("lower");
+            lowestAveragePriceCity = lower.getString("name");
+            lowestAveragePrice = Math.round(lower.getDouble("price") * 100.0) / 100.0;
+            lowestAverageApartmentsNumber = lower.getInt("count");
+
+            // Ottieni i dati per la città con il prezzo medio più alto
+            JSONObject higher = jsonObject.getJSONObject("higher");
+            highestAveragePriceCity = higher.getString("name");
+            highestAveragePrice = Math.round(higher.getDouble("price") * 100.0) / 100.0;
+            highestAverageApartmentsNumber = higher.getInt("count");
+
+            // Stampa o usa i valori come necessario
+            System.out.println("Città con il prezzo medio più basso: " + lowestAveragePriceCity + ", Prezzo: " + lowestAveragePrice + ", Numero appartamenti: " + lowestAverageApartmentsNumber);
+            System.out.println("Città con il prezzo medio più alto: " + highestAveragePriceCity + ", Prezzo: " + highestAveragePrice + ", Numero appartamenti: " + highestAverageApartmentsNumber);
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        if(highestAveragePrice==-1 || highestAveragePriceCity.isEmpty() || highestAverageApartmensNumber==-1){
+        if(highestAveragePrice==-1 || highestAveragePriceCity.isEmpty() || highestAverageApartmentsNumber==-1){
             cityHighestPrice.setText("No data available");
         } else {
-            cityHighestPrice.setText(highestAveragePriceCity + " with " + highestAveragePrice + "$ for " + highestAverageApartmensNumber + " apartments");
+            cityHighestPrice.setText(highestAveragePriceCity + " with " + highestAveragePrice + "$ for " + highestAverageApartmentsNumber + " apartments");
         }
-        if(lowestAveragePrice==-1 && lowestAveragePriceCity.isEmpty() || highestAverageApartmensNumber==-1){
+        if(lowestAveragePrice==-1 && lowestAveragePriceCity.isEmpty() || highestAverageApartmentsNumber==-1){
             cityLowestPrice.setText("No data available");
         } else {
-            cityLowestPrice.setText(lowestAveragePriceCity + " with " + lowestAveragePrice + "$ for " + lowestAverageApartmensNumber + " apartments");
+            cityLowestPrice.setText(lowestAveragePriceCity + " with " + lowestAveragePrice + "$ for " + highestAverageApartmentsNumber + " apartments");
         }
         cityHighestPrice.setVisible(true); cityLowestPrice.setVisible(true);
     }
