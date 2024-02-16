@@ -12,12 +12,7 @@ public class MongoNeoConsistencyManager extends ConsistencyManager{
 
     public void addApartmentOnNeo4J(Apartment apartment) {
         Thread thread = new Thread(() -> {
-            // sleep for 10 seconds
-            /*try {
-                Thread.sleep(10000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }*/
+
             System.out.println("\t\t\t\t\t\t*** THREAD addApartmentOnNeo STARTED ***");
             boolean added = neo4jConnectionManager.addApartment(apartment);
             if (added)
@@ -34,7 +29,6 @@ public class MongoNeoConsistencyManager extends ConsistencyManager{
 
         executeOperation(thread);
 
-        //operationsQueue.add(thread);
     }
 
 }

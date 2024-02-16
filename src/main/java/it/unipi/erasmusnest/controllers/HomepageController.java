@@ -137,7 +137,6 @@ public class HomepageController extends Controller{
     }
 
     @FXML void lookForCities() {
-        System.out.println("look for cities");
         radioButtonLookForUsers.setSelected(false);
         cityTextField.setText("");
         cityTextField.setOnKeyReleased(event -> handleSearchAction());
@@ -146,7 +145,6 @@ public class HomepageController extends Controller{
     }
 
     @FXML void lookForUsers() {
-        System.out.println("look for users");
         radioButtonLookForCities.setSelected(false);
         cityTextField.setText("");
         cityTextField.setOnKeyReleased(event -> {});
