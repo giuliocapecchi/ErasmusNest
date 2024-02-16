@@ -18,6 +18,8 @@ public class PerformanceEvaluator {
 
     private void loginTiming(String type){
 
+        // test
+
         Thread thread = new Thread(() -> {
 
             AtomicLong totalTime = new AtomicLong();
