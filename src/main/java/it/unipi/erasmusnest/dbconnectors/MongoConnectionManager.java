@@ -79,7 +79,7 @@ public class MongoConnectionManager extends ConnectionManager{
                 .applyConnectionString(uri)
                 .readPreference(ReadPreference.nearest())
                 .retryWrites(true)
-                .writeConcern(WriteConcern.ACKNOWLEDGED )
+                .writeConcern(WriteConcern.ACKNOWLEDGED)
                 .build();
         return MongoClients.create(settings);
     }
@@ -555,7 +555,7 @@ public class MongoConnectionManager extends ConnectionManager{
     }
 
     public boolean removeApartment(String objectIdToRemove, String userEmail) {
-        boolean res = false;
+        boolean res;
         try (MongoClient mongoClient = MongoClients.create("mongodb://" + super.getHost() + ":" + super.getPort())) {
             MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
             // Cerca e rimuovi l'appartamento dalla collezione "apartments" utilizzando l'ObjectID
