@@ -115,9 +115,9 @@ public class ApartmentController extends Controller{
         }
 
         likeButton.setDisable(!getSession().isLogged());
-        getSession().setApartment(getMongoConnectionManager().getApartment(getSession().getApartment().getId()));
-        if(getSession().getApartment()==null){
 
+        Apartment mongoApartment = getMongoConnectionManager().getApartment(getSession().getApartment().getId());
+        if(mongoApartment==null){ // TODO NON HA SENSO CON IL CODICE SOTTOSTANTE
             // If apartment is null seems that the apartment has been removed from Mongo
             // and so need to be removed also from Neo4j
             new NeoConsistencyManager(getNeo4jConnectionManager()).removeApartmentFromNeo4J(getSession().getApartment().getId());
@@ -145,12 +145,12 @@ public class ApartmentController extends Controller{
         }
         else
         {
-
             removeButton.setVisible(false);
             if(getSession().isLogged()) {
                 System.out.println("Logged user: "+getSession().getUser().getEmail());
                 removeButton.setVisible(getSession().getUser().isAdmin());
             }
+            getSession().setApartment(mongoApartment);
             getSession().getApartment().setAverageRating(getSession().getApartment().getAverageRating());
 
             MapGraphicManager mapGraphicManager = new MapGraphicManager(webView, getSession().getApartment().getLocation());
