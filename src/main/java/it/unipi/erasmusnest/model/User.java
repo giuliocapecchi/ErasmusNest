@@ -55,10 +55,6 @@ public class User {
         this.surname = surname;
     }
 
-    public ArrayList<String> getPreferredCities() {
-        return preferredCities;
-    }
-
     public void setPreferredCities(ArrayList<String> preferredCities) {
         this.preferredCities = preferredCities;
     }

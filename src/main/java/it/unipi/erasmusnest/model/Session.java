@@ -22,7 +22,7 @@ public class Session {
 
     private List<String> studyFieldsOptions; // list of possible study fields
 
-    private List<String> cities; // sono tutte le città presenti nel db, non quelle di interesse!
+    private List<String> cities; // sono tutte le città presenti nel db, non quelle di interesse!ì
 
     private List<String> myApartmentsIds; // contengono gli id degli appartamenti posseduti dall'utente
 

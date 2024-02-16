@@ -4,10 +4,10 @@ import java.util.ArrayList;
 
 public class MonthlyReservations {
 
-    private Integer year;
-    private Integer month;
+    private final Integer year;
+    private final Integer month;
     private Integer numberOfReservations;
-    private ArrayList<String> studentsEmails;
+    private final ArrayList<String> studentsEmails;
 
     public MonthlyReservations(Integer year, Integer month, String studentEmail) {
         this.year = year;

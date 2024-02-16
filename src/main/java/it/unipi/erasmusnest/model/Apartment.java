@@ -11,7 +11,6 @@ public class Apartment {
     private String description;
     private Point2D location;
     private String city;
-    private ArrayList<String> studyFields;
     private Integer dollarPriceMonth;
     private Integer maxAccommodates;
     private String hostEmail;
@@ -60,7 +59,7 @@ public class Apartment {
         this.hostSurname = surname;
     }
 
-    // NUOVO costruttore di Cape in cui metto anche la città dell'appartamento per il caricamento su Neo4j
+
     public Apartment(String houseName, String houseDescription, Point2D location, String city, Integer price, Integer accommodates, String userEmail, ArrayList<String> pictureUrls, double averageRating, int numberOfReviews, Integer bathrooms, String name, String surname) {
         this.name = houseName;
         this.description = houseDescription;
@@ -97,16 +96,8 @@ public class Apartment {
         return hostName;
     }
 
-    public void setHostName(String hostName) {
-        this.hostName = hostName;
-    }
-
     public String getHostSurname() {
         return hostSurname;
-    }
-
-    public void setHostSurname(String hostSurname) {
-        this.hostSurname = hostSurname;
     }
 
     public Integer getBathrooms() {
@@ -145,18 +136,6 @@ public class Apartment {
         return location;
     }
 
-    public void setLocation(Point2D location) {
-        this.location = location;
-    }
-
-    public ArrayList<String> getStudyFields() {
-        return studyFields;
-    }
-
-    public void setStudyFields(ArrayList<String> studyFields) {
-        this.studyFields = studyFields;
-    }
-
     public ArrayList<String> getImageURLs() {
         return imageUrls;
     }
@@ -175,10 +154,6 @@ public class Apartment {
 
     public String getHostEmail() {
         return hostEmail;
-    }
-
-    public void setHostEmail(String hostEmail) {
-        this.hostEmail = hostEmail;
     }
 
     public Integer getDollarPriceMonth() {
@@ -204,7 +179,6 @@ public class Apartment {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", position=" + location +
-                ", studyFields=" + studyFields +
                 ", dollarPriceMonth=" + dollarPriceMonth +
                 ", maxAccommodates=" + maxAccommodates +
                 ", bathrooms=" + bathrooms +
@@ -217,10 +191,6 @@ public class Apartment {
 
     public Object getNumberOfReviews() {
         return numberOfReviews;
-    }
-
-    public void setNumberOfReviews(int numberOfReviews) {
-        this.numberOfReviews = numberOfReviews;
     }
 
     public String getCity() {

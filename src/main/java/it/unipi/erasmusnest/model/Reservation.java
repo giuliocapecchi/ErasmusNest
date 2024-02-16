@@ -40,10 +40,6 @@ public class Reservation {
         return studentEmail;
     }
 
-    public void setStudentEmail(String studentEmail) {
-        this.studentEmail = studentEmail;
-    }
-
     public String getApartmentId() {
         return apartmentId;
     }
@@ -56,24 +52,12 @@ public class Reservation {
         return startYear;
     }
 
-    public void setStartYear(int startYear) {
-        this.startYear = startYear;
-    }
-
     public int getStartMonth() {
         return startMonth;
     }
 
-    public void setStartMonth(int startMonth) {
-        this.startMonth = startMonth;
-    }
-
     public int getNumberOfMonths() {
         return numberOfMonths;
-    }
-
-    public void setNumberOfMonths(int numberOfMonths) {
-        this.numberOfMonths = numberOfMonths;
     }
 
     public LocalDateTime getTimestamp() {

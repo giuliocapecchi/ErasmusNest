@@ -38,21 +38,12 @@ public class Review {
         this.apartmentId = apartmentId;
     }
 
-
     public String getComments() {
         return comments;
     }
 
-    public void setComments(String comments) {
-        this.comments = comments;
-    }
-
     public int getRating() {
         return rating;
-    }
-
-    public void setRating(int rating) {
-        this.rating = rating;
     }
 
     public LocalDate getTimestamp() {
@@ -75,7 +66,4 @@ public class Review {
         return userEmail;
     }
 
-    public void setUserEmail(String userEmail) {
-        this.userEmail = userEmail;
-    }
 }
