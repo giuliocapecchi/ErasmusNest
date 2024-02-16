@@ -120,6 +120,7 @@ public class MongoConnectionManager extends ConnectionManager{
         try (MongoClient mongoClient = MongoClients.create("mongodb://" + super.getHost() + ":" + super.getPort())) {
             MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
             MongoCollection<Document> apartmentsCollection = database.getCollection("apartments");
+
             AggregateIterable<Document> result = apartmentsCollection.aggregate(Arrays.asList(new Document("$match",
                             new Document("city", cityName)),
                     new Document("$group",
@@ -134,49 +135,60 @@ public class MongoConnectionManager extends ConnectionManager{
                                             new Document("$push", "$$ROOT"))),
                     new Document("$unwind", "$apartments"),
                     new Document("$set",
-                            new Document("apartments.lat2",
+                            new Document("avgLatRad",
                                     new Document("$degreesToRadians", "$avgLat"))
-                                    .append("apartments.lon2",
+                                    .append("avgLonRad",
                                             new Document("$degreesToRadians", "$avgLon"))
-                                    .append("apartments.lat1",
+                                    .append("latRad",
                                             new Document("$degreesToRadians",
                                                     new Document("$arrayElemAt", Arrays.asList("$apartments.position", 0L))))
-                                    .append("apartments.lon1",
+                                    .append("lonRad",
                                             new Document("$degreesToRadians",
                                                     new Document("$arrayElemAt", Arrays.asList("$apartments.position", 1L))))),
-                    new Document("$set",
-                            new Document("apartments.distance",
-                                    new Document("$let",
-                                            new Document("vars",
-                                                    new Document("earthRadius", 6371L * 1000L)
-                                                            .append("deltaLat",
-                                                                    new Document("$subtract", Arrays.asList("$apartments.lat2", "$apartments.lat1")))
-                                                            .append("deltaLon",
-                                                                    new Document("$subtract", Arrays.asList("$apartments.lon2", "$apartments.lon1"))))
-                                                    .append("in",
-                                                            new Document("$multiply", Arrays.asList("$$earthRadius",
-                                                                    new Document("$atan2", Arrays.asList(new Document("$sqrt",
-                                                                                    new Document("$add", Arrays.asList(new Document("$pow", Arrays.asList("$$deltaLat", 2L)),
-                                                                                            new Document("$multiply", Arrays.asList(new Document("$cos",
-                                                                                                            new Document("$divide", Arrays.asList(new Document("$add", Arrays.asList("$apartments.lat1", "$apartments.lat2")), 2L))),
-                                                                                                    new Document("$pow", Arrays.asList("$$deltaLon", 2L))))))),
-                                                                            new Document("$sqrt",
-                                                                                    new Document("$add", Arrays.asList(new Document("$cos", "$apartments.lat1"),
-                                                                                            new Document("$cos", "$apartments.lat2"),
-                                                                                            new Document("$multiply", Arrays.asList(new Document("$cos", "$$deltaLon"),
-                                                                                                    new Document("$cos",
-                                                                                                            new Document("$divide", Arrays.asList(new Document("$add", Arrays.asList("$apartments.lat1", "$apartments.lat2")), 2L)))))))))))))))),
+                    new Document("$addFields",
+                            new Document("dLatRadians",
+                                    new Document("$subtract", Arrays.asList("$latRad", "$avgLatRad")))
+                                    .append("dLonRadians",
+                                            new Document("$subtract", Arrays.asList("$lonRad", "$avgLonRad")))
+                                    .append("r", 6372.8d)),
+                    new Document("$addFields",
+                            new Document("a",
+                                    new Document("$multiply", Arrays.asList(new Document("$sin",
+                                                    new Document("$divide", Arrays.asList("$dLatRadians", 2L))),
+                                            new Document("$sin",
+                                                    new Document("$divide", Arrays.asList("$dLatRadians", 2L))))))
+                                    .append("a2",
+                                            new Document("$multiply", Arrays.asList(new Document("$sin",
+                                                            new Document("$divide", Arrays.asList("$dLonRadians", 2L))),
+                                                    new Document("$sin",
+                                                            new Document("$divide", Arrays.asList("$dLonRadians", 2L))),
+                                                    new Document("$cos",
+                                                            new Document("$arrayElemAt", Arrays.asList("$apartments.position", 0L))),
+                                                    new Document("$cos",
+                                                            new Document("$arrayElemAt", Arrays.asList("$apartments.position", 1L))))))),
+                    new Document("$addFields",
+                            new Document("a_out",
+                                    new Document("$add", Arrays.asList("$a", "$a2")))),
+                    new Document("$addFields",
+                            new Document("c",
+                                    new Document("$multiply", Arrays.asList(2L,
+                                            new Document("$asin",
+                                                    new Document("$sqrt",
+                                                            new Document("$max", Arrays.asList(0L, "$a_out")))))))),
+                    new Document("$addFields",
+                            new Document("distance",
+                                    new Document("$multiply", Arrays.asList("$r", "$c")))),
                     new Document("$project",
-                            new Document("apartments.distance", 1L)
+                            new Document("distance", 1L)
                                     .append("apartments.price", 1L)
                                     .append("apartments.position", 1L)
                                     .append("apartments.name", 1L)
                                     .append("apartments.city", 1L)),
                     new Document("$match",
-                            new Document("apartments.distance",
-                                    new Document("$lte", maxDistance))),
+                            new Document("distance",
+                                    new Document("$lte", (double) maxDistance / 1000))),
                     new Document("$group",
-                            new Document("_id", "$_id")
+                            new Document("_id", "$apartments.city")
                                     .append("avgPrice",
                                             new Document("$avg", "$apartments.price"))),
                     new Document("$project",
@@ -184,11 +196,10 @@ public class MongoConnectionManager extends ConnectionManager{
                                     .append("avgPrice",
                                             new Document("$round", Arrays.asList("$avgPrice", 2L))))));
 
-
-            /*for (Document doc : result) {
-                System.out.println(doc.toJson());
+            for (Document doc : result) {
                 return doc.getDouble("avgPrice");
-            }*/
+            }
+
         }
         return null;
     }
@@ -199,6 +210,7 @@ public class MongoConnectionManager extends ConnectionManager{
         try (MongoClient mongoClient = MongoClients.create("mongodb://" + super.getHost() + ":" + super.getPort())) {
             MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
             MongoCollection<Document> apartmentsCollection = database.getCollection("apartments");
+
             AggregateIterable<Document> result = apartmentsCollection.aggregate(Arrays.asList(new Document("$group",
                             new Document("_id", "$city")
                                     .append("avgLat",
@@ -211,61 +223,69 @@ public class MongoConnectionManager extends ConnectionManager{
                                             new Document("$push", "$$ROOT"))),
                     new Document("$unwind", "$apartments"),
                     new Document("$set",
-                            new Document("apartments.lat2",
+                            new Document("avgLatRad",
                                     new Document("$degreesToRadians", "$avgLat"))
-                                    .append("apartments.lon2",
+                                    .append("avgLonRad",
                                             new Document("$degreesToRadians", "$avgLon"))
-                                    .append("apartments.lat1",
+                                    .append("latRad",
                                             new Document("$degreesToRadians",
                                                     new Document("$arrayElemAt", Arrays.asList("$apartments.position", 0L))))
-                                    .append("apartments.lon1",
+                                    .append("lonRad",
                                             new Document("$degreesToRadians",
                                                     new Document("$arrayElemAt", Arrays.asList("$apartments.position", 1L))))),
-                    new Document("$set",
-                            new Document("apartments.distance",
-                                    new Document("$let",
-                                            new Document("vars",
-                                                    new Document("earthRadius", 6371L * 1000L)
-                                                            .append("deltaLat",
-                                                                    new Document("$subtract", Arrays.asList("$apartments.lat2", "$apartments.lat1")))
-                                                            .append("deltaLon",
-                                                                    new Document("$subtract", Arrays.asList("$apartments.lon2", "$apartments.lon1"))))
-                                                    .append("in",
-                                                            new Document("$multiply", Arrays.asList("$$earthRadius",
-                                                                    new Document("$atan2", Arrays.asList(new Document("$sqrt",
-                                                                                    new Document("$add", Arrays.asList(new Document("$pow", Arrays.asList("$$deltaLat", 2L)),
-                                                                                            new Document("$multiply", Arrays.asList(new Document("$cos",
-                                                                                                            new Document("$divide", Arrays.asList(new Document("$add", Arrays.asList("$apartments.lat1", "$apartments.lat2")), 2L))),
-                                                                                                    new Document("$pow", Arrays.asList("$$deltaLon", 2L))))))),
-                                                                            new Document("$sqrt",
-                                                                                    new Document("$add", Arrays.asList(new Document("$cos", "$apartments.lat1"),
-                                                                                            new Document("$cos", "$apartments.lat2"),
-                                                                                            new Document("$multiply", Arrays.asList(new Document("$cos", "$$deltaLon"),
-                                                                                                    new Document("$cos",
-                                                                                                            new Document("$divide", Arrays.asList(new Document("$add", Arrays.asList("$apartments.lat1", "$apartments.lat2")), 2L)))))))))))))))),
+                    new Document("$addFields",
+                            new Document("dLatRadians",
+                                    new Document("$subtract", Arrays.asList("$latRad", "$avgLatRad")))
+                                    .append("dLonRadians",
+                                            new Document("$subtract", Arrays.asList("$lonRad", "$avgLonRad")))
+                                    .append("r", 6372.8d)),
+                    new Document("$addFields",
+                            new Document("a",
+                                    new Document("$multiply", Arrays.asList(new Document("$sin",
+                                                    new Document("$divide", Arrays.asList("$dLatRadians", 2L))),
+                                            new Document("$sin",
+                                                    new Document("$divide", Arrays.asList("$dLatRadians", 2L))))))
+                                    .append("a2",
+                                            new Document("$multiply", Arrays.asList(new Document("$sin",
+                                                            new Document("$divide", Arrays.asList("$dLonRadians", 2L))),
+                                                    new Document("$sin",
+                                                            new Document("$divide", Arrays.asList("$dLonRadians", 2L))),
+                                                    new Document("$cos",
+                                                            new Document("$arrayElemAt", Arrays.asList("$apartments.position", 0L))),
+                                                    new Document("$cos",
+                                                            new Document("$arrayElemAt", Arrays.asList("$apartments.position", 1L))))))),
+                    new Document("$addFields",
+                            new Document("a_out",
+                                    new Document("$add", Arrays.asList("$a", "$a2")))),
+                    new Document("$addFields",
+                            new Document("c",
+                                    new Document("$multiply", Arrays.asList(2L,
+                                            new Document("$asin",
+                                                    new Document("$sqrt",
+                                                            new Document("$max", Arrays.asList(0L, "$a_out")))))))),
+                    new Document("$addFields",
+                            new Document("distance",
+                                    new Document("$multiply", Arrays.asList("$r", "$c")))),
                     new Document("$project",
-                            new Document("apartments.distance", 1L)
+                            new Document("distance", 1L)
                                     .append("apartments.price", 1L)
                                     .append("apartments.position", 1L)
                                     .append("apartments.name", 1L)
                                     .append("apartments.city", 1L)),
                     new Document("$match",
-                            new Document("apartments.distance",
-                                    new Document("$lte", distance))),
+                            new Document("distance",
+                                    new Document("$lte", (double) distance / 1000))), // la distanza è fornita in metri ma serve in chilometri nella query
                     new Document("$group",
-                            new Document("_id", "$_id")
+                            new Document("_id", "$apartments.city")
                                     .append("avgPrice",
                                             new Document("$avg", "$apartments.price"))),
                     new Document("$project",
                             new Document("_id", 1L)
                                     .append("avgPrice",
-                                            new Document("$round", Arrays.asList("$avgPrice", 2L)))))
-
-            );
+                                            new Document("$round", Arrays.asList("$avgPrice", 2L))))));
 
             List<Map<String, Object>> cityPrices = new ArrayList<>();
             for (Document doc : result) {
-                System.out.println(doc.toJson());
                 String city = doc.getString("_id");
                 double avgPrice = doc.getDouble("avgPrice");
                 Map<String, Object> cityPriceMap = new HashMap<>();
@@ -273,6 +293,13 @@ public class MongoConnectionManager extends ConnectionManager{
                 cityPriceMap.put("avgPrice", avgPrice);
                 cityPrices.add(cityPriceMap);
             }
+
+            cityPrices.sort((m1, m2) -> {
+                String city1 = (String) m1.get("city");
+                String city2 = (String) m2.get("city");
+                return city1.compareTo(city2);
+            });
+
             return cityPrices;
         }catch (Exception e){
             e.printStackTrace();
