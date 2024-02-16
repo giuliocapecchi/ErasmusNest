@@ -123,9 +123,9 @@ public class MongoConnectionManager extends ConnectionManager{
             MongoCollection<Document> apartmentsCollection = database.getCollection("apartments");
 
             AggregateIterable<Document> result = apartmentsCollection.aggregate(Arrays.asList(new Document("$match",
-                            new Document("city", cityName)),
+                            new Document("city", "Amsterdam")),
                     new Document("$group",
-                            new Document("_id", "$city")
+                            new Document("_id", cityName)
                                     .append("avgLat",
                                             new Document("$avg",
                                                     new Document("$arrayElemAt", Arrays.asList("$position", 0L))))
@@ -159,14 +159,12 @@ public class MongoConnectionManager extends ConnectionManager{
                                             new Document("$sin",
                                                     new Document("$divide", Arrays.asList("$dLatRadians", 2L))))))
                                     .append("a2",
-                                            new Document("$multiply", Arrays.asList(new Document("$sin",
-                                                            new Document("$divide", Arrays.asList("$dLonRadians", 2L))),
+                                            new Document("$multiply", Arrays.asList(new Document("$cos", "$latRad"),
+                                                    new Document("$cos", "$avgLatRad"),
                                                     new Document("$sin",
                                                             new Document("$divide", Arrays.asList("$dLonRadians", 2L))),
-                                                    new Document("$cos",
-                                                            new Document("$arrayElemAt", Arrays.asList("$apartments.position", 0L))),
-                                                    new Document("$cos",
-                                                            new Document("$arrayElemAt", Arrays.asList("$apartments.position", 1L))))))),
+                                                    new Document("$sin",
+                                                            new Document("$divide", Arrays.asList("$dLonRadians", 2L))))))),
                     new Document("$addFields",
                             new Document("a_out",
                                     new Document("$add", Arrays.asList("$a", "$a2")))),
@@ -196,6 +194,8 @@ public class MongoConnectionManager extends ConnectionManager{
                             new Document("_id", 1L)
                                     .append("avgPrice",
                                             new Document("$round", Arrays.asList("$avgPrice", 2L))))));
+
+
 
             for (Document doc : result) {
                 return doc.getDouble("avgPrice");
@@ -247,14 +247,12 @@ public class MongoConnectionManager extends ConnectionManager{
                                             new Document("$sin",
                                                     new Document("$divide", Arrays.asList("$dLatRadians", 2L))))))
                                     .append("a2",
-                                            new Document("$multiply", Arrays.asList(new Document("$sin",
-                                                            new Document("$divide", Arrays.asList("$dLonRadians", 2L))),
+                                            new Document("$multiply", Arrays.asList(new Document("$cos", "$latRad"),
+                                                    new Document("$cos", "$avgLatRad"),
                                                     new Document("$sin",
                                                             new Document("$divide", Arrays.asList("$dLonRadians", 2L))),
-                                                    new Document("$cos",
-                                                            new Document("$arrayElemAt", Arrays.asList("$apartments.position", 0L))),
-                                                    new Document("$cos",
-                                                            new Document("$arrayElemAt", Arrays.asList("$apartments.position", 1L))))))),
+                                                    new Document("$sin",
+                                                            new Document("$divide", Arrays.asList("$dLonRadians", 2L))))))),
                     new Document("$addFields",
                             new Document("a_out",
                                     new Document("$add", Arrays.asList("$a", "$a2")))),
@@ -284,6 +282,8 @@ public class MongoConnectionManager extends ConnectionManager{
                             new Document("_id", 1L)
                                     .append("avgPrice",
                                             new Document("$round", Arrays.asList("$avgPrice", 2L))))));
+
+
 
             List<Map<String, Object>> cityPrices = new ArrayList<>();
             for (Document doc : result) {
