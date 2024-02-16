@@ -722,74 +722,74 @@ public class MongoConnectionManager extends ConnectionManager{
     }
 
     public String getPriceAnalytics(Integer accommodates, Integer bathrooms, Integer priceMin, Integer priceMax) {
-        MongoClient client = MongoClients.create("mongodb://localhost:27017");
-        MongoDatabase database = client.getDatabase("ErasmusNest");
-        MongoCollection<Document> collection = database.getCollection("apartments");
 
-        List<Bson> matchFilters = new ArrayList<>();
+        try(MongoClient client = MongoClients.create("mongodb://" + super.getHost() + ":" + super.getPort())) {
+            MongoDatabase database = client.getDatabase("ErasmusNest");
+            MongoCollection<Document> collection = database.getCollection("apartments");
 
-        // Aggiungi filtri solo se il valore non è zero
-        if (accommodates != 0) {
-            matchFilters.add(Filters.gte("accommodates", accommodates));
-        }
-        if (bathrooms != 0) {
-            matchFilters.add(Filters.gte("bathrooms", bathrooms));
-        }
-        if (priceMin != 0) {
-            matchFilters.add(Filters.gte("price", priceMin));
-        }
-        if (priceMax != 0) {
-            matchFilters.add(Filters.lte("price", priceMax));
-        }
-        Bson matchStage = matchFilters.isEmpty() ? match(new Document()) : match(Filters.and(matchFilters));
+            List<Bson> matchFilters = new ArrayList<>();
 
-        // Define the aggregation pipeline
-        AggregateIterable<Document> result = collection.aggregate(Arrays.asList(
-                matchStage,
-                new Document("$group",
-                        new Document("_id", "$city")
-                                .append("averagePrice",
-                                        new Document("$avg", "$price"))
-                                .append("count",
-                                        new Document("$sum", 1L))),
-                new Document("$sort",
-                        new Document("averagePrice", 1L)),
-                new Document("$group",
-                        new Document("_id", 0L)
-                                .append("lowestName",
-                                        new Document("$first", "$_id"))
-                                .append("lowestCount",
-                                        new Document("$first", "$count"))
-                                .append("lowestAveragePrice",
-                                        new Document("$first", "$averagePrice"))
-                                .append("highestName",
-                                        new Document("$last", "$_id"))
-                                .append("highestCount",
-                                        new Document("$last", "$count"))
-                                .append("highestAveragePrice",
-                                        new Document("$last", "$averagePrice"))),
-                new Document("$project",
-                        new Document("_id", 0L)
-                                .append("lower",
-                                        new Document("name", "$lowestName")
-                                                .append("count", "$lowestCount")
-                                                .append("price", "$lowestAveragePrice"))
-                                .append("higher",
-                                        new Document("name", "$highestName")
-                                                .append("count", "$highestCount")
-                                                .append("price", "$highestAveragePrice")))));
-        System.out.println("Price analytics result: ");
-        StringBuilder resultString = new StringBuilder();
-        for (Document doc : result) {
-            resultString.append(doc.toJson()).append("\n");
+            // Aggiungi filtri solo se il valore non è zero
+            if (accommodates != 0) {
+                matchFilters.add(Filters.gte("accommodates", accommodates));
+            }
+            if (bathrooms != 0) {
+                matchFilters.add(Filters.gte("bathrooms", bathrooms));
+            }
+            if (priceMin != 0) {
+                matchFilters.add(Filters.gte("price", priceMin));
+            }
+            if (priceMax != 0) {
+                matchFilters.add(Filters.lte("price", priceMax));
+            }
+            Bson matchStage = matchFilters.isEmpty() ? match(new Document()) : match(Filters.and(matchFilters));
+            AggregateIterable<Document> result = collection.aggregate(Arrays.asList(
+                    matchStage,
+                    new Document("$group",
+                            new Document("_id", "$city")
+                                    .append("averagePrice",
+                                            new Document("$avg", "$price"))
+                                    .append("count",
+                                            new Document("$sum", 1L))),
+                    new Document("$sort",
+                            new Document("averagePrice", 1L)),
+                    new Document("$group",
+                            new Document("_id", 0L)
+                                    .append("lowestName",
+                                            new Document("$first", "$_id"))
+                                    .append("lowestCount",
+                                            new Document("$first", "$count"))
+                                    .append("lowestAveragePrice",
+                                            new Document("$first", "$averagePrice"))
+                                    .append("highestName",
+                                            new Document("$last", "$_id"))
+                                    .append("highestCount",
+                                            new Document("$last", "$count"))
+                                    .append("highestAveragePrice",
+                                            new Document("$last", "$averagePrice"))),
+                    new Document("$project",
+                            new Document("_id", 0L)
+                                    .append("lower",
+                                            new Document("name", "$lowestName")
+                                                    .append("count", "$lowestCount")
+                                                    .append("price", "$lowestAveragePrice"))
+                                    .append("higher",
+                                            new Document("name", "$highestName")
+                                                    .append("count", "$highestCount")
+                                                    .append("price", "$highestAveragePrice")))));
+            StringBuilder resultString = new StringBuilder();
+            for (Document doc : result) {
+                resultString.append(doc.toJson()).append("\n");
+            }
+            return !resultString.toString().isEmpty() ? resultString.toString() : null;
+        } catch(Exception e) {
+            e.printStackTrace();
+            new AlertDialogGraphicManager("MongoDB connection failed").show();
         }
-        String res = !resultString.toString().isEmpty() ? resultString.toString() : "No result found";
-        client.close();
-        return res;
+        return null;
     }
 
     public HashMap<Point2D, Integer> getHeatmap(String city) {
-
         long multiplier = 80L;
         try (MongoClient mongoClient = MongoClients.create("mongodb://" + super.getHost() + ":" + super.getPort())) {
             MongoDatabase database = mongoClient.getDatabase("ErasmusNest");
