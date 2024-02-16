@@ -222,9 +222,6 @@ public class RedisConnectionManager extends ConnectionManager{
 
         try (JedisCluster jedis = createJedisCluster()) {
 
-            // key design: <entity>:<email>
-            // entity: user
-
             String key = "user:" + email ;
 
             // set the key
