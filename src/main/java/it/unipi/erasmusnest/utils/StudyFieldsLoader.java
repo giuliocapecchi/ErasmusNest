@@ -1,9 +1,7 @@
 package it.unipi.erasmusnest.utils;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
@@ -34,15 +32,6 @@ public class StudyFieldsLoader {
             loadStudyFields();
         }
         return studyFields;
-    }
-
-    public static void printStudyFields() {
-        if (studyFields.isEmpty()) {
-            loadStudyFields();
-        }
-        for (String s : studyFields) {
-            System.out.println(s);
-        }
     }
 
 }

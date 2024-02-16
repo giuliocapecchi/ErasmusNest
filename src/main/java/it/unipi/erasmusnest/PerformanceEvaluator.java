@@ -30,12 +30,6 @@ public class PerformanceEvaluator {
                 String email = "adriana33@gmail.com";
 
                 long startTime = System.nanoTime();
-                //User user = getMongoConnectionManager().findUser(randomString);
-                // prendo un numero randomico tra 1 e 10000
-                //getMongoConnectionManager().averagePriceNearCityCenter(randomCity, random.nextInt(10000));
-                //String redisPwd = redisConnectionManager.getPassword(email);
-                // getRedisConnectionManager().getReservedApartments(email);
-                //String mongoPassword = mongoConnectionManager.getPassword(email);
 
                 if(Objects.equals(type, "redislocal")) {
                     redisConnectionManager.getPasswordForPerformanceEvaluation(email);
@@ -72,12 +66,6 @@ public class PerformanceEvaluator {
                 String newPassword = "aaaa";
 
                 long startTime = System.nanoTime();
-                //User user = getMongoConnectionManager().findUser(randomString);
-                // prendo un numero randomico tra 1 e 10000
-                //getMongoConnectionManager().averagePriceNearCityCenter(randomCity, random.nextInt(10000));
-                //String redisPwd = redisConnectionManager.getPassword(email);
-                // getRedisConnectionManager().getReservedApartments(email);
-                //String mongoPassword = mongoConnectionManager.getPassword(email);
 
                 if(Objects.equals(type, "redislocal")) {
                     redisConnectionManager.updateUserPasswordForPerformanceEvaluation(email, newPassword);
@@ -104,10 +92,7 @@ public class PerformanceEvaluator {
 
     public static void main(String[] args) {
         PerformanceEvaluator pe = new PerformanceEvaluator();
-        /*pe.loginTiming("rediscluster");
-        pe.loginTiming("mongo");
-        pe.loginTiming("redislocal");*/
-        pe.passwordUpdateTiming("mongo");
+        pe.loginTiming("redislocal");
         pe.passwordUpdateTiming("redislocal");
     }
 
