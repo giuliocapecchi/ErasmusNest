@@ -17,13 +17,13 @@
         </top>
         <center>
             <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="ALWAYS">
-            <VBox fx:id="followersBox">
+            <VBox>
                 <VBox.margin>
                     <Insets top="5.0" />
                 </VBox.margin>
-                <HBox fx:id="firstHBox" alignment="CENTER">
+                <HBox alignment="CENTER">
                     <VBox fx:id="leftFirstVBox" alignment="TOP_CENTER">
-                        <Label fx:id="followersLabel" style="-fx-font-size: 20px; -fx-text-fill: #019fe1;" text="Followers">
+                        <Label style="-fx-font-size: 20px; -fx-text-fill: #019fe1;" text="Followers">
                             <VBox.margin>
                                 <Insets top="5.0" />
                             </VBox.margin>
@@ -35,7 +35,7 @@
                         </Label>
                     </VBox>
                     <VBox fx:id="rightFirstVBox" alignment="TOP_CENTER">
-                        <Label fx:id="followsLabel" style="-fx-font-size: 20px; -fx-text-fill: #019fe1;" text="Follows">
+                        <Label style="-fx-font-size: 20px; -fx-text-fill: #019fe1;" text="Follows">
                             <VBox.margin>
                                 <Insets top="5.0" />
                             </VBox.margin>

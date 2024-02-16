@@ -1,7 +1,6 @@
 package it.unipi.erasmusnest.controllers;
 
 import it.unipi.erasmusnest.dbconnectors.Neo4jConnectionManager;
-import it.unipi.erasmusnest.model.Reservation;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -9,15 +8,10 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-import java.util.HashMap;
 import java.util.List;
 
 public class FollowersController extends Controller{
 
-    @FXML
-    private VBox followersBox;
-    @FXML
-    private HBox firstHBox;
     @FXML
     private VBox leftFirstVBox;
     @FXML
@@ -25,18 +19,12 @@ public class FollowersController extends Controller{
     @FXML
     private Label followersNumberLabel;
     @FXML
-    private Label followersLabel;
-    @FXML
     private Label followsNumberLabel;
-    @FXML
-    private Label followsLabel;
-    private String otherEmail = "";
 
     @FXML
     private void initialize()
     {
-        // TODO IN QUESTA CLASSE SI DEVE ANDARE A RECUPERARE LA LISTA DI FOLLOWS E FOLLOWERS
-        // E POI MOSTRARLA NELLA VIEW
+
         String email = getSession().getUser().getEmail();
         try
         {
@@ -80,9 +68,9 @@ public class FollowersController extends Controller{
                 rightFirstVBox.getChildren().add(buttonContainer);
             }
         }
-        catch(Exception e )
+        catch(Exception e)
         {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
 
     }

@@ -3,7 +3,6 @@ package it.unipi.erasmusnest.controllers;
 import com.dlsc.gemsfx.EmailField;
 import it.unipi.erasmusnest.consistency.RedisConsistencyManager;
 import it.unipi.erasmusnest.consistency.RedisMongoConsistencyManager;
-import it.unipi.erasmusnest.model.User;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -11,35 +10,26 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.TextFlow;
 
-import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 
 public class LoginController extends Controller{
 
     @FXML
-    Label title;
-
+    private Label title;
     @FXML
-    Button continueButton;
-
+    private Button continueButton;
     @FXML
-    EmailField emailField;
-
+    private EmailField emailField;
     @FXML
-    PasswordField passwordField;
-
+    private PasswordField passwordField;
     @FXML
-    TextFlow errorTextFlow;
-
+    private TextFlow errorTextFlow;
     @FXML
-    Button loginButton;
-
+    private Button loginButton;
     @FXML
-    Button signupButton;
-
+    private Button signupButton;
     @FXML
-    ImageView logoImageView;
+    private ImageView logoImageView;
 
     public LoginController() {
     }
@@ -50,7 +40,6 @@ public class LoginController extends Controller{
         if(getSession().getConnectionError()) {
             showErrorMessage("Connection error", errorTextFlow);
             getSession().setConnectionError(false);
-            //printDialogPopup();
         }
 
         if(getSession().isLogged()){
@@ -95,40 +84,6 @@ public class LoginController extends Controller{
     protected void onLoginButtonClick() {
         getSession().setLogged(false);
 
-        //TODO : login usando HASH delle password; scommenta solo quando sarà il momento
-        /*if(isEmailFieldValid(emailField) && isTextFieldValid(passwordField)) {
-            String redisPassword = getRedisConnectionManager().getPassword(emailField.getEmailAddress());
-            String typedPassword = passwordField.getText().trim();
-
-            if(redisPassword == null){ // Password not found in Redis
-                System.out.println("Credentials not found in Redis. Let's check in MongoDB");
-                String mongoPassword = getMongoConnectionManager().getPassword(emailField.getEmailAddress());
-
-                if(mongoPassword != null && BCrypt.checkpw(typedPassword, mongoPassword)) {
-                    getSession().setLogged(true);
-                    getSession().getUser().setEmail(emailField.getEmailAddress());
-                    super.getRedisConnectionManager().addUser(emailField.getEmailAddress(), BCrypt.hashpw(typedPassword, BCrypt.gensalt(12)));
-                }else{
-                    showErrorMessage("Invalid email or password", errorTextFlow);
-                }
-            }else if(BCrypt.checkpw(typedPassword, redisPassword)) { // Password taken from Redis is equal to real pw
-                getSession().setLogged(true);
-                getSession().getUser().setEmail(emailField.getEmailAddress());
-
-            }else{ // Wrong password
-                showErrorMessage("Invalid email or password", errorTextFlow);
-
-            }
-
-            if(getSession().isLogged()){
-                if(getPreviousWindowName() != null && !getPreviousWindowName().equals("signup")) {
-                    super.backToPreviousWindow();
-                } else {
-                    super.changeWindow("homepage");
-                }
-            }
-        }
-    */
         if(isEmailFieldValid(emailField) && isTextFieldValid(passwordField)) {
             String password = getRedisConnectionManager().getPassword(emailField.getEmailAddress());
             System.out.println("REDIS Password: " + password);

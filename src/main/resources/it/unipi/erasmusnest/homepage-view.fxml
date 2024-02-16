@@ -57,7 +57,7 @@
       </center>
        <bottom>
            <ToolBar nodeOrientation="LEFT_TO_RIGHT" prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: orange;" BorderPane.alignment="CENTER">
-               <Button fx:id="helpButton" mnemonicParsing="false" onAction="#handleHelpAction" text="Help">
+               <Button mnemonicParsing="false" onAction="#handleHelpAction" text="Help">
                    <cursor>
                        <Cursor fx:constant="DEFAULT" />
                    </cursor>

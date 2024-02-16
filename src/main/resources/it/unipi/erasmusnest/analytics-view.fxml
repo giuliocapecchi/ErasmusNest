@@ -67,7 +67,7 @@
                         </VBox>
                         <Separator orientation="VERTICAL" />
                         <HBox fx:id="hboxPriceButton" alignment="CENTER">
-                            <Button fx:id="priceAnalyticButton" mnemonicParsing="false" onAction="#onPriceAnalyticButton" text="Submit">
+                            <Button mnemonicParsing="false" onAction="#onPriceAnalyticButton" text="Submit">
                                 <HBox.margin>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                 </HBox.margin></Button>
@@ -123,7 +123,7 @@
                         </VBox>
                         <Separator orientation="VERTICAL" />
                         <HBox fx:id="hboxPositionButton" alignment="CENTER">
-                            <Button fx:id="PositionAnalyticButton" mnemonicParsing="false" onAction="#onPositionAnalyticButton" text="Submit">
+                            <Button mnemonicParsing="false" onAction="#onPositionAnalyticButton" text="Submit">
                                 <HBox.margin>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                 </HBox.margin></Button>
@@ -182,13 +182,13 @@
 
         <bottom>
             <HBox alignment="BOTTOM_CENTER" prefHeight="34.0" prefWidth="594.0" style="-fx-background-color: orange">
-                <Button fx:id="goBackButton" mnemonicParsing="false" onAction="#goBack" prefHeight="25.0" prefWidth="201.0" text="Go back">
+                <Button mnemonicParsing="false" onAction="#goBack" prefHeight="25.0" prefWidth="201.0" text="Go back">
                     <HBox.margin>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                     </HBox.margin>
                 </Button>
                 <Region prefHeight="57.0" prefWidth="215.0" HBox.hgrow="ALWAYS" />
-                <Button fx:id="goToHomepageButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#goToTheHomePage" prefHeight="25.0" prefWidth="155.0" text="Go to the homepage">
+                <Button contentDisplay="CENTER" mnemonicParsing="false" onAction="#goToTheHomePage" prefHeight="25.0" prefWidth="155.0" text="Go to the homepage">
                     <HBox.margin>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                     </HBox.margin>

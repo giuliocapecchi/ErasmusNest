@@ -7,7 +7,6 @@ import javafx.geometry.Point2D;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,63 +14,55 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public class AnalyticsController extends Controller {
+
     @FXML
-    Label valueLabel;
+    private Label valueLabel;
     @FXML
-    TextArea outputPositionTextArea;
+    private TextArea outputPositionTextArea;
     @FXML
-    VBox vboxQueryPrice;
+    private VBox vboxQueryPrice;
     @FXML
-    VBox vboxQueryPosition;
+    private VBox vboxQueryPosition;
     @FXML
-    VBox vboxPriceOutput;
+    private VBox vboxPriceOutput;
     @FXML
-    VBox vboxPositionOutput;
+    private VBox vboxPositionOutput;
     @FXML
-    HBox hboxPriceButton;
+    private HBox hboxPriceButton;
     @FXML
-    HBox hboxPositionButton;
+    private HBox hboxPositionButton;
     @FXML
-    Label title;
+    private Label title;
     @FXML
-    Button priceAnalyticButton;
+    private Spinner<Integer> inputAccommodates;
     @FXML
-    Button PositionAnalyticButton;
+    private Spinner<Integer> inputBathrooms;
     @FXML
-    Button goToHomepageButton;
+    private Spinner<Integer> minInputPrice;
     @FXML
-    Button goBackButton;
+    private Spinner<Integer> maxInputPrice;
     @FXML
-    Spinner<Integer> inputAccommodates;
+    private Label cityHighestPrice;
     @FXML
-    Spinner<Integer> inputBathrooms;
+    private Label cityLowestPrice;
     @FXML
-    Spinner<Integer> minInputPrice;
+    private Slider distanceSlider;
     @FXML
-    Spinner<Integer> maxInputPrice;
+    private ComboBox<String> citySplitComboBox;
     @FXML
-    Label cityHighestPrice;
+    private VBox vboxQueryHeatmap;
     @FXML
-    Label cityLowestPrice;
+    private VBox vboxMapOutput;
     @FXML
-    Slider distanceSlider;
+    private ComboBox<String> citySplitComboBox2;
     @FXML
-    ComboBox<String> citySplitComboBox;
+    private WebView heatmapWebView;
     @FXML
-    VBox vboxQueryHeatmap;
+    private HBox hboxHeatmapButton;
     @FXML
-    VBox vboxMapOutput;
-    @FXML
-    ComboBox<String> citySplitComboBox2;
-    @FXML
-    WebView heatmapWebView;
-    @FXML
-    HBox hboxHeatmapButton;
-    @FXML
-    Button HeatmapAnalyticButton;
+    private Button HeatmapAnalyticButton;
 
     @FXML
     private void initialize() {

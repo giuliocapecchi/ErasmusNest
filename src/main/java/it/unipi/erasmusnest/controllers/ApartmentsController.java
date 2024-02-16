@@ -20,25 +20,25 @@ import java.util.Objects;
 public class ApartmentsController extends Controller{
 
     @FXML
-    ScrollPane scrollPane;
+    private ScrollPane scrollPane;
 
     @FXML
-    MenuButton changeFiltersButton;
+    private MenuButton changeFiltersButton;
 
     @FXML
-    TextField title;
+    private TextField title;
 
     @FXML
-    TextField pageNumber;
+    private TextField pageNumber;
 
     @FXML
-    VBox apartmentsVBox = new VBox();
+    private VBox apartmentsVBox = new VBox();
 
     @FXML
-    Button nextPageButton;
+    private Button nextPageButton;
 
     @FXML
-    Button previousPageButton;
+    private Button previousPageButton;
 
     private Integer page;
 

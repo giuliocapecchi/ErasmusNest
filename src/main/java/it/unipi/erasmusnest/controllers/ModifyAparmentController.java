@@ -1,6 +1,5 @@
 package it.unipi.erasmusnest.controllers;
 
-import it.unipi.erasmusnest.consistency.ConsistencyManager;
 import it.unipi.erasmusnest.consistency.NeoConsistencyManager;
 import it.unipi.erasmusnest.graphicmanagers.AlertDialogGraphicManager;
 import it.unipi.erasmusnest.model.Apartment;
@@ -28,15 +27,15 @@ public class ModifyAparmentController extends Controller{
     private Spinner<Integer> inputPrice;
     private TextArea descriptionTextArea;
     @FXML
-    private Button updateHouse;
+    private Button updateApartment;
     @FXML
-    private Button removeHouse;
+    private Button removeApartment;
     @FXML
-    VBox pictureUrlsVBox;
+    private VBox pictureUrlsVBox;
     @FXML
-    Button morePictureButton;
+    private Button morePictureButton;
     @FXML
-    Button lessPictureButton;
+    private Button lessPictureButton;
     private ArrayList<TextField> pictureUrlsTextField;
     private Apartment apartment;
 
@@ -72,7 +71,7 @@ public class ModifyAparmentController extends Controller{
         maxDescriptionLengthReached.setVisible(false);
         // Aggiunta della descrizione
         descriptionTextArea = new TextArea();
-        // rendo la text area ad altezza dinamic
+        // rendo la text area ad altezza dinamica
         descriptionTextArea.minHeightProperty().bind(super.getRootPane().heightProperty().multiply(0.2));
         descriptionTextArea.setText(apartment.getDescription());
         descriptionTextArea.setWrapText(true); // Abilita il word wrapping per l'area di testo
@@ -104,7 +103,7 @@ public class ModifyAparmentController extends Controller{
 
     }
 
-    public void onUpdateHouseButtonClick()
+    public void onUpdateApartmentButtonClick()
     {
         //Qua deve sparare la query su MONGO per aggiornare i dati dell'appartamento
         String apartmentId = getSession().getApartment().getId();
@@ -113,15 +112,13 @@ public class ModifyAparmentController extends Controller{
         updatedApartment.setBathrooms(inputBathrooms.getValue());
         updatedApartment.setDollarPriceMonth(inputPrice.getValue());
         updatedApartment.setDescription(descriptionTextArea.getText());
-        // String imageUrl = textField.getText()==null || textField.getText().isBlank() || textField.getText().isEmpty() ? "" : textField.getText();
+
         ArrayList<String> pictureUrls = new ArrayList<>();
         for (TextField pictureUrlTextField : pictureUrlsTextField) {
             if(pictureUrlTextField.getText() != null && !pictureUrlTextField.getText().isEmpty() && !pictureUrlTextField.getText().isBlank())
                 pictureUrls.add(pictureUrlTextField.getText());
         }
-        //boolean change = false;
-        //if(!pictureUrls.get(0).equals(apartment.getImageURLs().get(0)) || apartment.getImageURLs()==null || apartment.getImageURLs().isEmpty())
-        //    change = true;
+
         updatedApartment.setImageURL(pictureUrls);
         System.out.println("\n\n\nIMMAGINI DENTRO ALL'APPARTAMENTO:");
         for (String s : updatedApartment.getImageURLs()) {
@@ -174,9 +171,9 @@ public class ModifyAparmentController extends Controller{
 
     }
 
-    private void showConfirmationMessage(String message, Button button) {
+    private void showConfirmationMessage(Button button) {
         PopOver popOver = new PopOver();
-        Label label = new Label(message);
+        Label label = new Label("Remove failed. This apartment has active reservations.");
         label.setStyle("-fx-padding: 15px;");
         popOver.setContentNode(label);
         popOver.setDetachable(false);
@@ -216,7 +213,7 @@ public class ModifyAparmentController extends Controller{
             }
             else
             {
-                showConfirmationMessage("Remove failed. This apartment has active reservations.", removeHouse);
+                showConfirmationMessage(removeApartment);
             }
 
         }
@@ -231,11 +228,6 @@ public class ModifyAparmentController extends Controller{
 
         ButtonType okButton = new ButtonType("OK");
         alert.getButtonTypes().setAll(okButton);
-
-        alert.setOnCloseRequest(event -> {
-            // Qui puoi aggiungere il codice per reindirizzare a un'altra pagina
-            //super.refreshWindow();
-        });
 
         // Mostra la finestra di dialogo
         alert.showAndWait();
@@ -299,7 +291,7 @@ public class ModifyAparmentController extends Controller{
             }
 
         }
-        updateHouse.setDisable(!fieldsModified);
+        updateApartment.setDisable(!fieldsModified);
     }
 
 }

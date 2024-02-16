@@ -2,57 +2,39 @@ package it.unipi.erasmusnest.controllers;
 
 import it.unipi.erasmusnest.graphicmanagers.AlertDialogGraphicManager;
 import it.unipi.erasmusnest.model.User;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
-import org.controlsfx.control.PopOver;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class HomepageController extends Controller{
 
     @FXML
-    Button helpButton;
+    private Button searchUserButton;
     @FXML
-    Button searchUserButton;
-
+    private RadioButton radioButtonLookForCities;
     @FXML
-    RadioButton radioButtonLookForCities;
-
+    private RadioButton radioButtonLookForUsers;
     @FXML
-    RadioButton radioButtonLookForUsers;
-
+    private ImageView logoImageView;
     @FXML
-    ImageView logoImageView;
-
+    private Label title;
     @FXML
-    Label title;
-
+    private Button signUpButton;
     @FXML
-    Button signUpButton;
-
+    private Button loginButton;
     @FXML
-    Button loginButton;
-
+    private Label welcomeText;
     @FXML
-    Label welcomeText;
-
+    private Button profileButton;
     @FXML
-    Button profileButton;
-
+    private Button logoutButton;
     @FXML
-    Button logoutButton;
-
+    private TextField cityTextField;
     @FXML
-    TextField cityTextField;
-
-    @FXML
-    VBox resultsBox;
+    private VBox resultsBox;
 
     public HomepageController() {
         System.out.println("HomepageController constructor");

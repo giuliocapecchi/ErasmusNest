@@ -1,13 +1,11 @@
 package it.unipi.erasmusnest.controllers;
 
-import it.unipi.erasmusnest.consistency.ConsistencyManager;
-import it.unipi.erasmusnest.consistency.MongoNeoConsistencyManager;
 import it.unipi.erasmusnest.consistency.NeoConsistencyManager;
 import it.unipi.erasmusnest.graphicmanagers.AlertDialogGraphicManager;
-import it.unipi.erasmusnest.model.Apartment;
 import it.unipi.erasmusnest.graphicmanagers.MapGraphicManager;
 import it.unipi.erasmusnest.graphicmanagers.RatingGraphicManager;
 import it.unipi.erasmusnest.graphicmanagers.ReservationGraphicManager;
+import it.unipi.erasmusnest.model.Apartment;
 import it.unipi.erasmusnest.model.Reservation;
 import it.unipi.erasmusnest.model.User;
 import javafx.event.ActionEvent;
@@ -37,7 +35,7 @@ import java.util.Stack;
 public class ApartmentController extends Controller{
 
     @FXML
-    HBox reviewHBox;
+    private HBox reviewHBox;
     @FXML
     private WebView webView;
     @FXML
@@ -104,8 +102,6 @@ public class ApartmentController extends Controller{
     @FXML
     private void initialize() {
 
-        System.out.println("INTIALIZE backPressed: "+backPressed);
-
         if(getSession().isLogged()) {
             if(apartmentsStack.isEmpty()) {
                 backPressed = false;
@@ -121,9 +117,9 @@ public class ApartmentController extends Controller{
         likeButton.setDisable(!getSession().isLogged());
         getSession().setApartment(getMongoConnectionManager().getApartment(getSession().getApartment().getId()));
         if(getSession().getApartment()==null){
+
             // If apartment is null seems that the apartment has been removed from Mongo
             // and so need to be removed also from Neo4j
-
             new NeoConsistencyManager(getNeo4jConnectionManager()).removeApartmentFromNeo4J(getSession().getApartment().getId());
 
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -173,6 +169,7 @@ public class ApartmentController extends Controller{
             nameLabel.setText(getSession().getApartment().getName());
             buildImage();
             imageView.fitWidthProperty().bind(leftFirstBorderPane.widthProperty().multiply(0.8));
+
             String information;
             if(getSession().getApartment().getDescription()==null || getSession().getApartment().getDescription().isEmpty()) {
                 information = "Accommodates: " + getSession().getApartment().getMaxAccommodates() + "\n" +
@@ -369,7 +366,7 @@ public class ApartmentController extends Controller{
             int numberOfMonths = (period.getMonths() + period.getYears() * 12) + 1;
 
             String userEmail = getSession().getUser().getEmail();
-            String houseId = String.valueOf(getSession().getApartment().getId());
+            String apartmentId = String.valueOf(getSession().getApartment().getId());
 
             User student = new User();
             student.setEmail(userEmail);
@@ -379,8 +376,8 @@ public class ApartmentController extends Controller{
             reservation.setCity(getSession().getApartment().getCity());
             reservation.setApartmentImage(getSession().getApartment().getImageURLs().get(0));
 
-            if(!getSession().getReservationsApartmentIds().contains(houseId)){
-                getSession().getReservationsApartmentIds().add(houseId);
+            if(!getSession().getReservationsApartmentIds().contains(apartmentId)){
+                getSession().getReservationsApartmentIds().add(apartmentId);
             }
 
             getRedisConnectionManager().addReservation(student, reservation, getSession().getReservationsApartmentIds());
@@ -398,8 +395,6 @@ public class ApartmentController extends Controller{
             backPressed = true;
         }
         super.backToPreviousWindow();
-        //super.changeWindow("apartment", "apartments");
-
     }
 
     private void cleanAverageRatingInSession(){
@@ -424,18 +419,18 @@ public class ApartmentController extends Controller{
         {
             if(!getRedisConnectionManager().isApartmentReserved(getSession().getApartment().getId()))
             {
-                // non ci sono prenotazioni attive, si puo eliminare la casa
+                // non ci sono prenotazioni attive, si può eliminare la casa
                 if(getMongoConnectionManager().removeApartment(getSession().getApartment().getId(), getSession().getUser().getEmail()))
                 {
                     // Apartment removed from MongoDB
                     // Apartment is still available on Neo4j, apartments view
                     // While someone try to find out more information on apartment view, this'll be removed
-                    alertDialog("House correctly removed");
+                    alertDialog("Apartment correctly removed");
                     super.changeWindow("myProfile");
                 }
                 else
                 {
-                    alertDialog("Impossible to remove house");
+                    alertDialog("Impossible to remove apartment");
                 }
             }
             else
@@ -456,12 +451,6 @@ public class ApartmentController extends Controller{
         ButtonType okButton = new ButtonType("OK");
         alert.getButtonTypes().setAll(okButton);
 
-        alert.setOnCloseRequest(event -> {
-            // Qui puoi aggiungere il codice per reindirizzare a un'altra pagina
-            //super.refreshWindow();
-        });
-
-        // Mostra la finestra di dialogo
         alert.showAndWait();
     }
 }
