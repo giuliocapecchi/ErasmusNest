@@ -10,6 +10,7 @@ import it.unipi.erasmusnest.graphicmanagers.AlertDialogGraphicManager;
 import it.unipi.erasmusnest.model.Apartment;
 import it.unipi.erasmusnest.model.User;
 import javafx.geometry.Point2D;
+import org.bson.BsonNull;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
@@ -698,43 +699,66 @@ public class MongoConnectionManager extends ConnectionManager{
         MongoDatabase database = client.getDatabase("ErasmusNest");
         MongoCollection<Document> collection = database.getCollection("apartments");
 
-        // Define filter conditions based on input parameters
-        Bson filters = and(
-                accommodates != 0 ? gte("accommodates", accommodates) : exists("accommodates"),
-                bathrooms != 0 ? gte("bathrooms", bathrooms) : exists("bathrooms"),
-                priceMin != 0 ? gte("price", priceMin) : exists("price"),
-                priceMax != 0 ? lte("price", priceMax) : exists("price")
-        );
+        List<Bson> matchFilters = new ArrayList<>();
+
+        // Aggiungi filtri solo se il valore non è zero
+        if (accommodates != 0) {
+            matchFilters.add(Filters.gte("accommodates", accommodates));
+        }
+        if (bathrooms != 0) {
+            matchFilters.add(Filters.gte("bathrooms", bathrooms));
+        }
+        if (priceMin != 0) {
+            matchFilters.add(Filters.gte("price", priceMin));
+        }
+        if (priceMax != 0) {
+            matchFilters.add(Filters.lte("price", priceMax));
+        }
+        Bson matchStage = matchFilters.isEmpty() ? match(new Document()) : match(Filters.and(matchFilters));
 
         // Define the aggregation pipeline
-        List<Bson> aggregationPipeline = Arrays.asList(
-                match(filters),
-                Aggregates.group("$city", Accumulators.avg("averagePrice", "$price")),
-                Aggregates.sort(Sorts.ascending("averagePrice")),
-                Aggregates.group(null,
-                        Accumulators.first("lowestAveragePrice", "$$ROOT"),
-                        Accumulators.last("highestAveragePrice", "$$ROOT")),
-                Aggregates.project(fields(
-                        excludeId(),
-                        computed("lowestAveragePriceCity", "$lowestAveragePrice._id"),
-                        computed("lowestAveragePrice", "$lowestAveragePrice.averagePrice"),
-                        computed("highestAveragePriceCity", "$highestAveragePrice._id"),
-                        computed("highestAveragePrice", "$highestAveragePrice.averagePrice")
-                ))
-        );
-
-        // Execute the aggregation
-        Document resultDocument = collection.aggregate(aggregationPipeline).first();
-
-        // Check if the result is not null and get the resulting string
-        String resultString = resultDocument != null ? resultDocument.toJson() : "No result found";
-
-        // Output the result string
-        System.out.println(resultString);
-
-        // Close the MongoDB client
+        AggregateIterable<Document> result = collection.aggregate(Arrays.asList(
+                matchStage,
+                new Document("$group",
+                        new Document("_id", "$city")
+                                .append("averagePrice",
+                                        new Document("$avg", "$price"))
+                                .append("count",
+                                        new Document("$sum", 1L))),
+                new Document("$sort",
+                        new Document("averagePrice", 1L)),
+                new Document("$group",
+                        new Document("_id", 0L)
+                                .append("lowestName",
+                                        new Document("$first", "$_id"))
+                                .append("lowestCount",
+                                        new Document("$first", "$count"))
+                                .append("lowestAveragePrice",
+                                        new Document("$first", "$averagePrice"))
+                                .append("highestName",
+                                        new Document("$last", "$_id"))
+                                .append("highestCount",
+                                        new Document("$last", "$count"))
+                                .append("highestAveragePrice",
+                                        new Document("$last", "$averagePrice"))),
+                new Document("$project",
+                        new Document("_id", 0L)
+                                .append("lower",
+                                        new Document("name", "$lowestName")
+                                                .append("count", "$lowestCount")
+                                                .append("price", "$lowestAveragePrice"))
+                                .append("higher",
+                                        new Document("name", "$highestName")
+                                                .append("count", "$highestCount")
+                                                .append("price", "$highestAveragePrice")))));
+        System.out.println("Price analytics result: ");
+        StringBuilder resultString = new StringBuilder();
+        for (Document doc : result) {
+            resultString.append(doc.toJson()).append("\n");
+        }
+        String res = !resultString.toString().isEmpty() ? resultString.toString() : "No result found";
         client.close();
-        return resultString;
+        return res;
     }
 
     public HashMap<Point2D, Integer> getHeatmap(String city) {
