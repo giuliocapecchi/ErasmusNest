@@ -222,9 +222,6 @@ public class RedisConnectionManager extends ConnectionManager{
 
         try (JedisCluster jedis = createJedisCluster()) {
 
-            // key design: <entity>:<email>
-            // entity: user
-
             String key = "user:" + email ;
 
             // set the key
@@ -233,7 +230,7 @@ public class RedisConnectionManager extends ConnectionManager{
             jedis.hset(key, hash);
 
             // compute the seconds between now and trashWeeksInterval
-            long seconds = LocalDateTime.now().until(LocalDateTime.now().plusWeeks(trashWeeksInterval), ChronoUnit.SECONDS);
+            long seconds = getGarbageTimeInSeconds();
             // set expiration time on the key equal to the seconds
             jedis.expire(key, seconds);
 
@@ -260,7 +257,7 @@ public class RedisConnectionManager extends ConnectionManager{
             jedis.hset(key, "reservedApartments",String.join(",", apartmentsIds));
 
             // compute the seconds between now and trashWeeksInterval
-            long seconds = LocalDateTime.now().until(LocalDateTime.now().plusWeeks(trashWeeksInterval), ChronoUnit.SECONDS);
+            long seconds = getGarbageTimeInSeconds();
             // set expiration time on the key equal to the seconds
             jedis.expire(key, seconds);
 
@@ -335,13 +332,10 @@ public class RedisConnectionManager extends ConnectionManager{
 
         try (JedisCluster jedis = createJedisCluster()) {
 
-            // key design: <entity>:<email>:<attribute>
-            // entity: user
-            // attribute: password
-            String attribute = "password";
-            String key = "user:" + email + ":" + attribute;
+
+            String key = "user:" + email;
             // set the key
-            jedis.set(key, password);
+            jedis.hset(key, "password", password);
 
             // set the ttl to -1 to remove the expiration time
             jedis.persist(key);
@@ -402,7 +396,7 @@ public class RedisConnectionManager extends ConnectionManager{
 
         try (JedisCluster jedis = createJedisCluster()) {
 
-            long maxSeconds = LocalDateTime.now().until(LocalDateTime.now().plusWeeks(trashWeeksInterval), ChronoUnit.SECONDS);
+            long maxSeconds = getGarbageTimeInSeconds();
 
             for(Reservation reservation : reservations) {
                 String subKey = getSubKey(reservation);
@@ -453,7 +447,7 @@ public class RedisConnectionManager extends ConnectionManager{
             hash.put("state", "rejected"); // pending | approved | rejected | expired | reviewed
             jedis.hset(subKey, hash);
 
-            long seconds = LocalDateTime.now().until(LocalDateTime.now().plusWeeks(trashWeeksInterval), ChronoUnit.SECONDS);
+            long seconds = getGarbageTimeInSeconds();
             jedis.expire(subKey, seconds);
 
             // leggo da redis gli apartmentIds dell'utente
@@ -520,5 +514,30 @@ public class RedisConnectionManager extends ConnectionManager{
         return value;
     }
 
+    public boolean updateUserPasswordForPerformanceEvaluation(String email, String password) {
+
+        try (JedisPooled jedis = new JedisPooled("localhost", 6379)) {
+
+            String key = "user:" + email;
+            // set the key
+            jedis.hset(key, "password", password);
+
+            // set the ttl to -1 to remove the expiration time
+            jedis.persist(key);
+
+            // jedis.close(); // not needed with try-with-resources
+            return true;
+        } catch (Exception e) {
+            System.out.println("Connection problem: " + e.getMessage());
+            new AlertDialogGraphicManager("Redis connection failed").show();
+        }
+        return false;
+    }
+
+    private long getGarbageTimeInSeconds(){
+
+        return LocalDateTime.now().until(LocalDateTime.now().plusWeeks(trashWeeksInterval), ChronoUnit.SECONDS);
+
+    }
 
 }
