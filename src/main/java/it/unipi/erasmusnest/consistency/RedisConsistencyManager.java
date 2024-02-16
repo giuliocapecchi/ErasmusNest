@@ -17,14 +17,10 @@ public class RedisConsistencyManager extends ConsistencyManager{
             else
                 System.out.println("\t\t\t\t\t\t*** USER NOT ADDED ON REDIS ***");
 
-            // no rollback needed
-
             System.out.println("\t\t\t\t\t\t*** THREAD addUserOnRedis ENDED ***");
         });
 
         executeOperation(thread);
-
-        //operationsQueue.add(thread);
     }
 
 }
