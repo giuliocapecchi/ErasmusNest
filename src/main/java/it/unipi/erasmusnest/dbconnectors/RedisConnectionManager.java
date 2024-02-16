@@ -67,17 +67,12 @@ public class RedisConnectionManager extends ConnectionManager{
 
         try (JedisCluster jedis = createJedisCluster()) {
 
-            // key design: <entity>:<email>
-            // entity: user
-            // attribute: reservedApartments
-
             String key = "user:" + email;
             String value = jedis.hget(key, "reservedApartments");
             if(value == null)
                 return new ArrayList<>();
             else
                 return new ArrayList<>(Arrays.asList(value.split(",")));
-            //jedis.close(); // not needed with try-with-resources
 
         } catch (Exception e) {
             System.out.println("REDIS connection problem in looking for the reserved Apartments: " + e.getMessage());
@@ -86,7 +81,7 @@ public class RedisConnectionManager extends ConnectionManager{
         return null;
     }
 
-    // DID: get only the reservations that are not in the trash period
+    // get only the reservations that are not in the trash period
     public ArrayList<Reservation> getReservationsForApartment(String houseIdToSearch) {
         ArrayList<Reservation> reservations = new ArrayList<>();
 
@@ -109,7 +104,7 @@ public class RedisConnectionManager extends ConnectionManager{
         return reservations;
     }
 
-    // DID: get only the reservations that are not in the trash period (already did in the used method)
+    // get only the reservations that are not in the trash period (already did in the used method)
     public ArrayList<Reservation> getReservationsForApartments(List<String> houseIds) {
         ArrayList<Reservation> reservations = new ArrayList<>();
 
@@ -159,7 +154,7 @@ public class RedisConnectionManager extends ConnectionManager{
         return isReserved;
     }
 
-    // DID: get only the reservations that are not in the trash period
+    // get only the reservations that are not in the trash period
     public ArrayList<Reservation> getReservationsForUser(String  userEmail, ArrayList<String> apartmentsIds) {
         ArrayList<Reservation> reservations = new ArrayList<>();
 
@@ -230,8 +225,7 @@ public class RedisConnectionManager extends ConnectionManager{
 
         } catch (Exception e) {
             System.out.println("Connection problem: " + e.getMessage());
-            // Commentoo altrimenti crasha
-            // new AlertDialogGraphicManager("Redis connection failed").show();
+            new AlertDialogGraphicManager("Redis connection failed").show();
         }
         return added;
     }
@@ -256,11 +250,10 @@ public class RedisConnectionManager extends ConnectionManager{
 
         } catch (Exception e) {
             System.out.println("Redis: error updating the apartmentsIds in the User entry: " + e.getMessage());
-            // new AlertDialogGraphicManager("Redis connection failed").show();
+            new AlertDialogGraphicManager("Redis connection failed").show();
         }
     }
 
-    // OKAY
     public void addReservation(User student, Reservation reservation, ArrayList<String> apartmentsIds) {
 
         try (JedisCluster jedis = createJedisCluster()) {
@@ -332,27 +325,56 @@ public class RedisConnectionManager extends ConnectionManager{
         return false;
     }
 
-    // DELETE
-
-    public void deleteUser(String email) {
-
+    public void approveReservation(Reservation reservation) {
         try (JedisCluster jedis = createJedisCluster()) {
 
-            // key design: <entity>:<email>:<attribute>
-            // entity: user
-            // attribute: password
-            String attribute = "password";
-            String key = "user:" + email + ":" + attribute;
-            // delete the key
-            jedis.del(key);
-            // jedis.close(); // not needed with try-with-resources
+            String subKey = getSubKey(reservation);
+            Map<String, String> hash = new HashMap<>();;
+            hash.put("timestamp", reservation.getTimestamp().toString());
+            hash.put("city", reservation.getCity());
+            hash.put("apartmentImage", reservation.getApartmentImage());
+            hash.put("state", "approved"); // pending | approved | rejected | expired | reviewed
+            jedis.hset(subKey, hash);
+
+        } catch (Exception e) {
+            new AlertDialogGraphicManager("Redis connection failed").show();
+        }
+    }
+
+    public void rejectReservation(Reservation reservation) {
+        try (JedisCluster jedis = createJedisCluster()) {
+
+            String subKey = "reservation:" + reservation.getStudentEmail()
+                    + ":" + reservation.getApartmentId()
+                    + ":" + reservation.getStartYear()
+                    + ":" + reservation.getStartMonth()
+                    + ":" + 0;  // note that a rejected reservation has numberOfMonths = 0
+
+            Map<String, String> hash = new HashMap<>();;
+            hash.put("timestamp", reservation.getTimestamp().toString());
+            hash.put("city", reservation.getCity());
+            hash.put("apartmentImage", reservation.getApartmentImage());
+            hash.put("state", "rejected"); // pending | approved | rejected | expired | reviewed
+            jedis.hset(subKey, hash);
+
+            long seconds = getGarbageTimeInSeconds();
+            jedis.expire(subKey, seconds);
+
+            String key = "user:" + reservation.getStudentEmail();
+            String apartmentsIds =  jedis.hget(key, "reservedApartments");
+            ArrayList<String> apartmentsIdsList = new ArrayList<>(Arrays.asList(apartmentsIds.split(",")));
+
+            updateExpirationTimeOnUser(reservation.getStudentEmail(),apartmentsIdsList);
+            deleteReservation(reservation, apartmentsIdsList);
+
         } catch (Exception e) {
             System.out.println("Connection problem: " + e.getMessage());
             new AlertDialogGraphicManager("Redis connection failed").show();
         }
     }
 
-    // OKAY
+    // DELETE
+
     public void deleteReservation(Reservation reservation, ArrayList<String> apartmentsIds) {
 
         try (JedisCluster jedis = createJedisCluster()) {
@@ -397,54 +419,7 @@ public class RedisConnectionManager extends ConnectionManager{
         }
     }
 
-    public void approveReservation(Reservation reservation) {
-        try (JedisCluster jedis = createJedisCluster()) {
 
-            String subKey = getSubKey(reservation);
-            Map<String, String> hash = new HashMap<>();;
-            hash.put("timestamp", reservation.getTimestamp().toString());
-            hash.put("city", reservation.getCity());
-            hash.put("apartmentImage", reservation.getApartmentImage());
-            hash.put("state", "approved"); // pending | approved | rejected | expired | reviewed
-            jedis.hset(subKey, hash);
-
-        } catch (Exception e) {
-            new AlertDialogGraphicManager("Redis connection failed").show();
-        }
-    }
-
-    public void rejectReservation(Reservation reservation) {
-        try (JedisCluster jedis = createJedisCluster()) {
-
-            String subKey = "reservation:" + reservation.getStudentEmail()
-                    + ":" + reservation.getApartmentId()
-                    + ":" + reservation.getStartYear()
-                    + ":" + reservation.getStartMonth()
-                    + ":" + 0;  // note that a rejected reservation has numberOfMonths = 0
-
-            Map<String, String> hash = new HashMap<>();;
-            hash.put("timestamp", reservation.getTimestamp().toString());
-            hash.put("city", reservation.getCity());
-            hash.put("apartmentImage", reservation.getApartmentImage());
-            hash.put("state", "rejected"); // pending | approved | rejected | expired | reviewed
-            jedis.hset(subKey, hash);
-
-            long seconds = getGarbageTimeInSeconds();
-            jedis.expire(subKey, seconds);
-
-            // leggo da redis gli apartmentIds dell'utente
-            String key = "user:" + reservation.getStudentEmail();
-            String apartmentsIds =  jedis.hget(key, "reservedApartments");
-            ArrayList<String> apartmentsIdsList = new ArrayList<>(Arrays.asList(apartmentsIds.split(",")));
-
-            updateExpirationTimeOnUser(reservation.getStudentEmail(),apartmentsIdsList);
-            deleteReservation(reservation, apartmentsIdsList);
-
-        } catch (Exception e) {
-            System.out.println("Connection problem: " + e.getMessage());
-            new AlertDialogGraphicManager("Redis connection failed").show();
-        }
-    }
 
     private static String getSubKey(Reservation reservation) {
         return "reservation:" + reservation.getStudentEmail()
@@ -471,9 +446,15 @@ public class RedisConnectionManager extends ConnectionManager{
         return isInTrash;
     }
 
+    private long getGarbageTimeInSeconds(){
+
+        return LocalDateTime.now().until(LocalDateTime.now().plusWeeks(trashWeeksInterval), ChronoUnit.SECONDS);
+
+    }
+
 
     // method used only for testing on localhost
-    public String getPasswordForPerformanceEvaluation(String email) {
+    public void getPasswordForPerformanceEvaluation(String email) {
 
         String value = null;
 
@@ -487,16 +468,14 @@ public class RedisConnectionManager extends ConnectionManager{
             value = jedis.hget(key, "password");
             System.out.println("LocalPassword: " + value);
             //jedis.close(); // not needed with try-with-resources
-            return value;
 
         } catch (Exception e) {
             System.out.println("Connection problem: " + e.getMessage());
             new AlertDialogGraphicManager("Redis connection failed").show();
         }
-        return value;
     }
 
-    public boolean updateUserPasswordForPerformanceEvaluation(String email, String password) {
+    public void updateUserPasswordForPerformanceEvaluation(String email, String password) {
 
         try (JedisPooled jedis = new JedisPooled("localhost", 6379)) {
 
@@ -508,18 +487,10 @@ public class RedisConnectionManager extends ConnectionManager{
             jedis.persist(key);
 
             // jedis.close(); // not needed with try-with-resources
-            return true;
         } catch (Exception e) {
             System.out.println("Connection problem: " + e.getMessage());
             new AlertDialogGraphicManager("Redis connection failed").show();
         }
-        return false;
-    }
-
-    private long getGarbageTimeInSeconds(){
-
-        return LocalDateTime.now().until(LocalDateTime.now().plusWeeks(trashWeeksInterval), ChronoUnit.SECONDS);
-
     }
 
 }

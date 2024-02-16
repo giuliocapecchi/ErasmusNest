@@ -42,37 +42,6 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
 
     //CREATE
 
-    public void addUser( final String email, final int id )
-    {
-        try (Session session = driver.session())
-        {
-            session.writeTransaction((TransactionWork<Void>) tx -> {
-                tx.run( "MERGE (p:Person {email: $email})",
-                        parameters( "email", email) );
-                return null;
-            });
-        }catch (Exception e){
-            System.out.println("Exception: " + e);
-            new AlertDialogGraphicManager("Neo4j connection failed").show();
-        }
-    }
-
-    public void addCity( final String name)
-    {
-        try (Session session = driver.session())
-        {
-            session.writeTransaction((TransactionWork<Void>) tx -> {
-                tx.run( "MERGE (c:City {name: $name})",
-                        parameters( "name", name ) );
-                return null;
-            });
-        }catch (Exception e){
-            System.out.println("Exception: " + e);
-            new AlertDialogGraphicManager("Neo4j connection failed").show();
-        }
-    }
-
-
     public boolean addApartment(Apartment apartment){
         try (Session session = driver.session()){
             session.writeTransaction((TransactionWork<Void>) tx -> {
@@ -175,14 +144,14 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
                                     "WITH a, COUNT(r) AS reviewCount " +
                                     "RETURN a, reviewCount " +
                                     "SKIP $elementsToSkip LIMIT $elementsPerPage", parameters);
-                }else if(filter==1){ // query that orders the houses based on the positiveness of the reviews
+                }else if(filter==1){ // query that orders the apartment based on the positiveness of the reviews
                     result = tx.run("MATCH (a:Apartment)-[:LOCATED]->(c:City {name:$cityName}) " +
                                     "OPTIONAL MATCH (a)<-[r:REVIEW]-() " +
                                     "WITH a, COUNT(r) AS reviewCount " +
                                     "RETURN a, reviewCount " +
                                     "ORDER BY CASE WHEN a.averageReviewScore IS NULL THEN 1 ELSE 0 END, a.averageReviewScore DESC " +
                                     "SKIP $elementsToSkip LIMIT $elementsPerPage", parameters);
-                }else if(filter==2){ // query that orders the houses based on the number of reviews
+                }else if(filter==2){ // query that orders the apartment based on the number of reviews
                     result = tx.run("MATCH (a:Apartment)-[:LOCATED]->(c:City {name:$cityName}) " +
                                         "OPTIONAL MATCH (a)<-[r:REVIEW]-() " +
                                         "WITH a, COUNT(r) AS reviewCount " +
@@ -212,7 +181,6 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
             });
             return apartments;
         }catch (Exception e){
-            e.printStackTrace();
             System.out.println("Exception: " + e);
             new AlertDialogGraphicManager("Neo4j connection failed").show();
             return null;
@@ -590,7 +558,6 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
                 });
                 result = true;
             } catch (Exception e) {
-                e.printStackTrace();
                 new AlertDialogGraphicManager("Neo4j connection failed").show();
             }
         }
