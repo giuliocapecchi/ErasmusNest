@@ -34,8 +34,6 @@ public class ProfileController extends Controller{
     @FXML
     private Label studyFieldLabel;
     @FXML
-    private Label citiesLabel;
-    @FXML
     public VBox housesContainer;
     @FXML
     private VBox suggestedOuterBox;
@@ -79,20 +77,6 @@ public class ProfileController extends Controller{
             else
                 studyFieldLabel.setText(utente.getStudyField());
 
-            List<String> userCities = utente.getPreferredCities();
-
-            String cities = "";
-            if (userCities != null && !userCities.isEmpty()) {
-                for (String city : userCities) {
-                    cities += city;
-                    if (userCities.indexOf(city) != userCities.size() - 1) {
-                        cities += ", ";
-                    }
-                }
-            } else {
-                cities = "not specified";
-            }
-            citiesLabel.setText(cities);
 
             //Adesso si deve popolare la vbox per le case dell'utente
             List<Apartment> userHouses = utente.getHouses();

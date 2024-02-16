@@ -27,8 +27,6 @@ public class RedisMongoConsistencyManager extends ConsistencyManager{
         });
 
         executeOperation(thread);
-
-        //operationsQueue.add(thread);
     }
 
 }

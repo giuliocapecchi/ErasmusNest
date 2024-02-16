@@ -16,13 +16,11 @@ public class NeoConsistencyManager extends ConsistencyManager{
                 System.out.println("\t\t\t\t\t\t*** APARTMENT IMAGE UPDATED ON NEO4J ***");
             else
                 System.out.println("\t\t\t\t\t\t*** APARTMENT IMAGE NOT UPDATED ON NEO4J ***");
-            // no rollback needed
+
             System.out.println("\t\t\t\t\t\t*** THREAD updateApartmentImageOnNeo ENDED ***");
         });
 
         executeOperation(thread);
-
-        //operationsQueue.add(thread);
     }
 
     public void removeApartmentFromNeo4J(String apartmentId) {
@@ -34,13 +32,10 @@ public class NeoConsistencyManager extends ConsistencyManager{
             else
                 System.out.println("\t\t\t\t\t\t*** APARTMENT NOT REMOVED FROM NEO4J ***");
             if(removed)
-
                 System.out.println("\t\t\t\t\t\t*** THREAD removeApartmentFromNeo4J ENDED ***");
         });
 
         executeOperation(thread);
-
-        //operationsQueue.add(thread);
     }
 
 }

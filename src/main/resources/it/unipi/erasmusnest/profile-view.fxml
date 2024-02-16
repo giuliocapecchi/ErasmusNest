@@ -41,10 +41,6 @@
                         <Label minWidth="75" style="-fx-font-weight: bold;" text="Study field:" />
                         <Label fx:id="studyFieldLabel" />
                     </HBox>
-                    <HBox spacing="10">
-                        <Label minWidth="75" style="-fx-font-weight: bold;" text="Cities of interest:" />
-                        <Label fx:id="citiesLabel" />
-                    </HBox>
                <Button mnemonicParsing="false" text="Show reviews" onAction="#showReviews">
                   <VBox.margin>
                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
