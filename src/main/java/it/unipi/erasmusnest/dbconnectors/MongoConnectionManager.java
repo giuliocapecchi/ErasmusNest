@@ -123,9 +123,9 @@ public class MongoConnectionManager extends ConnectionManager{
             MongoCollection<Document> apartmentsCollection = database.getCollection("apartments");
 
             AggregateIterable<Document> result = apartmentsCollection.aggregate(Arrays.asList(new Document("$match",
-                            new Document("city", "Amsterdam")),
+                            new Document("city", cityName)),
                     new Document("$group",
-                            new Document("_id", cityName)
+                            new Document("_id", "$city")
                                     .append("avgLat",
                                             new Document("$avg",
                                                     new Document("$arrayElemAt", Arrays.asList("$position", 0L))))
