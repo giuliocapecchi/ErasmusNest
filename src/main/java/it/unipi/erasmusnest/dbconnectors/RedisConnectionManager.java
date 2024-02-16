@@ -51,18 +51,13 @@ public class RedisConnectionManager extends ConnectionManager{
 
         try (JedisCluster jedis = createJedisCluster()) {
 
-            // key design: <entity>:<email>
-            // entity: user
-            // attribute: password
-
             String key = "user:" + email;
             value = jedis.hget(key, "password");
             System.out.println("Password: " + value);
-            //jedis.close(); // not needed with try-with-resources
+
             return value;
 
         } catch (Exception e) {
-            System.out.println("Connection problem: " + e.getMessage());
             new AlertDialogGraphicManager("Redis connection failed").show();
         }
         return value;
@@ -96,20 +91,19 @@ public class RedisConnectionManager extends ConnectionManager{
         ArrayList<Reservation> reservations = new ArrayList<>();
 
         try (JedisCluster jedis = createJedisCluster()) {
-            // key design: <entity>:<userEmail>:<houseId>:<startYear>:<startMonth>:<numberOfMonths>:<dateTime>
+
             // Use the KEYS command to get all keys matching the pattern
             Set<String> keys = jedis.keys("reservation:*:{" + houseIdToSearch + "}:*:*:*");
 
             for (String key : keys) {
                 if(!isReservationInTrashPeriod(key)) {
                     String[] keyParts = key.split(":");
-                    // rimuovo le graffe da keyParts[2]
+                    // removing the curly braces from keyParts[2]
                     keyParts[2] = keyParts[2].substring(1, keyParts[2].length()-1);
                     reservations.add(new Reservation(keyParts[1], keyParts[2], Integer.parseInt(keyParts[3]), Integer.parseInt(keyParts[4]), Integer.parseInt(keyParts[5])));
                 }
             }
         } catch (Exception e) {
-            System.out.println("Connection problem: " + e.getMessage());
             new AlertDialogGraphicManager("Redis connection failed").show();
         }
         return reservations;
@@ -170,7 +164,7 @@ public class RedisConnectionManager extends ConnectionManager{
         ArrayList<Reservation> reservations = new ArrayList<>();
 
         try (JedisCluster jedis = createJedisCluster()) {
-            // key design: <entity>:<userEmail>:<houseId>:<startYear>:<startMonth>:<numberOfMonths>:<dateTime>
+
             for(String apartmentId : apartmentsIds){
                 String subKey = "reservation:" + userEmail + ":{" + apartmentId + "}:*";
                 Set<String> keys = jedis.keys(subKey);
@@ -178,7 +172,7 @@ public class RedisConnectionManager extends ConnectionManager{
                     if (!isReservationInTrashPeriod(key)) {
                         ArrayList<String> attributesValues = getReservationAttributesValues(key);
                         String[] keyParts = key.split(":");
-                        //rimuovo le graffe da keyParts[2]
+                        // removing the curly braces from keyParts[2]
                         keyParts[2] = keyParts[2].substring(1, keyParts[2].length()-1);
                         reservations.add(new Reservation(keyParts[1], keyParts[2], Integer.parseInt(keyParts[3]),
                                 Integer.parseInt(keyParts[4]), Integer.parseInt(keyParts[5]),
@@ -188,7 +182,6 @@ public class RedisConnectionManager extends ConnectionManager{
                 }
             }
         } catch (Exception e) {
-            System.out.println("Connection problem: " + e.getMessage());
             new AlertDialogGraphicManager("Redis connection failed").show();
         }
         return reservations;
@@ -218,7 +211,6 @@ public class RedisConnectionManager extends ConnectionManager{
     public boolean addUser(String email, String password) {
 
         boolean added = false;
-
 
         try (JedisCluster jedis = createJedisCluster()) {
 
@@ -268,17 +260,13 @@ public class RedisConnectionManager extends ConnectionManager{
         }
     }
 
-
     // OKAY
     public void addReservation(User student, Reservation reservation, ArrayList<String> apartmentsIds) {
-
 
         try (JedisCluster jedis = createJedisCluster()) {
 
             String dateTime = LocalDateTime.now().toString();
             String subKey = "reservation:" + student.getEmail() + ":{" + reservation.getApartmentId() + "}:" + reservation.getStartYear() + ":" + reservation.getStartMonth() + ":" + reservation.getNumberOfMonths();
-
-            // chiave apartment -> chiave utente
 
             Map<String, String> hash = new HashMap<>();;
             hash.put("timestamp", dateTime);
@@ -305,9 +293,7 @@ public class RedisConnectionManager extends ConnectionManager{
         } catch (Exception e) {
             System.out.println("Connection problem: " + e.getMessage());
             new AlertDialogGraphicManager("Redis connection failed").show();
-            e.printStackTrace();
         }
-        System.out.println("Reservation added");
     }
 
     private void setExpirationTimeOnUser(String email, long seconds, ExpiryOption option) {
@@ -332,7 +318,6 @@ public class RedisConnectionManager extends ConnectionManager{
 
         try (JedisCluster jedis = createJedisCluster()) {
 
-
             String key = "user:" + email;
             // set the key
             jedis.hset(key, "password", password);
@@ -340,10 +325,8 @@ public class RedisConnectionManager extends ConnectionManager{
             // set the ttl to -1 to remove the expiration time
             jedis.persist(key);
 
-            // jedis.close(); // not needed with try-with-resources
             return true;
         } catch (Exception e) {
-            System.out.println("Connection problem: " + e.getMessage());
             new AlertDialogGraphicManager("Redis connection failed").show();
         }
         return false;
@@ -426,7 +409,6 @@ public class RedisConnectionManager extends ConnectionManager{
             jedis.hset(subKey, hash);
 
         } catch (Exception e) {
-            System.out.println("Connection problem: " + e.getMessage());
             new AlertDialogGraphicManager("Redis connection failed").show();
         }
     }
