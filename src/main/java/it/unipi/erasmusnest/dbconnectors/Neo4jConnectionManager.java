@@ -370,6 +370,7 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         }
     }
 
+
     //UPDATE
     public void updateApartmentAverageReviewScore(String apartmentId) {
         try (Session session = driver.session()) {
@@ -474,8 +475,7 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
         }
     }
 
-    public boolean removeApartment(String apartmentId)
-    {
+    public boolean removeApartment(String apartmentId) {
         try (Session session = driver.session())
         {
             session.writeTransaction((TransactionWork<Void>) tx -> {
@@ -655,7 +655,7 @@ public class Neo4jConnectionManager extends ConnectionManager implements AutoClo
             session.writeTransaction((TransactionWork<Void>) tx -> {
                 tx.run("MATCH (u:User {email: $email})-[r:REVIEW]->(a:Apartment {apartmentId: $apartmentId}) " +
                                 "WHERE r.comment = $comment AND r.score = $score AND r.date = $timestamp " +
-                                "DELETE r",
+                                "DETACH DELETE r",
                         parameters("email", review.getUserEmail(), "apartmentId", review.getApartmentId(), "comment", review.getComments(), "score", review.getRating(), "timestamp", review.getTimestamp().toString()));
                 return null;
             });

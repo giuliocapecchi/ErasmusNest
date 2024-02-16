@@ -16,6 +16,7 @@ import javafx.scene.layout.VBox;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class ReviewsController extends Controller{
 
@@ -168,7 +169,29 @@ public class ReviewsController extends Controller{
             timestampLabel.setAlignment(Pos.CENTER);
             timestampLabel.setMaxWidth(Double.MAX_VALUE);
             timestampLabel.setWrapText(true);
-            viewApartmentVBox.getChildren().addAll(timestampLabel, viewApartmentButton);
+
+            if(getSession().getUser().isAdmin()){
+                System.out.println("User is admin");
+                Button removeButton = new Button("Remove Review");
+                removeButton.setOnAction(e -> {
+                    Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
+                    confirmationAlert.setTitle("Confirm Review Removal");
+                    confirmationAlert.setHeaderText("Confirm Review Removal");
+                    confirmationAlert.setContentText("Are you sure you want to remove this review?");
+                    Optional<ButtonType> result = confirmationAlert.showAndWait();
+                    if (result.isPresent() && result.get() == ButtonType.OK) { // admin confirmed the removal of the review
+                        getNeo4jConnectionManager().removeReview(review);
+                        getNeo4jConnectionManager().updateApartmentAverageReviewScore(review.getApartmentId());
+                        printReviews();
+                    } else { // admin cancelled the removal of the review
+                        System.out.println("Review removal declined by admin.");
+                    }
+                });
+                viewApartmentVBox.getChildren().addAll(timestampLabel, viewApartmentButton, removeButton);
+            }else{
+                System.out.println("User is not admin");
+                viewApartmentVBox.getChildren().addAll(timestampLabel, viewApartmentButton);
+            }
             viewApartmentVBox.setAlignment(Pos.CENTER);
             viewApartmentVBox.prefWidthProperty().bind(reviewHBox.widthProperty().multiply(viewApartmentVBoxWidthRatio));
 
@@ -183,11 +206,6 @@ public class ReviewsController extends Controller{
 
             // Adding the apartment entry to the main VBox
             reviewsVBox.getChildren().add(reviewHBox);
-            Button removeButton = new Button("Remove Review");
-            removeButton.setOnAction(e -> {
-                getNeo4jConnectionManager().removeReview(review);
-                printReviews();
-            });
             pageNumber.setText("Page Number: "+page.toString());
         }
         if(reviews.size() < elementsPerPage){
