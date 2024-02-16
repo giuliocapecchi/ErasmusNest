@@ -10,18 +10,15 @@ import it.unipi.erasmusnest.graphicmanagers.AlertDialogGraphicManager;
 import it.unipi.erasmusnest.model.Apartment;
 import it.unipi.erasmusnest.model.User;
 import javafx.geometry.Point2D;
-import org.bson.BsonNull;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 
 import static com.mongodb.client.model.Aggregates.match;
 import static com.mongodb.client.model.Filters.*;
-import static com.mongodb.client.model.Projections.*;
 
 public class MongoConnectionManager extends ConnectionManager{
 
@@ -65,7 +62,7 @@ public class MongoConnectionManager extends ConnectionManager{
                         }
                         houses.add(casa);
                     }
-                    user.setHouses(houses);
+                    user.setApartments(houses);
                 }
             }
         }

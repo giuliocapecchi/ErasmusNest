@@ -20,45 +20,33 @@ import java.util.Objects;
 public class ReviewsController extends Controller{
 
     @FXML
-    HBox averageReviewScoreHBox;
+    private HBox averageReviewScoreHBox;
     @FXML
-    ImageView ratingImage1;
-
+    private ImageView ratingImage1;
     @FXML
-    ImageView ratingImage2;
-
+    private ImageView ratingImage2;
     @FXML
-    ImageView ratingImage3;
-
+    private ImageView ratingImage3;
     @FXML
-    ImageView ratingImage4;
-
+    private ImageView ratingImage4;
     @FXML
-    ImageView ratingImage5;
-
+    private ImageView ratingImage5;
     @FXML
-    HBox hboxTitle;
-
+    private HBox hboxTitle;
     @FXML
-    ScrollPane scrollPane;
-
+    private ScrollPane scrollPane;
     @FXML
-    Button previousPageButton;
-
+    private Button previousPageButton;
     @FXML
-    TextField pageNumber;
-
+    private TextField pageNumber;
     @FXML
-    Button nextPageButton;
-
+    private Button nextPageButton;
     @FXML
-    VBox reviewsVBox;
-
+    private VBox reviewsVBox;
     @FXML
-    MenuButton changeFiltersButton;
-
+    private MenuButton changeFiltersButton;
     @FXML
-    TextField title;
+    private TextField title;
     private Integer selectedFilter = 0;
 
     private Integer page = 1;
@@ -131,7 +119,7 @@ public class ReviewsController extends Controller{
             double emailWidthRatio = 0.2; // 20% of the width
             double ratingWidthRatio = 0.1; // 20% of the width
             double commentsWidthRatio = 0.55; // 60% of the width
-            double viewHouseVBoxWidthRatio = 0.15; // 20% of the width
+            double viewApartmentVBoxWidthRatio = 0.15; // 20% of the width
 
             String dividerColor = "-fx-border-color: #aeb000;";
 
@@ -166,12 +154,12 @@ public class ReviewsController extends Controller{
             scrollPane.setContent(commentsLabel);
             scrollPane.setFitToWidth(true);
 
-            // Timestamp & ViewHouseButton
-            VBox viewHouseVBox = new VBox();
-            Button viewHouseButton = new Button("View House");
-            viewHouseButton.prefWidthProperty().bind(viewHouseVBox.widthProperty().multiply(0.9));
-            viewHouseButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 12px;");
-            viewHouseButton.setOnAction(e -> {
+            // Timestamp & ViewApartmentButton
+            VBox viewApartmentVBox = new VBox();
+            Button viewApartmentButton = new Button("View Apartment");
+            viewApartmentButton.prefWidthProperty().bind(viewApartmentVBox.widthProperty().multiply(0.9));
+            viewApartmentButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 12px;");
+            viewApartmentButton.setOnAction(e -> {
                 getSession().getApartment().setId(review.getApartmentId());
                 super.changeWindow("apartment");
             });
@@ -180,17 +168,17 @@ public class ReviewsController extends Controller{
             timestampLabel.setAlignment(Pos.CENTER);
             timestampLabel.setMaxWidth(Double.MAX_VALUE);
             timestampLabel.setWrapText(true);
-            viewHouseVBox.getChildren().addAll(timestampLabel, viewHouseButton);
-            viewHouseVBox.setAlignment(Pos.CENTER);
-            viewHouseVBox.prefWidthProperty().bind(reviewHBox.widthProperty().multiply(viewHouseVBoxWidthRatio));
+            viewApartmentVBox.getChildren().addAll(timestampLabel, viewApartmentButton);
+            viewApartmentVBox.setAlignment(Pos.CENTER);
+            viewApartmentVBox.prefWidthProperty().bind(reviewHBox.widthProperty().multiply(viewApartmentVBoxWidthRatio));
 
             // Adding elements to the horizontal box
-            reviewHBox.getChildren().addAll(apartmentNameVBox, ratingLabel, scrollPane, viewHouseVBox);
+            reviewHBox.getChildren().addAll(apartmentNameVBox, ratingLabel, scrollPane, viewApartmentVBox);
             reviewHBox.setAlignment(Pos.CENTER);
             VBox.setMargin(emailLabel, new Insets(5.0, 5.0, 5.0, 5.0));
             HBox.setMargin(ratingLabel, new Insets(5.0, 5.0, 5.0, 5.0));
             VBox.setMargin(commentsLabel, new Insets(5.0, 5.0, 5.0, 5.0));
-            VBox.setMargin(viewHouseButton, new Insets(5.0, 5.0, 5.0, 5.0));
+            VBox.setMargin(viewApartmentButton, new Insets(5.0, 5.0, 5.0, 5.0));
             VBox.setMargin(timestampLabel, new Insets(5.0, 5.0, 5.0, 5.0));
 
             // Adding the apartment entry to the main VBox

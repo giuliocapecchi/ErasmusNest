@@ -1,7 +1,6 @@
 package it.unipi.erasmusnest.model;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class User {
@@ -72,12 +71,12 @@ public class User {
         this.studyField = studyField;
     }
 
-    public List<Apartment> getHouses()
+    public List<Apartment> getApartments()
     {
         return houses;
     }
 
-    public void setHouses(List<Apartment> houses)
+    public void setApartments(List<Apartment> houses)
     {
         this.houses = houses;
     }

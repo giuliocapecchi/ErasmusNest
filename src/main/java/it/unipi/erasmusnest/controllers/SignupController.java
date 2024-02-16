@@ -13,31 +13,22 @@ public class SignupController extends Controller{
 
     @FXML
     private GridPane gridPane;
-
     @FXML
     private PasswordField passwordField;
-
     @FXML
     private PasswordField confirmPasswordField;
-
     @FXML
     private EmailField emailField;
-
     @FXML
     private TextField nameField;
-
     @FXML
     private TextField surnameField;
-
     @FXML
-    TextFlow errorTextFlow;
-
+    private TextFlow errorTextFlow;
     @FXML
     private Button signupButton;
-
     @FXML
     private Button backButton;
-
     @FXML
     private ComboBox<String> studiesComboBox;
 
@@ -105,8 +96,7 @@ public class SignupController extends Controller{
         utente.setName(nameField.getText());
         utente.setSurname(surnameField.getText());
         String password = passwordField.getText().trim();
-        //TODO : scommentare per fare l'hash della password. Duale alla verifica che si trova nella login controller
-       // String password = BCrypt.hashpw(password, BCrypt.gensalt(12));
+
         utente.setPassword(password);
         utente.setStudyField(studiesComboBox.getValue());
         // Aggiungere citta di interesse

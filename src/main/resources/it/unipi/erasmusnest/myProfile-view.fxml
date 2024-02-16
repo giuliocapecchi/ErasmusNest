@@ -20,7 +20,7 @@
             <VBox>
                 <Accordion fx:id="accordion" expandedPane="$infoPane" >
                     <panes>
-                        <TitledPane fx:id="infoPane" text="My information" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ff6200;">
+                        <TitledPane text="My information" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ff6200;">
                             <ScrollPane fitToWidth="true" fitToHeight="true" hbarPolicy="NEVER">
                                 <VBox fx:id="personalInfoVbox" spacing="10">
                                     <padding>
@@ -102,7 +102,7 @@
                                     <padding>
                                         <Insets bottom="20" left="20" right="20" top="20" />
                                     </padding>
-                                    <Button fx:id="uploadHouseButton" onAction="#onUploadHouseButtonClick" style="-fx-background-color: orange; -fx-border-color: red; -fx-border-width: 1px;" text="Upload new apartment" />
+                                    <Button onAction="#onUploadApartmentButtonClick" style="-fx-background-color: orange; -fx-border-color: red; -fx-border-width: 1px;" text="Upload new apartment" />
                                     <!-- Qui inizia la sezione modificata -->
                                     <VBox fx:id="apartmentsContainer" spacing="10">
                                         <!-- Qui verranno aggiunti dinamicamente gli HBox per ogni appartamento -->

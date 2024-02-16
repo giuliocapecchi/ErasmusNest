@@ -1,7 +1,6 @@
 package it.unipi.erasmusnest.controllers;
 
 import it.unipi.erasmusnest.model.Apartment;
-import it.unipi.erasmusnest.model.Session;
 import it.unipi.erasmusnest.model.User;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -20,9 +19,9 @@ import java.util.Objects;
 public class ProfileController extends Controller{
 
     @FXML
-    ToolBar toolBar;
+    private ToolBar toolBar;
     @FXML
-    Button backToSearch;
+    private Button backToSearch;
     @FXML
     private Label pageTitle;
     @FXML
@@ -34,7 +33,7 @@ public class ProfileController extends Controller{
     @FXML
     private Label studyFieldLabel;
     @FXML
-    public VBox housesContainer;
+    public VBox apartmentsContainer;
     @FXML
     private VBox suggestedOuterBox;
     @FXML
@@ -51,7 +50,6 @@ public class ProfileController extends Controller{
 
     @FXML
     private void initialize() {
-
 
         if (getSession().getOtherProfileMail() != null) {
 
@@ -77,14 +75,12 @@ public class ProfileController extends Controller{
             else
                 studyFieldLabel.setText(utente.getStudyField());
 
-
             //Adesso si deve popolare la vbox per le case dell'utente
-            List<Apartment> userHouses = utente.getHouses();
+            List<Apartment> userApartments = utente.getApartments();
             // Recupera gli appartamenti dell'utente e li aggiunge al VBox apartmentsContainer
-            if (userHouses != null && !userHouses.isEmpty()) {
-                for (Apartment apartment : userHouses) {
-                    //QUI TUTTO CORRETTO
-                    // HBox apartmentBox = new HBox(10);
+            if (userApartments != null && !userApartments.isEmpty()) {
+                for (Apartment apartment : userApartments) {
+
                     HBox apartmentBox = new HBox();
 
                     ImageView apartmentImage = new ImageView();
@@ -123,14 +119,14 @@ public class ProfileController extends Controller{
 
                     //Now add the apartment image and button to the HBox
                     apartmentBox.getChildren().addAll(apartmentImage, apartmentButton);
-                    housesContainer.getChildren().add(apartmentBox); // This should add the apartment to the UI
+                    apartmentsContainer.getChildren().add(apartmentBox); // This should add the apartment to the UI
                     if(Objects.equals(getPreviousWindowName(), "homepage")
                             || Objects.equals(getPreviousWindowName(), "profile")) {
                         toolBar.getItems().remove(backToSearch);
                     }
                 }
             } else {
-                housesContainer.getChildren().clear();
+                apartmentsContainer.getChildren().clear();
             }
         }
     }

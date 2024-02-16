@@ -21,7 +21,7 @@ import java.util.Objects;
 public class MyProfileController extends Controller {
 
     @FXML
-    Button updateCitiesOfInterestButton;
+    private Button updateCitiesOfInterestButton;
     @FXML
     private VBox personalInfoVbox;
     @FXML
@@ -29,31 +29,29 @@ public class MyProfileController extends Controller {
     @FXML
     private TitledPane cityTitlePane;
     @FXML
-    VBox apartmentsContainerVBox;
+    private VBox apartmentsContainerVBox;
     @FXML
-    VBox apartmentsContainer;
+    private VBox apartmentsContainer;
     @FXML
-    Label emailLabel;
+    private Label emailLabel;
     @FXML
-    Label nameLabel;
+    private Label nameLabel;
     @FXML
-    Label lastNameLabel;
+    private Label lastNameLabel;
     @FXML
-    Button uploadHouseButton;
+    private PasswordField passwordField; // Campo password
     @FXML
-    PasswordField passwordField; // Campo password
+    private Button modifyPasswordButton; // Bottone per la modifica della password
     @FXML
-    Button modifyPasswordButton; // Bottone per la modifica della password
-    @FXML
-    VBox passwordChangeBox; // Banner/pop-up per la modifica della password
+    private VBox passwordChangeBox; // Banner/pop-up per la modifica della password
     @FXML
     private VBox passwordChangeOuterBox;
     @FXML
-    PasswordField newPasswordField; // Campo per la nuova password
+    private PasswordField newPasswordField; // Campo per la nuova password
     @FXML
-    PasswordField confirmNewPasswordField; // Campo per la conferma della nuova password
+    private PasswordField confirmNewPasswordField; // Campo per la conferma della nuova password
     @FXML
-    Label passwordErrorLabel; // Etichetta per visualizzare gli errori
+    private Label passwordErrorLabel; // Etichetta per visualizzare gli errori
     @FXML
     private ComboBox<String> studyFieldComboBox;
     @FXML
@@ -67,8 +65,6 @@ public class MyProfileController extends Controller {
     private TitledPane incomingReservationPane;
     @FXML
     private TitledPane favouriteAptsPane;
-    @FXML
-    private TitledPane infoPane;
     @FXML
     private Accordion accordion;
 
@@ -100,7 +96,6 @@ public class MyProfileController extends Controller {
         // Set the password field with asterisks, one for each character
         passwordField.setText("*".repeat(getSession().getUser().getPassword().length()));
 
-
         // Nascondi il banner/pop-up per la modifica della password all'inizio
         passwordChangeBox.setVisible(false);
         passwordChangeOuterBox.setVisible(false);
@@ -121,11 +116,11 @@ public class MyProfileController extends Controller {
         lastNameLabel.setText(utente.getSurname());
         emailLabel.setText(utente.getEmail());
 
-        if(utente.getHouses() != null  && !utente.getHouses().isEmpty()){
+        if(utente.getApartments() != null  && !utente.getApartments().isEmpty()){
             // Recupera gli appartamenti dell'utente e li aggiunge al VBox apartmentsContainer
-            for (Apartment apartment : utente.getHouses())
+            for (Apartment apartment : utente.getApartments())
             {
-                //QUI TUTTO CORRETTO
+
                 HBox apartmentBox = new HBox(10);
                 apartmentBox.setAlignment(Pos.CENTER_LEFT);
 
@@ -234,8 +229,6 @@ public class MyProfileController extends Controller {
     @FXML
     private void onBackButtonClick() {
         passwordChangeOuterBox.setVisible(false);
-        // Puoi anche reimpostare i campi della password se lo desideri, ad esempio:
-        //  oldPasswordField.clear();
         newPasswordField.clear();
         confirmNewPasswordField.clear();
         onModifyPasswordButtonClick();
@@ -279,9 +272,8 @@ public class MyProfileController extends Controller {
                 onModifyPasswordButtonClick();
 
                 new RedisMongoConsistencyManager(getRedisConnectionManager(), getMongoConnectionManager()).updateUserPasswordOnMongo(getSession().getUser().getEmail(), newPassword, getSession().getReservationsApartmentIds());
-                // TODO jacopo here we should update the password on MongoDB too starting the thread
 
-            }else{ // aggiorno su Mongo e basta / TODO : eventual consistency da gestire qui! La password rimane solo su Redis per ora
+            }else{ // aggiorno su Mongo e basta
                 System.out.println("Password non aggiornata su Redis perchè non trovata la chiave. La aggiorno su MongoDB");
                 // per come è ora il codice, su mongo la password viene aggiornata a priori (errore???)
                 if(getMongoConnectionManager().updatePassword(getSession().getUser().getEmail(), newPassword)){
@@ -338,8 +330,8 @@ public class MyProfileController extends Controller {
         citiesVBox.getChildren().add(cityTitlePane);
     }
 
-    public void onUploadHouseButtonClick() {
-        super.changeWindow("uploadHouse");
+    public void onUploadApartmentButtonClick() {
+        super.changeWindow("uploadApartment");
     }
 
     public void onApartmentView(String apartmentId) {
@@ -361,7 +353,7 @@ public class MyProfileController extends Controller {
     protected void onReservationsMyApartmentsButtonClick() {
         // mettere in sessione gli id di tutte le case
         ArrayList<String> ids = new ArrayList<>();
-        for(Apartment apartment : getSession().getUser().getHouses()){
+        for(Apartment apartment : getSession().getUser().getApartments()){
             ids.add(apartment.getId());
         }
         getSession().setMyApartmentsIds(ids);
@@ -374,13 +366,10 @@ public class MyProfileController extends Controller {
 
     public void onFavouritesButtonClick() {
         if(favouriteAptsPane.isExpanded()) {
-            // TODO JACO PARTI DA QUI
+
             favouritesContainerVBox.getChildren().clear();
             System.out.println("Favourites button clicked");
             ArrayList<Apartment> favourites = getNeo4jConnectionManager().getFavourites(getSession().getUser().getEmail());
-            //favouritesLabel.setVisible(true);
-
-
 
             if (favourites == null || favourites.isEmpty()) {
                 Label favouritesLabel = new Label();

@@ -105,7 +105,7 @@ public class ModifyAparmentController extends Controller{
 
     public void onUpdateApartmentButtonClick()
     {
-        //Qua deve sparare la query su MONGO per aggiornare i dati dell'appartamento
+        // query su MONGO per aggiornare i dati dell'appartamento
         String apartmentId = getSession().getApartment().getId();
         Apartment updatedApartment = getMongoConnectionManager().getApartment(apartmentId);
         updatedApartment.setMaxAccommodates(inputAccommodates.getValue());
@@ -133,7 +133,7 @@ public class ModifyAparmentController extends Controller{
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Information Dialog");
             alert.setHeaderText(null);
-            alert.setContentText("House correctly modified.");
+            alert.setContentText("Apartment correctly modified.");
 
             // Aggiungi un pulsante "OK"
             ButtonType okButton = new ButtonType("OK");
@@ -153,7 +153,7 @@ public class ModifyAparmentController extends Controller{
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Information Dialog");
             alert.setHeaderText(null);
-            alert.setContentText("Impossible to correctly modify the house.");
+            alert.setContentText("Impossible to correctly modify the apartment.");
 
             // Aggiungi un pulsante "OK"
             ButtonType okButton = new ButtonType("OK");
@@ -188,7 +188,7 @@ public class ModifyAparmentController extends Controller{
     }
 
     @FXML
-    private void onRemoveHouseButtonClick(ActionEvent actionEvent)
+    private void onRemoveApartmentButtonClick(ActionEvent actionEvent)
     {
         String apartmentId = getSession().getApartment().getId();
         boolean remove = new AlertDialogGraphicManager("Delete confirmation","Are you sure you want to remove this apartment?\n",
@@ -203,12 +203,12 @@ public class ModifyAparmentController extends Controller{
                     // Apartment removed from MongoDB
                     // Apartment is still available on Neo4j, apartments view
                     // While someone try to find out more information on apartment view, this'll be removed
-                    alertDialog("House correctly removed");
+                    alertDialog("Apartment correctly removed");
                     super.changeWindow("myProfile");
                 }
                 else
                 {
-                    alertDialog("Impossible to remove house");
+                    alertDialog("Impossible to remove apartment");
                 }
             }
             else

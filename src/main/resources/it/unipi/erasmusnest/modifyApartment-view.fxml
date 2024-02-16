@@ -34,7 +34,7 @@
 
             <VBox fx:id="buttons">
                 <Button fx:id="updateApartment" disable="true" onAction="#onUpdateApartmentButtonClick" text="Update House" />
-                <Button fx:id="removeApartment" onAction="#onRemoveHouseButtonClick" text="Remove House" />
+                <Button fx:id="removeApartment" onAction="#onRemoveApartmentButtonClick" text="Remove House" />
                 <Button onAction="#onGoBackButtonClick" text="Back to Profile" />
             </VBox>
 

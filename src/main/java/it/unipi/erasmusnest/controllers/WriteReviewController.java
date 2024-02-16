@@ -10,26 +10,21 @@ import javafx.scene.text.TextFlow;
 import java.util.ArrayList;
 
 public class WriteReviewController extends Controller{
-    @FXML
-    Label pageTitle;
 
     @FXML
-    Button goBackButton;
-
+    private Label pageTitle;
     @FXML
-    Button goToHomepageButton;
-
+    private Button goBackButton;
     @FXML
-    Button submitButton;
-
+    private Button goToHomepageButton;
     @FXML
-    TextFlow errorTextFlow;
-
+    private Button submitButton;
     @FXML
-    TextArea textArea;
-
+    private TextFlow errorTextFlow;
     @FXML
-    Slider ratingSlider;
+    private TextArea textArea;
+    @FXML
+    private Slider ratingSlider;
 
     @FXML
     private void initialize() {

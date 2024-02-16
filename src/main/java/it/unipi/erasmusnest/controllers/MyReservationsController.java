@@ -107,9 +107,6 @@ public class MyReservationsController extends Controller {
         reservationHBox.minHeightProperty().bind(super.getRootPane().heightProperty().multiply(0.2));
         reservationHBox.maxHeightProperty().bind(super.getRootPane().heightProperty().multiply(0.2));
 
-        //VBox imageVBox = new VBox();
-        //imageVBox.setAlignment(Pos.CENTER_LEFT);
-
         VBox cityVBox = new VBox();
         cityVBox.setAlignment(javafx.geometry.Pos.CENTER);
         VBox stateVBox = new VBox();
@@ -152,11 +149,9 @@ public class MyReservationsController extends Controller {
         buildLabels(stateVBox, reservation, userType);
         buildButtons(buttonsVBox, reservation, userType, msgPeriod);
 
-        //imageVBox.getChildren().add(imageView);
         cityVBox.setSpacing(10);
         cityVBox.getChildren().addAll(city, period);
 
-        //imageVBox.prefWidthProperty().bind(reservationHBox.widthProperty().multiply(0.5));
         cityVBox.prefWidthProperty().bind(reservationHBox.widthProperty().multiply(0.5));
         stateVBox.prefWidthProperty().bind(reservationHBox.widthProperty().multiply(0.5));
         buttonsVBox.prefWidthProperty().bind(reservationHBox.widthProperty().multiply(0.5));

@@ -46,7 +46,7 @@
                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                   </VBox.margin>
                </Button>
-                    <VBox fx:id="housesContainer" spacing="10">
+                    <VBox fx:id="apartmentsContainer" spacing="10">
                         <padding>
                             <Insets top="20" />
                         </padding>
