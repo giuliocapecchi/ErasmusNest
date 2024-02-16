@@ -67,6 +67,8 @@ public class MyProfileController extends Controller {
     private TitledPane favouriteAptsPane;
     @FXML
     private Accordion accordion;
+    @FXML
+    private TitledPane infoPane;
 
     private String selectedStudyField;
     private ArrayList<String> citiesOfInterestInNeo4j = new ArrayList<>();
