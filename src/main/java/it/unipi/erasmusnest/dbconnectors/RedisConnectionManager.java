@@ -230,7 +230,7 @@ public class RedisConnectionManager extends ConnectionManager{
             jedis.hset(key, hash);
 
             // compute the seconds between now and trashWeeksInterval
-            long seconds = LocalDateTime.now().until(LocalDateTime.now().plusWeeks(trashWeeksInterval), ChronoUnit.SECONDS);
+            long seconds = getGarbageTimeInSeconds();
             // set expiration time on the key equal to the seconds
             jedis.expire(key, seconds);
 
@@ -257,7 +257,7 @@ public class RedisConnectionManager extends ConnectionManager{
             jedis.hset(key, "reservedApartments",String.join(",", apartmentsIds));
 
             // compute the seconds between now and trashWeeksInterval
-            long seconds = LocalDateTime.now().until(LocalDateTime.now().plusWeeks(trashWeeksInterval), ChronoUnit.SECONDS);
+            long seconds = getGarbageTimeInSeconds();
             // set expiration time on the key equal to the seconds
             jedis.expire(key, seconds);
 
@@ -396,7 +396,7 @@ public class RedisConnectionManager extends ConnectionManager{
 
         try (JedisCluster jedis = createJedisCluster()) {
 
-            long maxSeconds = LocalDateTime.now().until(LocalDateTime.now().plusWeeks(trashWeeksInterval), ChronoUnit.SECONDS);
+            long maxSeconds = getGarbageTimeInSeconds();
 
             for(Reservation reservation : reservations) {
                 String subKey = getSubKey(reservation);
@@ -447,7 +447,7 @@ public class RedisConnectionManager extends ConnectionManager{
             hash.put("state", "rejected"); // pending | approved | rejected | expired | reviewed
             jedis.hset(subKey, hash);
 
-            long seconds = LocalDateTime.now().until(LocalDateTime.now().plusWeeks(trashWeeksInterval), ChronoUnit.SECONDS);
+            long seconds = getGarbageTimeInSeconds();
             jedis.expire(subKey, seconds);
 
             // leggo da redis gli apartmentIds dell'utente
@@ -534,6 +534,10 @@ public class RedisConnectionManager extends ConnectionManager{
         return false;
     }
 
+    private long getGarbageTimeInSeconds(){
 
+        return LocalDateTime.now().until(LocalDateTime.now().plusWeeks(trashWeeksInterval), ChronoUnit.SECONDS);
+
+    }
 
 }
