@@ -220,6 +220,7 @@ public class MyReservationsController extends Controller {
                     deleteButton.setStyle("-fx-background-color: #019fe1; -fx-text-fill: #ffffff; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 5px;");
                     deleteButton.setOnAction(event -> {
                         getSession().getApartment().setId(reservation.getApartmentId());
+                        getSession().setCity(reservation.getCity());
                         changeWindow("writeReview");
                     });
                     buttonsVBox.getChildren().add(deleteButton);

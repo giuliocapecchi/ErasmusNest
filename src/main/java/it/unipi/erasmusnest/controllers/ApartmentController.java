@@ -420,7 +420,7 @@ public class ApartmentController extends Controller{
             if(!getRedisConnectionManager().isApartmentReserved(getSession().getApartment().getId()))
             {
                 // non ci sono prenotazioni attive, si può eliminare la casa
-                if(getMongoConnectionManager().removeApartment(getSession().getApartment().getId(), getSession().getUser().getEmail()))
+                if(getMongoConnectionManager().removeApartment(getSession().getApartment().getId(), getSession().getApartment().getHostEmail()))
                 {
                     // Apartment removed from MongoDB
                     // Apartment is still available on Neo4j, apartments view
