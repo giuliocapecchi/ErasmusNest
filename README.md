@@ -21,7 +21,10 @@ Extensive information can be found in the [report](ErasmusNest_Report_LargeScale
 - **Booking Management**: Users can view and manage their active bookings, including dates, price, and status.
 - **Profile Management**: Users can update their personal information, including field of study and city of interest.
 
-<img src="assets/signup.png" alt="Signup" style="border-radius: 10px;">
+<p align="center">
+  <img src="assets/logo.png" alt="Signup" width="100">
+</p>
+
 
 ## License
 
