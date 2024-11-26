@@ -1,5 +1,10 @@
 # ErasmusNest
 
+<p align="center">
+  <img src="assets/logo.png" alt="Signup" width="100">
+</p>
+
+
 ErasmusNest is an application designed to assist Erasmus students in finding accommodation and help property owners advertise their listings. The app features a review system and personalized recommendations based on users' likes and preferences. Its main strenght resides in its high scalability functionalities, mainly because of the usage of :
 
 - **Redis** for caching the login of the users and their reservations
@@ -20,11 +25,6 @@ Extensive information can be found in the [report](ErasmusNest_Report_LargeScale
 - **Personalized Recommendations**: Users receive personalized apartment suggestions based on their likes and preferences.
 - **Booking Management**: Users can view and manage their active bookings, including dates, price, and status.
 - **Profile Management**: Users can update their personal information, including field of study and city of interest.
-
-<p align="center">
-  <img src="assets/logo.png" alt="Signup" width="100">
-</p>
-
 
 ## License
 
