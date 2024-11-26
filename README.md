@@ -1,31 +1,32 @@
 # ErasmusNest
 
 <p align="center">
-  <img src="assets/logo.png" alt="Signup" width="100">
+  <img src="assets/logo.png" alt="ErasmusNest Logo" width="100">
 </p>
 
+ErasmusNest is an application designed to help Erasmus students find accommodation while allowing property owners to advertise their listings. The app features a review system and personalized recommendations based on users' preferences and "likes." Its primary strength lies in its high scalability, achieved through the use of the following technologies:
 
-ErasmusNest is an application designed to assist Erasmus students in finding accommodation and help property owners advertise their listings. The app features a review system and personalized recommendations based on users' likes and preferences. Its main strenght resides in its high scalability functionalities, mainly because of the usage of :
+- **Redis**: For caching user logins and reservations, improving performance.
+- **Neo4J**: For managing relationships between users and apartments, leveraging graph database capabilities.
+- **MongoDB**: For storing apartment listings and user data, ensuring flexibility and scalability.
 
-- **Redis** for caching the login of the users and their reservations
-- **Neo4J** for the relations between the users and the apartments
-- **MongoDB** for the apartemnts and the users
+The project was developed as part of the **Large Scale and Multistructured Databases** course @Unipi, in A.A. 2023/2024.
 
-The project was developed during the Large Scale and Multistructured Databases course @Unipi, A.A 2023/2024.
+<p align="center">
+  <img src="assets/apartment_view.png" alt="Apartment view" width="800">
+</p>
 
-<img src="assets/apartment_view.png" alt="Apartment view" style="border-radius: 10px;">
-
-Extensive information can be found in the [report](ErasmusNest_Report_LargeScale.pdf).
+Extensive information on the project can be found in the [final report](ErasmusNest_Report_LargeScale.pdf).
 
 ## Features
 
-- **Apartment Search**: Students can search for apartments based on various filters, such as city, price, number of bathrooms, etc., and view details of available listings.
-- **Reviews**: Users can write reviews for apartments they have stayed in and view reviews left by other users.
-- **Apartment Management**: Property owners can upload new listings, modify existing apartment details, and remove properties.
-- **Personalized Recommendations**: Users receive personalized apartment suggestions based on their likes and preferences.
-- **Booking Management**: Users can view and manage their active bookings, including dates, price, and status.
-- **Profile Management**: Users can update their personal information, including field of study and city of interest.
+- **Apartment Search**: Students can search for apartments using various filters such as city, price, number of bathrooms, and more. Detailed listings are available for each apartment.
+- **Reviews**: Users can leave reviews for apartments they have stayed in, including ratings and comments. They can also view reviews from other users.
+- **Apartment Management**: Property owners can upload new listings, update details of existing properties, and remove listings when necessary.
+- **Personalized Recommendations**: Based on user preferences and "likes," the app provides tailored apartment suggestions to enhance the user experience.
+- **Booking Management**: Users can view and manage their active bookings, including details like dates, price, and booking status.
+- **Profile Management**: Users can update their personal information, such as field of study and city of interest, to receive more relevant apartment recommendations.
 
 ## License
 
-This project is distributed under the APACHE License. See the [LICENSE](LICENSE) file for more details.
+This project is distributed under the **Apache License**. See the [LICENSE](LICENSE) file for more details.
