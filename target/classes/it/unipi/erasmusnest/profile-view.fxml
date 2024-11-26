@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.erasmusnest.controllers.ProfileController">
+    <BorderPane prefHeight="200.0" prefWidth="200.0">
+        <top>
+            <HBox alignment="CENTER_LEFT" style="-fx-background-color: #ff8000">
+                <Label fx:id="pageTitle" style="-fx-font-size: 25px; -fx-text-fill: white; -fx-font-style: italic;">
+                    <HBox.margin>
+                        <Insets bottom="5.0" left="20.0" right="20.0" top="5.0" />
+                    </HBox.margin>
+                </Label>
+                <Button fx:id="followButton" onAction="#seeSuggested" disable="true" text="Follow" />
+                <Button fx:id="removeProfileButton" onAction="#removeUser" disable="true" text="Remove User" />
+            </HBox>
+        </top>
+        <center>
+            <ScrollPane fitToWidth="true" BorderPane.alignment="CENTER">
+            <!-- Parte sinistra con i dettagli dell'utente -->
+                <VBox>
+                    <padding>
+                        <Insets bottom="20" left="20" right="20" top="20" />
+                    </padding>
+                    <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Personal information" wrapText="true" />
+                    <HBox spacing="10">
+                        <Label minWidth="75" style="-fx-font-weight: bold;" text="Email:" />
+                        <Label fx:id="emailLabel" />
+                    </HBox>
+                    <HBox spacing="10">
+                        <Label minWidth="75" style="-fx-font-weight: bold;" text="Name:" />
+                        <Label fx:id="nameLabel" />
+                    </HBox>
+                    <HBox spacing="10">
+                        <Label minWidth="75" style="-fx-font-weight: bold;" text="Surname:" />
+                        <Label fx:id="surnameLabel" />
+                    </HBox>
+                    <HBox spacing="10">
+                        <Label minWidth="75" style="-fx-font-weight: bold;" text="Study field:" />
+                        <Label fx:id="studyFieldLabel" />
+                    </HBox>
+               <Button mnemonicParsing="false" text="Show reviews" onAction="#showReviews">
+                  <VBox.margin>
+                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                  </VBox.margin>
+               </Button>
+                    <VBox fx:id="apartmentsContainer" spacing="10">
+                        <padding>
+                            <Insets top="20" />
+                        </padding>
+                        <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Apartments hosted" wrapText="true" />
+                    </VBox>
+                    <VBox fx:id="suggestedOuterBox" alignment="TOP_CENTER" spacing="10" visible="false">
+                        <VBox fx:id="suggestedVBox" spacing="10">
+                            <padding>
+                                <Insets top="20" />
+                            </padding>
+                            <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Suggested Users" wrapText="true" />
+                        </VBox>
+                    </VBox>
+                </VBox>
+            </ScrollPane>
+        </center>
+        <bottom>
+            <VBox alignment="CENTER_RIGHT" />
+            <ToolBar fx:id="toolBar" nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: orange;" BorderPane.alignment="CENTER">
+                <Button fx:id="backToSearch" onAction="#backToBrowse" text="Go back" />
+                <Button onAction="#backToHomepage" text="Homepage" />
+            </ToolBar>
+        </bottom>
+    </BorderPane>
+</StackPane>

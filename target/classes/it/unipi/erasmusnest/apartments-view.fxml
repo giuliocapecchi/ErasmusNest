@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane fx:id="rootPane" prefHeight="348.0" prefWidth="387.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.erasmusnest.controllers.ApartmentsController">
+    <BorderPane prefHeight="200.0" prefWidth="200.0">
+        <top>
+            <HBox alignment="CENTER_LEFT">
+                <TextField fx:id="title" alignment="CENTER" editable="false" text="Apartments found in "  HBox.hgrow="ALWAYS" />
+                <MenuButton fx:id="changeFiltersButton" text="Filter by">
+                    <items>
+                        <MenuItem text="Positive reviews first" onAction="#handleOption1"/>
+                        <MenuItem text="Most number of reviews first" onAction="#handleOption2"/>
+                        <MenuItem text="Default option" onAction="#handleDefaultOption"/>
+                    </items>
+                </MenuButton>
+            </HBox>
+        </top>
+        <center>
+            <ScrollPane fx:id="scrollPane" fitToWidth="true" prefHeight="178.0" prefWidth="387.0" BorderPane.alignment="CENTER">
+                <!-- The fx:id for VBox is necessary to manipulate it in the controller -->
+                <VBox fx:id="apartmentsVBox" alignment="CENTER" prefWidth="384.0" spacing="10" />
+            </ScrollPane>
+        </center>
+      <bottom>
+          <HBox alignment="CENTER">
+             <Button alignment="CENTER" onAction="#onBackButtonPressed" text="Change location">
+               <HBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="110.0" top="5.0" />
+               </HBox.margin></Button>
+               <TextField fx:id="pageNumber" alignment="CENTER" editable="false" text="Page Number: 1">
+               <HBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </HBox.margin></TextField>
+          <Button fx:id="previousPageButton" onAction="#goToPreviousPage" text="Previous page" BorderPane.alignment="CENTER">
+               <HBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </HBox.margin></Button>
+          <Button fx:id="nextPageButton" onAction="#goToNextPage" text="Next page" BorderPane.alignment="CENTER">
+               <HBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </HBox.margin></Button>
+          </HBox>
+      </bottom>
+    </BorderPane>
+
+</StackPane>

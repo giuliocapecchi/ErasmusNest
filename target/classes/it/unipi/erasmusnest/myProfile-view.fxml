@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane fx:id="rootPane" prefHeight="356.0" prefWidth="423.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.erasmusnest.controllers.MyProfileController">
+    <BorderPane prefHeight="200.0" prefWidth="200.0">
+        <top>
+            <HBox alignment="CENTER_LEFT" style="-fx-background-color: #ff8000">
+                <Label style="-fx-font-size: 25px; -fx-text-fill: white; -fx-font-style: italic;" text="My profile">
+                    <HBox.margin>
+                        <Insets bottom="5.0" left="20.0" right="20.0" top="5.0" />
+                    </HBox.margin>
+                </Label>
+            </HBox>
+        </top>
+        <center>
+
+            <VBox>
+                <Accordion fx:id="accordion" expandedPane="$infoPane" >
+                    <panes>
+                        <TitledPane text="My information" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ff6200;">
+                            <ScrollPane fitToWidth="true" fitToHeight="true" hbarPolicy="NEVER">
+                                <VBox fx:id="personalInfoVbox" spacing="10">
+                                    <padding>
+                                        <Insets bottom="20" left="20" right="20" top="20" />
+                                    </padding>
+                                    <HBox alignment="CENTER_LEFT" spacing="10">
+                                        <Label minWidth="75" style="-fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Name:" />
+                                        <Label fx:id="nameLabel" />
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT" spacing="10">
+                                        <Label minWidth="75" style="-fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Surname:" />
+                                        <Label fx:id="lastNameLabel" />
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT" spacing="10">
+                                        <Label minWidth="75" style="-fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Email:" />
+                                        <Label fx:id="emailLabel" />
+                                        <Button onAction="#onFollowersButtonClick" style="-fx-background-color: orange; -fx-border-color: red; -fx-border-width: 1px;" text="View Followers" />
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT" spacing="10">
+                                        <Label minWidth="75" style="-fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Password:" />
+                                        <PasswordField fx:id="passwordField" editable="false" minWidth="200" text="••••••" />
+                                        <Button fx:id="modifyPasswordButton" onAction="#onModifyPasswordButtonClick" style="-fx-background-color: orange; -fx-border-color: red; -fx-border-width: 1px;" text="Change Password" />
+                                    </HBox>
+                                    <VBox fx:id="passwordChangeOuterBox" alignment="TOP_CENTER" spacing="10" visible="false">
+                                        <VBox fx:id="passwordChangeBox" style="-fx-border-color: red; -fx-border-width: 5px; -fx-padding: 10px; -fx-background-color: white; -fx-background-radius: 5px; -fx-border-radius: 5px;">
+                                            <HBox alignment="CENTER_LEFT" spacing="10">
+                                                <Label minWidth="75" text="New password:" />
+                                                <PasswordField fx:id="newPasswordField" minWidth="200" onKeyReleased="#checkNewPassword" />
+                                            </HBox>
+                                            <HBox alignment="CENTER_LEFT" spacing="10">
+                                                <Label minWidth="75" text="Confirm password:" />
+                                                <PasswordField fx:id="confirmNewPasswordField" minWidth="200" onKeyReleased="#checkNewPassword" />
+                                            </HBox>
+                                            <HBox>
+                                                <Button fx:id="buttonPwdUpdate" disable="true" onAction="#onUpdatePasswordClick" text="Update" />
+                                                <Button onAction="#onBackButtonClick" text="Back" />
+                                            </HBox>
+                                        </VBox>
+                                    </VBox>
+                                    <HBox alignment="CENTER_LEFT" spacing="10">
+                                        <Label minWidth="75" style="-fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Study Field:" />
+                                        <ComboBox fx:id="studyFieldComboBox" minWidth="200" onAction="#onStudyFieldSelectionChanged" />
+                                    </HBox>
+                                    <HBox spacing="10">
+                                        <Label minWidth="75" style="-fx-font-weight: bold; -fx-text-fill: #ff6200;" text="Cities of Interest:">
+                                        <HBox.margin>
+                                            <Insets top="5.0" />
+                                        </HBox.margin>
+                                        </Label>
+                                        <VBox fx:id="citiesVBox" alignment="CENTER">
+                                            <!-- Qui verranno inserite le checkbox -->
+                                            <TitledPane fx:id="cityTitlePane" onMouseClicked="#getCitiesOfInterest" text="Update cities of interest" />
+                                        </VBox>
+                                        <Button fx:id="updateCitiesOfInterestButton" onAction="#onUpdateCitiesOfInterestButtonClick" style="-fx-background-color: orange; -fx-border-color: red; -fx-border-width: 1px;" text="Update" />
+                                    </HBox>
+                                     <HBox.margin>
+                                        <Insets left="10.0" top="50.0" />
+                                     </HBox.margin>
+
+                                </VBox>
+                            </ScrollPane>
+                        </TitledPane>
+
+                        <TitledPane text="My reservations" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ff6200;">
+                            <VBox spacing="10">
+                                <padding>
+                                    <Insets bottom="20" left="20" right="20" top="20" />
+                                </padding>
+                                <Button onAction="#onReservationsButtonClick" style="-fx-background-color: orange; -fx-border-color: red; -fx-border-width: 1px;" text="Go to reservations" />
+                                <HBox.margin>
+                                    <Insets right="60.0" top="50.0" />
+                                </HBox.margin>
+                            </VBox>
+                        </TitledPane>
+
+                        <TitledPane text="My apartments" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ff6200;">
+                            <ScrollPane fitToWidth="true" fitToHeight="true" hbarPolicy="NEVER">
+                                <VBox fx:id="apartmentsContainerVBox" spacing="10">
+                                    <padding>
+                                        <Insets bottom="20" left="20" right="20" top="20" />
+                                    </padding>
+                                    <Button onAction="#onUploadApartmentButtonClick" style="-fx-background-color: orange; -fx-border-color: red; -fx-border-width: 1px;" text="Upload new apartment" />
+                                    <!-- Qui inizia la sezione modificata -->
+                                    <VBox fx:id="apartmentsContainer" spacing="10">
+                                        <!-- Qui verranno aggiunti dinamicamente gli HBox per ogni appartamento -->
+                                    </VBox>
+                                     <HBox.margin>
+                                        <Insets right="60.0" top="50.0" />
+                                     </HBox.margin>
+                                </VBox>
+                            </ScrollPane>
+                        </TitledPane>
+
+                        <TitledPane fx:id="incomingReservationPane" text="Reservations for my apartments" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ff6200;">
+                            <VBox spacing="10">
+                                <padding>
+                                    <Insets bottom="20" left="20" right="20" top="20" />
+                                </padding>
+                                <Button onAction="#onReservationsMyApartmentsButtonClick" style="-fx-background-color: orange; -fx-border-color: red; -fx-border-width: 1px;" text="Go to reservations for my apartments" />
+                                <HBox.margin>
+                                    <Insets right="60.0" top="50.0" />
+                                </HBox.margin>
+                            </VBox>
+                        </TitledPane>
+
+                        <TitledPane fx:id="favouriteAptsPane" text="My favourite ones" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ff6200;" >
+                            <ScrollPane fitToWidth="true" fitToHeight="true" hbarPolicy="NEVER" >
+                                <VBox fx:id="favouritesContainerVBox" spacing="10" >
+                                    <padding>
+                                        <Insets bottom="20" left="20" right="20" top="20" />
+                                    </padding>
+                                    </VBox>
+                            </ScrollPane>
+                        </TitledPane>
+                    </panes>
+                </Accordion>
+
+            </VBox>
+
+        </center>
+        <bottom>
+            <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" prefWidth="256.0" style="-fx-background-color: orange;" BorderPane.alignment="CENTER">
+                <Button onAction="#logoutButtonClick" text="Logout" />
+                <Button onAction="#onBack" text="Homepage" />
+                <Button fx:id="adminButton" onAction="#onAdminView" text="Admin View" visible="false" />
+            </ToolBar>
+        </bottom>
+    </BorderPane>
+</StackPane>

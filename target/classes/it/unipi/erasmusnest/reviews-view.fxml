@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.erasmusnest.controllers.ReviewsController">
+    <BorderPane prefHeight="200.0" prefWidth="200.0">
+        <top>
+            <VBox>
+                <HBox fx:id="hboxTitle" alignment="CENTER_LEFT">
+                    <TextField fx:id="title" alignment="CENTER" editable="false" text="Apartments found in " HBox.hgrow="ALWAYS" />
+                    <MenuButton fx:id="changeFiltersButton" text="Change results order">
+                        <items>
+                            <MenuItem onAction="#handleOption1" text="Review score: Descendent order" />
+                            <MenuItem onAction="#handleOption2" text="Review score: Ascendant order" />
+                            <MenuItem onAction="#handleOption3" text="Review score: Newest first" />
+                            <MenuItem onAction="#handleOption4" text="Review score: Oldest first" />
+                            <MenuItem onAction="#handleDefaultOption" text="Default option" />
+                        </items>
+                    </MenuButton>
+                </HBox>
+                <HBox fx:id="averageReviewScoreHBox" alignment="CENTER" prefHeight="31.0" prefWidth="234.0">
+                    <Label alignment="CENTER" text="Average score:">
+                  <padding>
+                     <Insets bottom="5.0" left="5.0" right="10.0" top="5.0" />
+                  </padding></Label>
+                    <ImageView fx:id="ratingImage1" fitHeight="20" fitWidth="20" preserveRatio="true">
+                        <HBox.margin>
+                            <Insets bottom="5.0" />
+                        </HBox.margin>
+                    </ImageView>
+                    <ImageView fx:id="ratingImage2" fitHeight="20" fitWidth="20" preserveRatio="true">
+                        <HBox.margin>
+                            <Insets bottom="5.0" />
+                        </HBox.margin>
+                    </ImageView>
+                    <ImageView fx:id="ratingImage3" fitHeight="20" fitWidth="20" preserveRatio="true">
+                        <HBox.margin>
+                            <Insets bottom="5.0" />
+                        </HBox.margin>
+                    </ImageView>
+                    <ImageView fx:id="ratingImage4" fitHeight="20" fitWidth="20" preserveRatio="true">
+                        <HBox.margin>
+                            <Insets bottom="5.0" />
+                        </HBox.margin>
+                    </ImageView>
+                    <ImageView fx:id="ratingImage5" fitHeight="20" fitWidth="20" preserveRatio="true">
+                        <HBox.margin>
+                            <Insets bottom="5.0" />
+                        </HBox.margin>
+                    </ImageView>
+                </HBox>
+            </VBox>
+        </top>
+        <center>
+            <ScrollPane fx:id="scrollPane" fitToWidth="true" prefHeight="178.0" prefWidth="387.0" BorderPane.alignment="CENTER">
+                <!-- The fx:id for VBox is necessary to manipulate it in the controller -->
+                <VBox fx:id="reviewsVBox" alignment="CENTER" prefWidth="384.0" spacing="10" />
+            </ScrollPane>
+        </center>
+        <bottom>
+            <HBox alignment="CENTER">
+                <Button alignment="CENTER" onAction="#onGoBackButtonPressed" text="Go back">
+                    <HBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="110.0" top="5.0" />
+                    </HBox.margin></Button>
+                <TextField fx:id="pageNumber" alignment="CENTER" editable="false" text="Page Number: 1">
+                    <HBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                    </HBox.margin></TextField>
+                <Button fx:id="previousPageButton" onAction="#goToPreviousPage" text="Previous page" BorderPane.alignment="CENTER">
+                    <HBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                    </HBox.margin></Button>
+                <Button fx:id="nextPageButton" onAction="#goToNextPage" text="Next page" BorderPane.alignment="CENTER">
+                    <HBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                    </HBox.margin></Button>
+            </HBox>
+        </bottom>
+    </BorderPane>
+
+</StackPane>

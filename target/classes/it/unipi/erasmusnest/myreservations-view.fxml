@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane fx:id="rootPane" prefHeight="348.0" prefWidth="387.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.erasmusnest.controllers.MyReservationsController">
+    <BorderPane prefHeight="200.0" prefWidth="200.0">
+        <top>
+            <HBox alignment="CENTER_LEFT" style="-fx-background-color: #ff8000">
+                <Label style="-fx-font-size: 25px; -fx-text-fill: white; -fx-font-style: italic;" text="Reservations list">
+                    <HBox.margin>
+                        <Insets bottom="5.0" left="20.0" right="20.0" top="5.0" />
+                    </HBox.margin>
+                </Label>
+            </HBox>
+        </top>
+        <center>
+            <ScrollPane fx:id="scrollPane" fitToWidth="true" BorderPane.alignment="CENTER">
+
+                <VBox fx:id="centerVBox" alignment="CENTER" BorderPane.alignment="CENTER" />
+
+            </ScrollPane>
+        </center>
+        <bottom>
+            <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: orange;" BorderPane.alignment="CENTER">
+                <Button onAction="#homepageButtonClick" text="Homepage" />
+                <Button onAction="#profileButtonClick" text="Profile" />
+                <Button onAction="#logoutButtonClick" text="Logout" />
+            </ToolBar>
+        </bottom>
+    </BorderPane>
+
+</StackPane>
